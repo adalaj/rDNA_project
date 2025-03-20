@@ -366,12 +366,11 @@ for (j in 1: nrow(rdna_hg38_dataset_sequences)){
 }
 
 
-#pending
+#
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rloop_and_rdna/human/one_rDNA_seq/output")
-rdna_2018<- fread("rdna_hg38_chr21_2018_dataset_details_v1.csv", header = TRUE, sep = ",")
+rdna_2018<- fread("rdna_hg38_chr21_2018_dataset_details_v2.csv", header = TRUE, sep = ",")
 # select only nucleotide percent and identifier 
 nucleotide<- rdna_2018 %>% select(Name,"A%","G%","C%", "T%")
-nucleotide<- nucleotide[1:8,]
 nucleotide_new<- separate(nucleotide, Name, "Name", sep = "_")
 
 
@@ -381,13 +380,13 @@ nucleotide_new<- separate(nucleotide, Name, "Name", sep = "_")
 
 nucleotide_reshape <- pivot_longer(nucleotide_new, -Name, names_to = "Nucleotide", values_to = "Percent")
 fwrite(nucleotide_reshape,  
-       file= "nucleotide_rdna_hg38_chr21_dataset_sequences_graph_input.csv")
+       file= "nucleotide_rdna_hg38_chr21_dataset_sequences_graph_input2.csv")
 
 #Please note below code do not work, because you can only drop one column 
 #nar_reshape <- pivot_longer(nar, -Name, -Sequences,-Details, names_to = "Variable", values_to = "Value")
 
 nucleotide_reshape$Name <- factor(nucleotide_reshape$Name, 
-                                  levels = c("5'ETS", "18S", "ITS1", "5.8S", "ITS2","28S", "3'ETS", "IGS" ))
+                                  levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2","28S", "3'ETS", "IGS" ))
 
 
 
@@ -396,15 +395,22 @@ nucleotide_reshape$Name <- factor(nucleotide_reshape$Name,
 
 rdna_2018_sequences_nuceotide_distribution<- ggplot(nucleotide_reshape, aes(x = Name, y = Percent, fill = Nucleotide)) + 
   geom_bar(stat= 'identity', color = "black") +
-  theme(axis.text.x = element_text(angle = 45, size = 10)) +
-  labs(title= " Nucleotide distribution percent in human rDNA locus", x= "rDNA region", y= "Nucleotide distribution percent")+
+  theme(axis.text.x = element_text(angle = 45, size = 20, hjust=1)) +
+  labs(title= " Nucleotide distribution percent in human rDNA locus", 
+       subtitle = "KY962518",
+       x= "rDNA region", 
+       y= "Nucleotide distribution percent")+
+  geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 6)+ # Adjusted label positioning
   theme(plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
         text = element_text(size = 30),
         axis.line = element_line(color = "black"),
-        theme(panel.grid = element_blank()),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25)) +  # Center Y-axis title
-  theme(axis.ticks.y = element_line(color = "black"))
+        panel.grid = element_blank(),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+
+
 
 ggsave( "rdna_2018_sequences_nuceotide_distribution.tiff", 
         plot = rdna_2018_sequences_nuceotide_distribution, width=15,height=10, dpi=150)
