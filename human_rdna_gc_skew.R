@@ -1,10 +1,8 @@
 
 
-#Task is to create GC skew for human RDNA locus 
-# and make coorelation with RLFS.
+#Task is to visually show GC skew for human RDNA locus. 
 
-#first make GC for each region and then calculate correlation with RLFS in that region.
-#next, I wanted to take average RLFS length and then calculate GC skew using sliding window.
+#first make GC for each region and then calculate GC skew using sliding window in entire rDNA length .
 
 
 # for first analysis, I already defined a function to calculate GC skew  
@@ -31,6 +29,9 @@ for ( i in 1:nrow(rdna_human)){
 
 selected_gc_skew_data <- attempt1 %>% select(GC_skew_value, norm_GC_skew) 
 rdna_human<- cbind(rdna_human, selected_gc_skew_data)
+# wanted to add cumulative sum of total nucleotides for future 
+
+rdna_human$x_axis <- cumsum(rdna_human$Total_nucleotides)
 fwrite(rdna_human, "rdna_hg38_chr21_2018_dataset_details_v3.csv")
 
 full_length_gc_skew<- ggplot(rdna_human, aes(x = x_axis, y = norm_GC_skew)) +
@@ -67,7 +68,7 @@ full_length_gc_skew_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = nor
         text = element_text(size = 30),
         axis.line = element_line(color = "black"),
         panel.grid = element_blank(),
-        panel.background = element_rect(fill = "white", color = "black"),
+        panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
         axis.text.x = element_text(angle = 45, hjust = 1, size=20))
