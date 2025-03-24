@@ -56,10 +56,10 @@ entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 9026 ] <- "18S 
 
 
 entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 9027  ] <- "ITS1"
-entire_g4s_rdna$v7[entire_g4s_rdna$actual_pG4CS_start > 10096] <- "ITS1 and 5.8S junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 10096] <- "ITS1 and 5.8S junction"
 
 entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 10097 ] <- "5.8S"
-entire_g4s_rdna$v7[entire_g4s_rdna$actual_pG4CS_start > 10253 ] <- "5.8S and ITS2 junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 10253 ] <- "5.8S and ITS2 junction"
 
 entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 10254] <- "ITS2"
 entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 11420 ] <- "ITS2 and 28S junction"
