@@ -53,7 +53,7 @@ Details <- c("1299_3500","3501_7157", "7158_9026", "9027_10096", "10097_10253",
 
 rdna_hg38_dataset<- data.frame(Name, Sequences, Details)
 
-attempt1<- data.frame((matrix(nrow = 0, ncol=5)) )
+attempt1<- data.frame((matrix(nrow = 0, ncol=5)))
 for (j in 1: nrow(rdna_hg38_dataset)){
   a<- nchar (rdna_hg38_dataset[j,2])
   b<- str_count(rdna_hg38_dataset[j,2], "A")
@@ -150,6 +150,7 @@ rdna_2018_sequences_nuceotide_distribution<- ggplot(nucleotide_reshape, aes(x = 
 
 ggsave( "rdna_2018_sequences_nuceotide_distribution.tiff", 
         plot = rdna_2018_sequences_nuceotide_distribution, width=15,height=10, dpi=150)
+
 
 
 
