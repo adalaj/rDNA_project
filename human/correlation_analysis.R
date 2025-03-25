@@ -93,17 +93,8 @@ fwrite(rdna_rlfs_table_filt, "RLFS_KY962518_added_3500nt_IGS_upstream_master_tab
 
 
 # I want to plot average length of RIZ, RLFS and G4s in rdna region 
-# avearge length of RIZ,RLFS and G4s will be compared again similar sliding window of GC skew
+# average length of RIZ,RLFS and G4s will be compared again similar sliding window of GC skew
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
-
-
-entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
-
-avg_g4cs<- round(mean(entire_g4s_rdna$pG4CS_length),2) #23.85
-avg_rlfs<- round(mean(rdna_rlfs_table_filt$length_RLFS),2) #842.89
-avg_riz <- round(mean(rdna_rlfs_table_filt$length_RIZ),2) #17.03
-avg_rez<- round(mean(rdna_rlfs_table_filt$length_REZ),2) #817.38
 
 length_distribution <- data.frame(matrix(nrow = 0, ncol = 6))
 colnames(length_distribution)<- c("rDNA_region", "length_RIZ", "Linker", "length_REZ","length_RLFS", "strand")
@@ -113,7 +104,21 @@ for ( i in unique(rdna_rlfs_table_filt$rDNA_region)){
                 filter (rdna_rlfs_table_filt$rDNA_region == i) %>% 
                 select(rDNA_region, length_RIZ, Linker, length_REZ,length_RLFS, strand)
   length_distribution <- rbind(length_distribution, rdna)
+  
 }
+
+#as we also want to see avlues in 18s and 5.8 we will create new rows
+
+new_rows <- data.frame(rDNA_region= c("18S", "5.8S", "5.8S"),
+                       length_RIZ=c(0, 0, 0),
+                       Linker= c(0, 0, 0),
+                       length_REZ = c(0, 0, 0),
+                       length_RLFS = c(0, 0, 0),
+                       strand = c("+", "+", "-"))
+  
+  
+length_distribution <- rbind(length_distribution, new_rows)
+fwrite(length_distribution, "RLFS_Length_distribution_entire_human_rDNA_master.csv", sep = ",")
 
 template_length<- length_distribution %>% filter(strand == "-")
 nontemplate_length <- length_distribution %>% filter(strand == "+")
@@ -145,47 +150,239 @@ for ( i in 1: length(list_of_data)){
                                                  stringsAsFactors = FALSE))
     
   }
-  fwrite(length_distribution_graph, paste("length_distribution_graph_input_", names(list_of_data)[i], ".csv", sep = ""))
+  fwrite(length_distribution_graph, paste("length_distribution_", names(list_of_data)[i], ".csv", sep = ""))
+  data_long <- length_distribution_graph %>%
+    pivot_longer(cols = -rDNA_region, 
+                 names_to = "Property", 
+                 values_to = "Length")
+  
+  data_long<- data_long %>% mutate(round_length = round(data_long$Length))
+  fwrite(data_long, paste("length_distribution_data_long_graphinput_", names(list_of_data)[i], ".csv", sep = ""))
 }
       
   
-length_distribution_entire_rdna<- fread("length_distribution_graph_input_entire_rDNA_RLFS.csv", header = TRUE, sep = ",")
+#to plot graphs simultaneously:
+
+for(i in names(list_of_data)){
+  filename<- paste("length_distribution_data_long_graphinput_", i, ".csv", sep = "")
+  graph_data<- fread(filename, header = TRUE, sep = ",")
+  graph_data$Property <- factor(graph_data$Property, 
+                                           levels = c("Mean_RLFS_length", 
+                                                      "Mean_RIZ_length", 
+                                                      "Mean_REZ_length",
+                                                      "Mean_linker_length"))
+  
+  graph_data$rDNA_region <- factor(graph_data$rDNA_region, 
+                                              levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                         "ITS2","28S", "3'ETS", "IGS" ))
+  
+  graph<- ggplot(graph_data, aes(x= rDNA_region, y = round_length, fill= Property)) + 
+    geom_bar(stat= "identity", position ="dodge", color = "black") +
+    labs(title= paste(i,"_Length_distribution"), 
+         x= "Human rDNA region", 
+         y= "Length (Rounded to Nearest Integer)", 
+         fill= "Parameter")+
+    scale_y_continuous(breaks= seq(0, 2100, by = 500), limits =c(0,2100))+
+    geom_text(aes(label= round_length), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+    scale_fill_manual(values= c("Mean_RLFS_length"= "darkgrey","Mean_RIZ_length"= "pink", "Mean_linker_length"= "cyan","Mean_REZ_length"= "steelblue"))+
+    #scale_fill_manual(values = combined_colors)+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
+          #panel.grid = element_blank(),
+          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.subtitle = element_text(hjust = 0.5),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"))
+  
+  ggsave(paste(i, "_length_distribution_in_human_rdna.tiff", sep = ""), 
+         plot = graph, width = 18, height = 10, dpi = 150)
+  
+}
 
 
-data_long <- length_distribution_entire_rdna %>%
-  pivot_longer(cols = -rDNA_region, 
-               names_to = "Property", 
-               values_to = "Length")
+#Next, want to make similar length distribution comparison for G4s
+  
+entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
+
+g4s_length_distribution <- data.frame(matrix(nrow = 0, ncol = 3))
+colnames(g4s_length_distribution)<- c("rDNA_region", "length_pG4CS", "strand")
+
+for ( i in unique(entire_g4s_rdna$rDNA_region)){
+  rdna<- entire_g4s_rdna %>% 
+    filter (entire_g4s_rdna$rDNA_region == i) %>% 
+    select(rDNA_region, length_pG4CS, strand)
+  g4s_length_distribution <- rbind(g4s_length_distribution, rdna)
+  
+}
+
+new_rows<- data.table(rDNA_region = c( "Promoter", "ITS1", "18S","18S", "5.8S","5.8S"),
+                      length_pG4CS = c(0, 0, 0,0,0,0),
+                      strand= c("+", "-", "+", "-", "+", "-"))
+
+g4s_length_distribution <- rbind(g4s_length_distribution, new_rows)
+fwrite(g4s_length_distribution, "pG4CS_length_distribution_entire_human_rDNA_master.csv", sep = ",")
+
+g4s_template_length<- g4s_length_distribution %>% filter(strand == "-")
+g4s_nontemplate_length <- g4s_length_distribution %>% filter(strand == "+")
+
+list_of_data<- list(g4s_length_distribution, g4s_template_length, g4s_nontemplate_length)
+names(list_of_data)<- c("entire_rDNA_pG4CS", "template_rDNA_pG4CS", "nontemplate_rDNA_pG4CS")
 
 
-ggplot(data_long, aes(x= rDNA_region, y = Length, fill= Property)) + 
-  geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized RLFS strandwise distribution in the Human rDNA locus", 
-       x= "Human rDNA region", 
-       y= "Normalized RLFS count", 
-       fill= "RLFS strand")+
-  #scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
-  geom_text(aes(label= Length), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
-  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                                  "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
-  #scale_fill_manual(values = combined_colors)+
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
-        #panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
-        plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        panel.grid = element_blank(),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"))
+for ( i in 1: length(list_of_data)){
+  g4s_length_distribution_graph<- data.frame(matrix(nrow = 0, ncol=5))
+  colnames(length_distribution_graph)<- c("rDNA_region", "Mean_pG4CS_length")
+  
+  data_of_interest <- as.data.frame(list_of_data[[i]])
+  for (j in unique(data_of_interest$rDNA_region)) {
+    tmp<- data_of_interest %>% filter(data_of_interest$rDNA_region == j)
+    region_of_interest<- j
+    avg_pG4CS<- round(mean(tmp$length_pG4CS),2)
+    
+    
+    g4s_length_distribution_graph<- rbind(g4s_length_distribution_graph, 
+                                      data.frame(rDNA_region = region_of_interest,
+                                                 Mean_pG4CS_length = avg_pG4CS,
+                                                 stringsAsFactors = FALSE))
+    
+  }
   
   
+  fwrite(g4s_length_distribution_graph, paste("length_distribution_", names(list_of_data)[i], ".csv", sep = ""))
+  data_long <- g4s_length_distribution_graph %>%
+    pivot_longer(cols = -rDNA_region, 
+                 names_to = "Property", 
+                 values_to = "Length")
+  
+  data_long<- data_long %>% mutate(round_length = round(data_long$Length))
+  fwrite(data_long, paste("length_distribution_data_long_graphinput_", names(list_of_data)[i], ".csv", sep = ""))
+}
+
+
+#to plot graphs simultaneously:
+
+for(i in names(list_of_data)){
+  filename<- paste("length_distribution_data_long_graphinput_", i, ".csv", sep = "")
+  graph_data<- fread(filename, header = TRUE, sep = ",")
+  
+  graph_data$rDNA_region <- factor(graph_data$rDNA_region, 
+                                   levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                              "ITS2","28S", "3'ETS", "IGS" ))
+  
+  graph<- ggplot(graph_data, aes(x= rDNA_region, y = round_length, fill= Property)) + 
+    geom_bar(stat= "identity", position ="dodge", color = "black") +
+    labs(title= paste(i,"_length_distribution"), 
+         x= "Human rDNA region", 
+         y= "Length (Rounded to Nearest Integer)", 
+         fill= "Parameter")+
+    scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
+    geom_text(aes(label= round_length), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+    scale_fill_manual(values= c("Mean_pG4CS_length"= "cornflowerblue"))+
+    #scale_fill_manual(values = combined_colors)+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
+          #panel.grid = element_blank(),
+          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.subtitle = element_text(hjust = 0.5),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"))
+  
+  ggsave(paste(i, "_length_distribution_in_human_rdna.tiff", sep = ""), 
+         plot = graph, width = 18, height = 10, dpi = 150)
+  
+}
+
+
+
+#Next, plot length of RIZ and pG4CS next to each other 
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
+
+entire_rlfs<- fread("length_distribution_entire_rDNA_RLFS.csv", sep = ",", header = TRUE)
+entire_riz<- entire_rlfs %>% select(rDNA_region, Mean_RIZ_length)
+colnames(entire_rlfs)<- c("rDNA_region", "length")
+entire_rlfs$non_canonical_str <- "RIZ"
+
+
+entire_g4s<- fread("length_distribution_entire_rDNA_pG4CS.csv", sep = ",", header = TRUE)
+colnames(entire_g4s)<- c("rDNA_region", "length")
+entire_g4s$non_canonical_str<- "pG4CS"
+
+entire_rdna_riz_g4s<- rbind(entire_riz, entire_g4s)
+
+
+
+
+nontemplate_riz<- fread("length_distribution_nontemplate_rDNA_RLFS.csv", sep = ",", header = TRUE)
+nontemplate_riz<- nontemplate_riz %>% select(rDNA_region, Mean_RIZ_length)
+colnames(nontemplate_riz)<- c("rDNA_region", "length")
+nontemplate_riz$non_canonical_str <- "RIZ"
+
+nontemplate_g4s<- fread("length_distribution_nontemplate_rDNA_pG4CS.csv", sep = ",", header = TRUE)
+colnames(nontemplate_g4s)<- c("rDNA_region", "length")
+nontemplate_g4s$non_canonical_str<- "pG4CS"
+
+nontemplate_rdna_riz_g4s<- rbind(nontemplate_riz, nontemplate_g4s)
+
+
+template_riz<- fread("length_distribution_template_rDNA_RLFS.csv", sep = ",", header = TRUE)
+template_riz<- template_riz %>% select(rDNA_region, Mean_RIZ_length)
+colnames(template_riz)<- c("rDNA_region", "length")
+template_riz$non_canonical_str <- "RIZ"
+
+template_g4s<- fread("length_distribution_template_rDNA_pG4CS.csv", sep = ",", header = TRUE)
+colnames(template_g4s)<- c("rDNA_region", "length")
+template_g4s$non_canonical_str<- "pG4CS"
+
+template_rdna_riz_g4s<- rbind(template_riz, template_g4s)
+
+
+data_list<- list(entire_rdna_riz_g4s,nontemplate_rdna_riz_g4s,template_rdna_riz_g4s)
+names(data_list)<- c("entire_rdna_riz_g4s","nontemplate_rdna_riz_g4s","template_rdna_riz_g4s")
+
+for (i in 1:length(data_list)){
+  
+  data <- as.data.frame(data_list[[i]])
+  data$rDNA_region <- factor(data$rDNA_region, 
+                                   levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                              "ITS2","28S", "3'ETS", "IGS" ))
+  data$non_canonical_str <- factor(data$non_canonical_str, 
+                             levels = c("RIZ", "pG4CS"))
+  
+  data<- data %>% mutate(round_length = round(data$length))
+  fwrite(data, paste(names(data_list)[i], "_graphinput.csv", sep = ""), sep = ",")
   
   
+  graph_riz_g4<- ggplot(data, aes(x= rDNA_region, y = length, fill= non_canonical_str)) + 
+    geom_bar(stat= "identity", position ="dodge", color = "black") +
+    labs(title= paste(names(data_list)[i], "_length_distribution", sep = ""), 
+         x= "Human rDNA region", 
+         y= "Length (Rounded to Nearest Integer)", 
+         fill= "Non Canonical structure")+
+    scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
+    geom_text(aes(label= round_length), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+    scale_fill_manual(values= c("RIZ" = "pink", "pG4CS" = "cornflowerblue"))+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 45, hjust=1),
+          panel.grid = element_blank(),
+          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.subtitle = element_text(hjust = 0.5),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"))
   
-  
-  
+  ggsave(paste(names(data_list)[i], "_length_distribution_in_human_rdna.tiff", sep = ""), 
+         plot = graph_riz_g4, width = 18, height = 10, dpi = 150)
+}
+
+
   
 
 
