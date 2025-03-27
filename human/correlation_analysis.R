@@ -91,6 +91,10 @@ rdna_rlfs_table_filt$rDNA_region[rdna_rlfs_table_filt$actual_RLFS_start > 16833 
 fwrite(rdna_rlfs_table_filt, "RLFS_KY962518_added_3500nt_IGS_upstream_master_table_after_rule.csv", sep = ",")
 
 
+# There are 8 parameters which I am considering for correlation heatmap
+# length of RIZ, LINKER, REZ, RLFS, G4S, count of RIZ, counts G4s, GC skew
+
+# there will be three heatmaps total, template and non template
 
 # I want to plot average length of RIZ, RLFS and G4s in rdna region 
 # average length of RIZ,RLFS and G4s will be compared again similar sliding window of GC skew
@@ -383,15 +387,106 @@ for (i in 1:length(data_list)){
 }
 
 
+
   
+# I wanted to try this but it didnt work! 
+
+{
+  #Mainly becuase on X-axis it is counting RIZ and on Y-axis it counting G4. 
+  #and each dot represents the bins. 
+  #Each dot in your scatter plot represents one genomic bin (e.g., 30 bp or 100 bp region, depending on your bin size).
+  
+  #For example:
+    
+  #If you see four dots at (0, y-value) on the x-axis (G4s count = 0), it means that four different bins have zero RIZs but different G4s counts on the y-axis.
+  #This tells you that some bins have G4s without RIZ.
+  
+  #Similarly:
+  #If a dot appears at (x, 0) on the y-axis, it means that there are bins with RIZ but no G4s.
+  #If a dot is at (0,0), it means there are bins with neither G4s nor RIZ
+  
+  #If many dots are clustered around (0,0), most bins have low or no G4s and RIZ.
+  #If dots are spread diagonally, there is a positive correlation (bins with high G4s also tend to have high RIZ).
+  #If dots are all over with no pattern, there’s no strong correlation between G4s and RIZ.
+  
+  
+#On a scatter diagram, the closer the points lie to a straight line, the stronger the linear relationship between two variables. 
+#To quantify the strength of the relationship, we can calculate the correlation coefficient.
+#A value of the correlation coefficient close to +1 indicates a strong positive linear relationship (i.e. one variable increases with the other). 
+#A value close to -1 indicates a strong negative linear relationship (i.e. one variable decreases as the other increases
+#A value close to 0 indicates no linear relationship; however, there could be a nonlinear relationship (a hyperbola type) between the variables
+# refer: https://pmc.ncbi.nlm.nih.gov/articles/PMC374386/
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
+entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
+rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_table_after_rule.csv", header = TRUE, sep = ",") #195
+
+#as total rdna length is 44838
+range(entire_g4s_rdna$actual_pG4CS_start)
+#[1]  2197 44857
+
+range(rlfs$actual_RLFS_start)
+#[1]  2267 43029
+
+bin_size <- c(30)#, 50, 75, 100, 200, 500, 1000)
+cor_results <- data.frame(bin_size = numeric(), rho = numeric(), p_value = numeric())
 
 
 
+for (i in bin_size){
+  bin_size_new<- i +1
+  bin_break <- seq(1, 44857, length.out= bin_size_new)
+
+g4s_hist<- hist(entire_g4s_rdna[["actual_pG4CS_start"]], breaks = bin_break, plot = FALSE)
+riz_hist <- hist(rlfs[["actual_RLFS_start"]], breaks = bin_break, plot = FALSE)
+
+combined_data<- data.frame(
+  bin_midpoints = (head(bin_break,-1) + tail(bin_break,-1))/2,
+  pG4CS_counts = g4s_hist$counts,
+  RIZ_counts = riz_hist$counts
+)
 
 
+fwrite(combined_data, paste("correlation_riz_g4_input_file_bin_size", i,".csv", sep=""), sep=",")
 
 
+print(i)
+print(cor.test(combined_data$pG4CS_counts, combined_data$RIZ_counts, method = "spearman"))
 
+cor_result <- cor.test(combined_data$pG4CS_counts, combined_data$RIZ_counts, method = "spearman")
+
+cor_results <- rbind(cor_results, data.frame(
+  bin_size = i,
+  rho = cor_result$estimate,
+  p_value = cor_result$p.value
+))
+
+
+ggplot(cor_results, aes(x = bin_size, y = rho)) +
+  geom_point() + geom_line() +
+  labs(title = "Spearman's Correlation vs. Bin Size",
+       x = "Bin Size (bp)", y = "Spearman's rho") +
+  theme_minimal()
+
+
+test<- ggplot(combined_data, aes(x = `RIZ_counts`, y = `pG4CS_counts`)) +
+  geom_point(position = position_jitter(width = 2.0, height=0.2)) +
+  geom_smooth(method = "lm", level= 0.95) +
+  labs(x = "riz", y = "g4s", title = paste("Scatter plot of RIZ vs pG4CS")) + 
+  theme_minimal()
+
+# what i see is that rho value increase with decrease in bin size, for example its 0.7 when bins are only 30. 
+# in either case this graph is not helping me to visualise anything or interpret anything. 
+# maybe rdna regionwise will help instead of bins
+
+
+ggsave(paste("correlation_riz_g4_input_file_bin_size", i, ".tiff", sep = ""), 
+       plot = test, width = 18, height = 10, dpi = 150)
+}
+
+}
 
 
 
