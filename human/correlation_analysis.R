@@ -1,11 +1,12 @@
 #Task is to find coorelation between alot of parameters in human 
 
-#1) Correlation between average length of RLFS,RIZ or pG4CS and same length of GC skew strandwise?
-#2) Correlation between RLFS and pG4CS in human rDNA locus (strandwise)
-#3) Correlation between RIZ (m1 and m2) and pG4CS in human rDNA locus (strandwise)
+# There are 8 parameters which I am considering for correlation heatmap
+# length of RIZ, LINKER, REZ, RLFS, G4S, count of RIZ, counts G4s, GC skew
+# there will be three heatmaps total, template and non template
 
 
-# to start with first #1) Correlation between average length of RLFS,RIZ or pG4CS and same length of GC skew?
+
+# to start with first #1) Calculation of average length of RLFS,RIZ,rex, linker or pG4CS?
 # i need to first get table format of RLFS to get information where RIZ is starting and ending. 
 # find average length of RIZ, RLFS and pG4CS in each subsection of rDNA (as there is nothing found initiating at junction). 
 
@@ -88,18 +89,109 @@ rdna_rlfs_table_filt$rDNA_region[rdna_rlfs_table_filt$actual_RLFS_start > 16832]
 
 rdna_rlfs_table_filt$rDNA_region[rdna_rlfs_table_filt$actual_RLFS_start > 16833 & rdna_rlfs_table_filt$actual_RLFS_start < 46137] <- "IGS"
 
-fwrite(rdna_rlfs_table_filt, "RLFS_KY962518_added_3500nt_IGS_upstream_master_table_after_rule.csv", sep = ",")
+fwrite(rdna_rlfs_table_filt, "RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_rule.csv", sep = ",")
 
 
-# There are 8 parameters which I am considering for correlation heatmap
-# length of RIZ, LINKER, REZ, RLFS, G4S, count of RIZ, counts G4s, GC skew
-
-# there will be three heatmaps total, template and non template
 
 # I want to plot average length of RIZ, RLFS and G4s in rdna region 
 # average length of RIZ,RLFS and G4s will be compared again similar sliding window of GC skew
 
 
+#2) comparing pG4CS count, RIZ count
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
+
+riz_count_entire <- fread ("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+riz_count_entire<- riz_count_entire[!grepl("junction", riz_count_entire$rDNA_region),] #nrow=9
+riz_count_entire$non_canonical_str <- "RIZ"
+colnames(riz_count_entire)<- c("rDNA_region", "count", "norm_count", "non_canonical_str")
+
+
+riz_count_strandwise<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv", sep = ",", header = TRUE)
+riz_count_strandwise$non_canonical_str<- "RIZ"
+colnames(riz_count_strandwise)<- c("rDNA_region", "strand", "count", "norm_count", "non_canonical_str")
+
+riz_nontemplate<-riz_count_strandwise %>% filter(strand == "+") #nrow=9
+riz_template<- riz_count_strandwise %>% filter(strand == "-") #nrow=9
+
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
+
+g4s_count<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_graphinput.csv", sep = ",", header = TRUE)
+g4s_count<- g4s_count[!grepl("junction", g4s_count$rDNA_region),] #nrow=9
+g4s_count$non_canonical_str<- "pG4CS"
+colnames(g4s_count)<- c("rDNA_region", "count", "norm_count", "non_canonical_str")
+
+g4s_count_strandwise <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv", sep = ",", header = TRUE)
+g4s_count_strandwise$non_canonical_str<- "pG4CS"
+colnames(g4s_count_strandwise)<- c("rDNA_region","strand","count", "norm_count", "non_canonical_str")
+
+
+g4s_nontemplate<-g4s_count_strandwise %>% filter(strand == "+") #nrow=9
+g4s_template<- g4s_count_strandwise %>% filter(strand == "-") #nrow=9
+
+
+
+entire_riz_vs_g4s<- rbind(riz_count_entire, g4s_count) #nrow=18
+nontemplate_riz_vs_g4s<- rbind(riz_nontemplate,g4s_nontemplate) #nrow=18
+template_riz_vs_g4s<- rbind(riz_template,g4s_template) #nrow=18
+
+
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
+
+count_list<- list(entire_riz_vs_g4s, template_riz_vs_g4s, nontemplate_riz_vs_g4s)
+names(count_list)<- c("entire_RIZ_vs_pG4CS", "template_RIZ_vs_pG4CS", "nontemplate_RIZ_vs_pG4CS")
+
+for (i in 1:length(count_list)){
+  print(paste("count_distribution_graphinput_", names(count_list)[i], ".csv", sep = ""))
+fwrite(count_list[[i]], paste("count_distribution_graphinput_", names(count_list)[i], ".csv", sep = ""), sep = ",")
+}
+
+
+
+#to plot graphs simultaneously:
+
+for(i in names(count_list)){
+  filename<- paste("count_distribution_graphinput_", i, ".csv", sep = "")
+  graph_data<- fread(filename, header = TRUE, sep = ",")
+  print(paste(i, "_count_distribution_in_human_rdna.tiff", sep = ""))
+  
+  graph_data$rDNA_region <- factor(graph_data$rDNA_region, 
+                                   levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                              "ITS2","28S", "3'ETS", "IGS" ))
+  graph_data$non_canonical_str<- factor(graph_data$non_canonical_str, 
+                                             levels = c("RIZ", "pG4CS"))
+  
+  count_graph<- ggplot(graph_data, aes(x= rDNA_region, y = norm_count, fill= non_canonical_str)) + 
+    geom_bar(stat= "identity", position ="dodge", color = "black") +
+    labs(title= paste(i, "_count_distribution", sep = ""), 
+         x= "Human rDNA region", 
+         y= "Normalized count", 
+         fill= "Non Canonical Structures")+
+    scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.40))+
+    geom_text(aes(label= count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+    scale_fill_manual(values= c("RIZ" = "pink", "pG4CS" = "cornflowerblue"))+
+    #scale_fill_manual(values = combined_colors)+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
+          #panel.grid = element_blank(),
+          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.subtitle = element_text(hjust = 0.5),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"))
+  
+  ggsave(paste(i, "_count_distribution_in_human_rdna.tiff", sep = ""), 
+         plot = count_graph, width = 18, height = 10, dpi = 150)
+  
+           }
+
+
+
+
+# 3) comparing length of RLFS with RIZ, Linker and REZ
 length_distribution <- data.frame(matrix(nrow = 0, ncol = 6))
 colnames(length_distribution)<- c("rDNA_region", "length_RIZ", "Linker", "length_REZ","length_RLFS", "strand")
 
@@ -182,7 +274,7 @@ for(i in names(list_of_data)){
   
   graph<- ggplot(graph_data, aes(x= rDNA_region, y = round_length, fill= Property)) + 
     geom_bar(stat= "identity", position ="dodge", color = "black") +
-    labs(title= paste(i,"_Length_distribution"), 
+    labs(title= paste(i,"_Length_distribution", sep = ""), 
          x= "Human rDNA region", 
          y= "Length (Rounded to Nearest Integer)", 
          fill= "Parameter")+
@@ -207,8 +299,9 @@ for(i in names(list_of_data)){
 }
 
 
-#Next, want to make similar length distribution comparison for G4s
-  
+#4) Next, want to make similar length distribution comparison for G4s
+
+
 entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
 
 g4s_length_distribution <- data.frame(matrix(nrow = 0, ncol = 3))
@@ -304,7 +397,7 @@ for(i in names(list_of_data)){
 
 
 
-#Next, plot length of RIZ and pG4CS next to each other 
+#5) Next, plot length of RIZ and pG4CS next to each other 
 
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
 
@@ -360,7 +453,7 @@ for (i in 1:length(data_list)){
                              levels = c("RIZ", "pG4CS"))
   
   data<- data %>% mutate(round_length = round(data$length))
-  fwrite(data, paste(names(data_list)[i], "_graphinput.csv", sep = ""), sep = ",")
+  fwrite(data, paste("length_distribution_",names(data_list)[i], "_graphinput.csv", sep = ""), sep = ",")
   
   
   graph_riz_g4<- ggplot(data, aes(x= rDNA_region, y = length, fill= non_canonical_str)) + 
@@ -388,7 +481,130 @@ for (i in 1:length(data_list)){
 
 
 
-  
+
+
+
+#6) Make a correlation matrix between 
+
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
+g4s_count<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_graphinput.csv", sep = ",", header = TRUE)
+g4s_count<- g4s_count[!grepl("junction", g4s_count$rDNA_region),] #nrow=9
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
+riz_count_entire <- fread ("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+riz_count_entire<- riz_count_entire[!grepl("junction", riz_count_entire$rDNA_region),] #nrow=9
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
+
+rlfs_length<- fread("length_distribution_entire_rDNA_RLFS.csv")
+pG4CS_length<- fread("length_distribution_entire_rDNA_pG4CS.csv")
+
+
+correlation_entire<- rlfs_length %>% left_join(pG4CS_length, by=join_by(rDNA_region)) #only takes two dataset at a time
+correlation_entire<- correlation_entire %>% left_join(g4s_count, by=join_by(rDNA_region))
+correlation_entire<- correlation_entire %>% left_join(riz_count_entire, by=join_by(rDNA_region))
+
+#factor/levels doesnt matter here
+
+correlation_entire_input<- correlation_entire %>% select(-rDNA_region,-pG4CS_count, -RLFS_count)
+fwrite(correlation_entire_input, "entire_rdna_inputfile_for_correlation_matrix.csv", sep = ",")
+
+install.packages("corrplot")
+library(corrplot)
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
+
+cor_matrix= cor(correlation_entire_input, method = c("spearman"))
+
+fwrite(cor_matrix, "spearman_correlation_matrix_graphinput_entire_human_rdna.csv", sep=",")
+
+png("correlation_plot_entire_human_rdna.png", width = 1600, height = 1200, res=150)
+corrplot(cor_matrix, type = "lower", method = "square", 
+                    addCoef.col = "black",  # Color of correlation coefficient labels
+                    col = colorRampPalette(c("blue", "white", "red"))(200),  # Custom color palette
+                    tl.col = "black",       # Text label color
+                    tl.cex = 1.2,           # Increase text label size
+                    number.cex = 1.2,       # Increase correlation coefficient size
+                    tl.srt = 45,            # Rotate axis labels
+                    title = "Correlation Matrix of Parameters in entire human rDNA (not strandwise)", 
+                    mar=c(0,0,1,0))
+         # Add title
+                         # Adjust margins to accommodate title
+
+dev.off()
+
+
+#prepare for non-template data and template
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
+
+g4s_count_strandwise<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv")
+g4s_count_nontemplate<- g4s_count_strandwise %>% filter(strand == "+")
+g4s_count_template<- g4s_count_strandwise %>% filter(strand == "-")
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
+riz_count_strandwise<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv")
+riz_count_nontemplate<- riz_count_strandwise %>% filter(strand == "+")
+riz_count_template<- riz_count_strandwise %>% filter(strand == "-")
+
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
+
+rlfs_nontemplate<- fread("length_distribution_nontemplate_rDNA_RLFS.csv", header = TRUE, sep = ",")
+rlfs_template<- fread("length_distribution_template_rDNA_RLFS.csv", header = TRUE, sep = ",")
+
+pG4CS_nontemplate<- fread("length_distribution_nontemplate_rDNA_pG4CS.csv", header = TRUE, sep = ",")
+pG4CS_template<- fread("length_distribution_template_rDNA_pG4CS.csv", header = TRUE, sep = ",")
+
+
+correlation_filenames <- list(nontemplate = c("nontemplate"), 
+                              template = c("template"))
+
+for ( i in names(correlation_filenames)){
+  filename<- paste("correlation_",i, sep = "")
+  rlfs_length<- get(paste("rlfs_", i, sep = ""))
+  pG4CS_length<- get(paste("pG4CS_", i, sep = ""))
+  g4s_count<- get(paste("g4s_count_", i, sep = ""))
+  riz_count<- get(paste("riz_count_", i, sep = ""))
+
+  filename<- rlfs_length %>% left_join(pG4CS_length, by=join_by(rDNA_region))
+
+#only takes two dataset at a time
+  filename<- filename %>% left_join(g4s_count, by=join_by(rDNA_region))
+  filename<- filename %>% left_join(riz_count, by=join_by(rDNA_region))
+
+  filename2<- paste(filename, "_input", sep = "")
+  filename2<- filename %>% select(-rDNA_region,-pG4CS_count, -RLFS_count,-strand.x, -strand.y) #bcoz it only recognise numbers, no character needed
+fwrite(filename2, paste(i, "_inputfile_for_correlation_matrix.csv", sep= ""), sep = ",")
+
+
+
+cor_matrix= cor(filename2, method = c("spearman")) #cor needs matrix meaning the row names as to be changed otherwise it will print as 1,2,3 on vertical side
+png(paste("correlation_plot_", i, "human_rdna.png",sep = ""), width = 1600, height = 1200, res=150)
+corrplot(cor_matrix, type = "lower", method = "square", 
+         addCoef.col = "black",  # Color of correlation coefficient labels
+         col = colorRampPalette(c("blue", "white", "red"))(200),  # Custom color palette
+         tl.col = "black",       # Text label color
+         tl.cex = 1.2,           # Increase text label size
+         number.cex = 1.2,       # Increase correlation coefficient size
+         tl.srt = 45,            # Rotate axis labels
+         title = paste("Correlation Matrix of Parameters in", i, "human rDNA",sep=" "), 
+         mar=c(0,0,1,0))
+# Add title
+# Adjust margins to accommodate title
+
+dev.off()
+
+fwrite(cor_matrix, paste("spearman_correlation_matrix_graphinput_",i, ".csv", sep=""), sep=",")
+}
+
+
+
+#make similar for strand specific 
+
+
+
+
 # I wanted to try this but it didnt work! 
 
 {
@@ -421,7 +637,7 @@ setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUnivers
 entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
 
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
-rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_table_after_rule.csv", header = TRUE, sep = ",") #195
+rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_rule.csv", header = TRUE, sep = ",") #195
 
 #as total rdna length is 44838
 range(entire_g4s_rdna$actual_pG4CS_start)
