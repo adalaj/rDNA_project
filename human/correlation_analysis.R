@@ -600,14 +600,160 @@ fwrite(cor_matrix, paste("spearman_correlation_matrix_graphinput_",i, ".csv", se
 
 
 
-#make similar for strand specific 
+#lets make 100 bin size histogram for g4s in riz and see if they show similar trend.
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
+entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
+rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_rule.csv", header = TRUE, sep = ",") #195
+
+#as total rdna length is 44838
+range(entire_g4s_rdna$actual_pG4CS_start) #actual_start ensures adjust the confusion for strand orientation.
+#[1]  2197 44857
+
+range(rlfs$actual_RLFS_start)
+#[1]  2267 43029
+
+bin_size <- c(100)#,30, 50, 75, 100, 200, 500, 1000)
+
+
+
+for (i in bin_size){
+  bin_size_new<- i +1
+  bin_break <- seq(1, 44857, length.out= bin_size_new) # this step is important because it is ensuring consistency across dataset 44857 is the rdna locus
+  #The start and end coordinates of the bins must be identical for both datasets, so that the corresponding bins in both datasets refer to the exact same genomic region.
+  
+  g4s_hist<- hist(entire_g4s_rdna[["actual_pG4CS_start"]], breaks = bin_break, plot = FALSE)
+  riz_hist <- hist(rlfs[["actual_RLFS_start"]], breaks = bin_break, plot = FALSE)
+  
+  combined_data<- data.frame(
+    bin_lower_value= head(bin_break,-1),
+    bin_upper_value=tail(bin_break,-1),
+    bin_midpoints = (head(bin_break,-1) + tail(bin_break,-1))/2,
+    pG4CS_counts = g4s_hist$counts,
+    RIZ_counts = riz_hist$counts
+  )
+  
+  
+  fwrite(combined_data, paste("graph_input_pG4CS_RIZ_bar_graph_", i,"bin.csv", sep=""), sep=",")
+  
+  rdna_bin<- ggplot() + 
+    geom_bar(data = combined_data, 
+             aes(x = bin_midpoints, y = pG4CS_counts, fill = "pG4CS_counts"), 
+             stat = "identity", color = "cornflowerblue", alpha = 0.7) + 
+    geom_bar(data = combined_data, 
+             aes(x = bin_midpoints, y = RIZ_counts, fill = "RIZ_counts"), 
+             stat = "identity", color = "pink", alpha = 0.7) + 
+    geom_point(data = combined_data, 
+               aes(x = bin_midpoints, y = pG4CS_counts), 
+               color = "cornflowerblue") + 
+    geom_smooth(data = combined_data, 
+                aes(x = bin_midpoints, y = pG4CS_counts), 
+                method = "lm", 
+                color = "cornflowerblue", 
+                se = FALSE) + 
+    geom_point(data = combined_data, 
+               aes(x = bin_midpoints, y = RIZ_counts), 
+               color = "pink") + 
+    geom_smooth(data = combined_data, 
+                aes(x = bin_midpoints, y = RIZ_counts), 
+                method = "lm", 
+                color = "pink", 
+                se = FALSE)+
+  
+    scale_x_continuous(breaks = seq(0, 44857, by = 4485.7)) +
+    labs(title= "pG4CS vs RIZ frequency distribution in human rDNA", 
+         x= "Human rDNA region with 100 bins", 
+         y= "Frequency", 
+         fill= "Non Canonical structures")+
+    scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
+    scale_fill_manual(values= c("RIZ_counts" = "pink", "pG4CS_counts" = "cornflowerblue"))+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 45, hjust=1),
+          axis.ticks.x = element_line(color = "black"),
+          panel.grid = element_blank(),
+          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.subtitle = element_text(hjust = 0.5),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"))
+  
+  ggsave(paste("pG4CS_RIZ_bar_graph_human_rdna_in_", i, "bin.tiff", sep = ""), 
+         plot = rdna_bin, width = 18, height = 10, dpi = 150)
+  
+
+
+#scatter plot to show how g4s and RIZ are showing similar trend 
+graph_max_value <- max(max(combined_data$pG4CS_counts), max(combined_data$RIZ_counts))+1
+
+g4_riz<- ggplot(combined_data, aes(x = pG4CS_counts, y = RIZ_counts)) +
+     geom_point(color = "blue") +
+     geom_smooth(method = "lm", se = FALSE, color = "red") +  # Add a trend line
+     labs(title = "Scatter Plot of pG4CS vs RIZ Frequency in human rDNA",
+     x = "pG4CS Frequency",
+     y = "RIZ Frequency") +
+     scale_x_continuous(breaks= seq(0, graph_max_value, by = 3))+
+     scale_y_continuous(breaks= seq(0, graph_max_value, by = 3))+
+     theme_minimal()+
+     theme(axis.text.x = element_text(angle = 45, hjust=1),
+        axis.ticks.x = element_line(color = "black"),
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"))  
+
+ggsave(paste("pG4CS_vs_RIZ_scatter_plot_human_rdna_in_", i, "bin.tiff", sep = ""), 
+       plot = g4_riz, width = 18, height = 10, dpi = 150)
+
+
+riz_g4<- ggplot(combined_data, aes(x = RIZ_counts, y = pG4CS_counts)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +  # Add a trend line
+  labs(title = "Scatter Plot of RIZ vs pG4CS in human rDNA",
+       x = "RIZ Frequency",
+       y = "pG4CS Frequency") +
+  scale_x_continuous(breaks= seq(0, graph_max_value, by = 3))+
+  scale_y_continuous(breaks= seq(0, graph_max_value, by = 3))+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        axis.ticks.x = element_line(color = "black"),
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"))  
+
+ggsave(paste("RIZ_vs_pG4CS_scatter_plot_human_rdna_in_", i, "bin.tiff", sep = ""), 
+       plot = riz_g4, width = 18, height = 10, dpi = 150)
+
+print(paste("RIZ_vs_pg4CS_scatter_plot_correlation_in_", i, "bins", sep = ""))
+
+print(cor.test(combined_data$RIZ_counts, combined_data$pG4CS_counts, method = "spearman")) #or cor.test(combined_data$pG4CS_counts,combined_data$RIZ_counts, method = "spearman") the rho value is same
+}
+#Spearman's rank correlation rho in case of 100 bins
+
+#data:  combined_data$pG4CS_counts and combined_data$RIZ_counts
+#S = 60273, p-value = 9.062e-13
+#alternative hypothesis: true rho is not equal to 0
+#sample estimates:
+     rho 
+#0.638326 
+
+
+##Spearman rank correlation [ρ (rho) or r]: This measures the strength and direction of the association between 2 ranked variables.
 
 
 
 
-# I wanted to try this but it didnt work! 
+#scatter plot interpretation
 
-{
   #Mainly becuase on X-axis it is counting RIZ and on Y-axis it counting G4. 
   #and each dot represents the bins. 
   #Each dot in your scatter plot represents one genomic bin (e.g., 30 bp or 100 bp region, depending on your bin size).
@@ -633,76 +779,8 @@ fwrite(cor_matrix, paste("spearman_correlation_matrix_graphinput_",i, ".csv", se
 #A value close to 0 indicates no linear relationship; however, there could be a nonlinear relationship (a hyperbola type) between the variables
 # refer: https://pmc.ncbi.nlm.nih.gov/articles/PMC374386/
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
-entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
-
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
-rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_rule.csv", header = TRUE, sep = ",") #195
-
-#as total rdna length is 44838
-range(entire_g4s_rdna$actual_pG4CS_start)
-#[1]  2197 44857
-
-range(rlfs$actual_RLFS_start)
-#[1]  2267 43029
-
-bin_size <- c(30)#, 50, 75, 100, 200, 500, 1000)
-cor_results <- data.frame(bin_size = numeric(), rho = numeric(), p_value = numeric())
 
 
-
-for (i in bin_size){
-  bin_size_new<- i +1
-  bin_break <- seq(1, 44857, length.out= bin_size_new)
-
-g4s_hist<- hist(entire_g4s_rdna[["actual_pG4CS_start"]], breaks = bin_break, plot = FALSE)
-riz_hist <- hist(rlfs[["actual_RLFS_start"]], breaks = bin_break, plot = FALSE)
-
-combined_data<- data.frame(
-  bin_midpoints = (head(bin_break,-1) + tail(bin_break,-1))/2,
-  pG4CS_counts = g4s_hist$counts,
-  RIZ_counts = riz_hist$counts
-)
-
-
-fwrite(combined_data, paste("correlation_riz_g4_input_file_bin_size", i,".csv", sep=""), sep=",")
-
-
-print(i)
-print(cor.test(combined_data$pG4CS_counts, combined_data$RIZ_counts, method = "spearman"))
-
-cor_result <- cor.test(combined_data$pG4CS_counts, combined_data$RIZ_counts, method = "spearman")
-
-cor_results <- rbind(cor_results, data.frame(
-  bin_size = i,
-  rho = cor_result$estimate,
-  p_value = cor_result$p.value
-))
-
-
-ggplot(cor_results, aes(x = bin_size, y = rho)) +
-  geom_point() + geom_line() +
-  labs(title = "Spearman's Correlation vs. Bin Size",
-       x = "Bin Size (bp)", y = "Spearman's rho") +
-  theme_minimal()
-
-
-test<- ggplot(combined_data, aes(x = `RIZ_counts`, y = `pG4CS_counts`)) +
-  geom_point(position = position_jitter(width = 2.0, height=0.2)) +
-  geom_smooth(method = "lm", level= 0.95) +
-  labs(x = "riz", y = "g4s", title = paste("Scatter plot of RIZ vs pG4CS")) + 
-  theme_minimal()
-
-# what i see is that rho value increase with decrease in bin size, for example its 0.7 when bins are only 30. 
-# in either case this graph is not helping me to visualise anything or interpret anything. 
-# maybe rdna regionwise will help instead of bins
-
-
-ggsave(paste("correlation_riz_g4_input_file_bin_size", i, ".tiff", sep = ""), 
-       plot = test, width = 18, height = 10, dpi = 150)
-}
-
-}
 
 
 
