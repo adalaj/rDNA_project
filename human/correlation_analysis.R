@@ -608,7 +608,7 @@ entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_det
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/coorelation_and_length_distribution_human/files")
 rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_rule.csv", header = TRUE, sep = ",") #195
 
-#as total rdna length is 44838
+#as total rdna length is 44838 (promoter to IGS)
 range(entire_g4s_rdna$actual_pG4CS_start) #actual_start ensures adjust the confusion for strand orientation.
 #[1]  2197 44857
 
@@ -621,7 +621,7 @@ bin_size <- c(100)#,30, 50, 75, 100, 200, 500, 1000)
 
 for (i in bin_size){
   bin_size_new<- i +1
-  bin_break <- seq(1, 44857, length.out= bin_size_new) # this step is important because it is ensuring consistency across dataset 44857 is the rdna locus
+  bin_break <- seq(1, 45000, length.out= bin_size_new) # this step is important because it is ensuring consistency across dataset 44857 is the rdna locus
   #The start and end coordinates of the bins must be identical for both datasets, so that the corresponding bins in both datasets refer to the exact same genomic region.
   
   g4s_hist<- hist(entire_g4s_rdna[["actual_pG4CS_start"]], breaks = bin_break, plot = FALSE)
@@ -662,7 +662,8 @@ for (i in bin_size){
                 color = "pink", 
                 se = FALSE)+
   
-    scale_x_continuous(breaks = seq(0, 44857, by = 4485.7)) +
+    scale_x_continuous(breaks = c(seq(0, 45000, by = 5000), 44838), 
+                       labels = c(seq(0, 45000, by = 5000), "")) +
     labs(title= "pG4CS vs RIZ frequency distribution in human rDNA", 
          x= "Human rDNA region with 100 bins", 
          y= "Frequency", 
@@ -737,7 +738,22 @@ print(paste("RIZ_vs_pg4CS_scatter_plot_correlation_in_", i, "bins", sep = ""))
 
 print(cor.test(combined_data$RIZ_counts, combined_data$pG4CS_counts, method = "spearman")) #or cor.test(combined_data$pG4CS_counts,combined_data$RIZ_counts, method = "spearman") the rho value is same
 }
-#Spearman's rank correlation rho in case of 100 bins
+
+
+
+#[1] "RIZ_vs_pg4CS_scatter_plot_correlation_in_100bins in seq 1 to 45000
+
+#Spearman's rank correlation rho
+
+#data:  combined_data$RIZ_counts and combined_data$pG4CS_counts
+#S = 65242, p-value = 1.871e-11
+#alternative hypothesis: true rho is not equal to 0
+#sample estimates:
+#      rho 
+#0.6085067 
+
+
+#Spearman's rank correlation rho in case of 100 bins in seq 1 to 44857.
 
 #data:  combined_data$pG4CS_counts and combined_data$RIZ_counts
 #S = 60273, p-value = 9.062e-13
