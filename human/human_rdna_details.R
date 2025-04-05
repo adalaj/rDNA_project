@@ -1,7 +1,14 @@
-##Aim: Find the total nucleotide distribution percent in KY962518_2018 NCBI entry that is for rDNA locus. 
+##Aim: Find the total nucleotide distribution percent in KY962518_2018 NCBI entry that is for human rDNA locus. 
 ## this calculation as been previously done in my earliar code. 
 ##however, after alot of back and forth we redefined the promoter and IGS boundary. 
 ## we simply took 2202 from IGS end side, because these were matching with UCSC hg38 nucleotides and added them to front of 5'ETS. We call them as promoter. 
+## so manually i added 3500 bp form IGS to upstream of 5'ETS 
+
+#in future if you want to avoid manual adding you can use stringr which i did for mouse rDNA refer code mouse_rdna_details.R
+
+
+
+
 
 library(Biostrings)
 library(seqinr)
