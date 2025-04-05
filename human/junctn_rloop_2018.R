@@ -20,8 +20,10 @@ entire_RLFSs_rdna<- fread("KY962518_added_3500nt_IGS_upstream_qmrlfs.out.bed", s
 entire_RLFSs_rdna<- entire_RLFSs_rdna %>% select(1:6)
 colnames(entire_RLFSs_rdna) <- c("GenBank_Accession", "RLFS_start", "RLFS_end", "RLFS_name","score", "strand")
 
-# strand specificty doesnt matter here because we are cropping region of our interest
+# strand specificity doesnt matter here because we are cropping region of our interest
 entire_RLFSs_rdna<- entire_RLFSs_rdna[entire_RLFSs_rdna$RLFS_start >1299 & entire_RLFSs_rdna$RLFS_start < 46137] #195 
+#after 1298 is where the promoter begins and 46137 is where IGS end (48338- promoter length which is 2202=46136)
+
 entire_RLFSs_rdna$rDNA_region <- "junction"
 
 
@@ -32,7 +34,7 @@ entire_RLFSs_rdna$rDNA_region <- "junction"
 entire_RLFSs_rdna<- entire_RLFSs_rdna %>% mutate(actual_rlfs_start = ifelse(entire_RLFSs_rdna$strand == "+", RLFS_start, RLFS_end))
 entire_RLFSs_rdna$RLFS_length<- abs(entire_RLFSs_rdna$RLFS_start-entire_RLFSs_rdna$RLFS_end)
 
-entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 1299 & entire_RLFSs_rdna$actual_rlfs_start < 3500] <- "Promoter"
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 1299 & entire_RLFSs_rdna$actual_rlfs_start < 3501] <- "Promoter"
 sum(entire_RLFSs_rdna$rDNA_region=="Promoter")#13
 
 entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 3500] <- "Promoter and 5'ETS junction"
@@ -173,7 +175,8 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = n
                                   "#818689", "#ECE612", "#E07F80", "#DE9A22")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.text.x = element_blank(), 
+  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
+        axis.ticks.x = element_line(color = "black"), 
         panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
