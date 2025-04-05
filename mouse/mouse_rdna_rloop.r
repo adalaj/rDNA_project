@@ -1,167 +1,337 @@
-##Find rloop in mouse rdna region
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rloop_and_rdna/mouse")
-library(Biostrings)
-library(stringr)
+##i want plot bar graph after the rule for RLFSs that has 5000 bp added to 5ETS.  
+##basically input file will be output_RLFS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt after passing through QmRLFS algorithm.
+
+##the rule: Counting the presence of RLFSs where it is first detected. For example, if RLFSs start towards the
+# end of 5'ETS but stretches to 18S then it will counted under 5'ETS. 
+# if we would have defined boundary in the first place then we would have lost this junction during counting. 
+
+
+
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/mouse/output/QmRLFS")
+
 library(data.table)
 library(tidyverse)
-library(seqinr)
 
 
-#ref Sayers E.W., Bolton E.E., Brister J.R., Canese K., Chan J., Comeau D.C.et al.
-#Database resources of the national center for biotechnology information.
-#Nucleic Acids Res. 2022; 50: D20-D26
+#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
+#QmRLFS-finder.py (version v1.5)
+#run on Fri Apr 04 2025 13:14:27 
+#command line: python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
 
-#Human KY962518.1 (44,838 nt) and mouse Genbank BK000964.3 (45,306 nt) reference rDNA sequences are available from NCBI Genbank (13) and are used in the literature as consensus reference rDNA sequences for their respective species (8, 14, 15, 16)
-
-#I found mouse link https://www.ncbi.nlm.nih.gov/nuccore/BK000964?report=genbank
-#rdna region is in 12, 15, 17,18 and 19 in mouse. I guess the sequency is in chr 17 in mouse ncbi genome assembly.
-
-#I clicked on fasta, then select send to file and hit enter. I renamed from sequence.fasta to BK000964_mouse_rDNA_2013.fasta.
-#BK000964_mouse_rDNA_2013.fastacontains one mouse rDNA repeat from chr17 i believe.
-
-mouse_rDNA<- read.fasta(file = "BK000964_mouse_rDNA_2013.fasta", forceDNAtolower = FALSE, as.string = TRUE) #belongs to package seqinr
-
-#forceDNAtolower false is used to keep dna seq in uppercase, as. string to entire seq as one string
-mouse_rDNA_seq<- mouse_rDNA[[1]]
-nchar(mouse_rDNA_seq)
-#45306
-
-
-#Now i want to separate the rdna1 into subsections described by the authors
-#1..4007- 5’ external transcribed spacer
-#4008..5877 - 18S ribosomal RNA
-#5878..6877 - internal transcribed spacer 1
-#6878..7034 - 5.8S ribosomal RNA
-#7035..8122 - internal transcribed spacer 2
-#8123..12852- 28S ribosomal RNA
-#12853..13403 - 3' external transcribed spacer
-#13404 ..45306 - intergenic spacer; IGS
-
-
-ets5_mouse<- str_sub(mouse_rDNA_seq, start = 1, end = 4007)
-s18_mouse<- str_sub(mouse_rDNA_seq, start= 4008, end = 5877)
-its1_mouse<- str_sub(mouse_rDNA_seq, start= 5878, end = 6877)
-s5.8_mouse <- str_sub(mouse_rDNA_seq, start= 6878, end = 7034)
-its2_mouse<- str_sub(mouse_rDNA_seq, start= 7035, end = 8122)
-s28_mouse<- str_sub(mouse_rDNA_seq, start= 8123, end = 12852)
-ets3_mouse<- str_sub(mouse_rDNA_seq, start= 12853, end = 13403)
-igs_mouse<- str_sub(mouse_rDNA_seq, start= 13404, end = 45306)
-
-
-Name<- c("5'ETS_mouse", "18S_mouse", "ITS1_mouse", "5.8S_mouse", 
-         "ITS2_mouse", "28S_mouse", "3'ETS_mouse", "IGS_mouse")
-
-
-Sequences <- c(ets5_mouse, s18_mouse, its1_mouse, s5.8_mouse, 
-               its2_mouse, s28_mouse, ets3_mouse, igs_mouse)
-
-Details <- c("1_4007", "4008_5877", "5878_6877", "6878_7034",
-             "7035_8122", "8123_12852", "12853_13403","13404_45306")
+#Time used: 0.36 mins
 
 
 
-rdna_mouse_dataset<- data.frame(Name, Sequences, Details)
-
-attempt1<- data.frame((matrix(nrow = 0, ncol=5)) )
-for (j in 1: nrow(rdna_mouse_dataset)){
-  a<- nchar (rdna_mouse_dataset[j,2])
-  b<- str_count(rdna_mouse_dataset[j,2], "A")
-  c<- str_count(rdna_mouse_dataset[j,2], "T")
-  d<- str_count(rdna_mouse_dataset[j,2], "G")
-  e<- str_count(rdna_mouse_dataset[j,2], "C")
-  f <- c(a, b, c, d, e)
-  attempt1[nrow(attempt1)+1,] <- f
-}
-
-colnames(attempt1) <- c("Total_nucleotides", "A", "T", "G", "C")
-rdna_mouse_dataset_v1<- cbind(rdna_mouse_dataset, attempt1)
+#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs 
+#QmRLFS-finder.py (version v1.5)
+#run on Fri Apr 04 2025 13:15:12 
+#command line: python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
 
 
-rdna_mouse_dataset_details_v1 <- rdna_mouse_dataset_v1 %>% 
-  mutate(across(all_of(c(5,6,7,8)), function(x) x/Total_nucleotides*100, .names = "{col}%")) %>% 
-  mutate(across(all_of(c(9,10,11,12)), function (x) round(x, 2))) %>% 
-  select(1,2,3,4,5,9,6,10,7,11,8,12)
+entire_RLFSs_rdna<- fread("BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs.out.bed", sep = "\t", header = FALSE) #71
+entire_RLFSs_rdna<- entire_RLFSs_rdna %>% select(1:6)
+colnames(entire_RLFSs_rdna) <- c("GenBank_Accession", "RLFS_start", "RLFS_end", "RLFS_name","score", "strand")
 
+# strand specificity doesnt matter here because we are cropping region of our interest
+entire_RLFSs_rdna<- entire_RLFSs_rdna[entire_RLFSs_rdna$RLFS_start >2001 & entire_RLFSs_rdna$RLFS_start < 47307] #68
+#After 2000 is where the promoter begins and 45338 is where IGS end (50306-promoter length which is 3000 = 47306)
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rloop_and_rdna/mouse/output")
-
-fwrite(rdna_mouse_dataset_details_v1, 
-       file = "rdna_mouse_2013_dataset_details_v1.csv")
-
-##filter rows that contain a certain string
-
-rdna_mouse_dataset_sequences<- rdna_mouse_dataset_details_v1 %>% select(1,2)
-
-
-##create FASTA format
-for (j in 1: nrow(rdna_mouse_dataset_sequences)){
-  
-  write(paste(">",rdna_mouse_dataset_sequences[j,1], sep=''),                                            
-        file = "rDNA_mouse_2013_sequence_fasta_format.txt",
-        append = TRUE)
-  
-  write(rdna_mouse_dataset_sequences[j,2],                                            
-        file = "rDNA_mouse_2013_sequence_fasta_format.txt",
-        append = TRUE)
-  
-  write("\n",                                            
-        file = "rDNA_mouse_2013_sequence_fasta_format.txt",
-        append = TRUE)
-  
-}
-
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rloop_and_rdna/mouse/output")
-rdna_2013<- fread("rdna_mouse_2013_dataset_details_v1.csv", header = TRUE, sep = ",")
-# select only nucleotide percent and identifier 
-nucleotide<- rdna_2013 %>% select(Name,"A%","T%","G%","C%")
-nucleotide_new<- separate(nucleotide, Name, "Name", sep = "_")
-
-
-nucleotide_reshape <- pivot_longer(nucleotide_new, -Name, names_to = "Nucleotide", values_to = "Percent")
-fwrite(nucleotide_reshape,  
-       file= "nucleotide_rdna_mouse_2013_dataset_sequences_graph_input.csv")
-
-#Please note below code do not work, because you can only drop one column 
-#nar_reshape <- pivot_longer(nar, -Name, -Sequences,-Details, names_to = "Variable", values_to = "Value")
-
-nucleotide_reshape$Name <- factor(nucleotide_reshape$Name, 
-                                  levels = c("5'ETS", "18S", "ITS1", "5.8S", "ITS2","28S", "3'ETS", "IGS" ))
+entire_RLFSs_rdna$rDNA_region <- "junction"
 
 
 
+#strand specificity will matter here now we want to allocate RLFS to rdna region sub components  based on their direction
+# to do that, i will be creating a column that will have actual RLFS start based on strand specificity
 
-#The fill aesthetic is used to color the bars based on the the X variable.
+entire_RLFSs_rdna<- entire_RLFSs_rdna %>% mutate(actual_rlfs_start = ifelse(entire_RLFSs_rdna$strand == "+", RLFS_start, RLFS_end))
+entire_RLFSs_rdna$RLFS_length<- abs(entire_RLFSs_rdna$RLFS_start-entire_RLFSs_rdna$RLFS_end)
 
-rdna_2013_sequences_nucleotide_distribution<- ggplot(nucleotide_reshape, aes(x = Name, y = Percent, fill = Nucleotide)) + 
-  geom_bar(stat= 'identity', color = "black") +
-  theme(axis.text.x = element_text(angle = 45, size = 10)) +
-  labs(title= " Nucleotide distribution percent in mouse rDNA locus", x= "rDNA region", y= "Nucleotide distribution percent")+
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 2001 & entire_RLFSs_rdna$actual_rlfs_start < 5001] <- "Promoter"
+sum(entire_RLFSs_rdna$rDNA_region=="Promoter")
+#3
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 5000] <- "Promoter and 5'ETS junction"
+
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start >= 5001] <- "5'ETS"
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 9007 ] <- "5'ETS and 18S junction"
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start >= 9008] <- "18S"
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 10877 ] <- "18S and ITS1 junction"
+
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start >= 10878   ] <- "ITS1"
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 11877] <- "ITS1 and 5.8S junction"
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start >= 11878 ] <- "5.8S"
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 12034 ] <- "5.8S and ITS2 junction"
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start >= 12035] <- "ITS2"
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 13122] <- "ITS2 and 28S junction"
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start >= 13123 ] <- "28S"
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 17852 ] <- "28S and 3'ETS junction"
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start >= 17853] <- "3'ETS"
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 18403 ] <- "3'ETS and IGS junction"
+
+entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 18404 & entire_RLFSs_rdna$actual_rlfs_start < 45339] <- "IGS"
+
+
+fwrite(entire_RLFSs_rdna, "RLFS_BK000964_added_5000nt_IGS_upstream_at_junctn_details.csv", sep = ",")
+
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna %>% group_by(rDNA_region) %>% count()
+#rows order is lost 
+
+sum(entire_RLFSs_rdna_summary$n)
+#[1] 68
+
+entire_RLFSs_rdna_summary[,1]
+
+#1 28S         3'ETS       5'ETS       
+#4 IGS          ITS1       ITS2       promoter
+
+
+new_rows<- data.table(rDNA_region = c("Promoter and 5'ETS junction", "5'ETS and 18S junction", "18S", 
+                                      "18S and ITS1 junction","ITS1 and 5.8S junction","5.8S",
+                                      "5.8S and ITS2 junction","ITS2 and 28S junction",
+                                      "28S and 3'ETS junction", "3'ETS and IGS junction"))
+
+new_rows$n<- 0
+
+
+entire_RLFSs_rdna_summary<- rbind(entire_RLFSs_rdna_summary, new_rows)
+entire_RLFSs_rdna_summary$rDNA_region
+#[1] "28S"                         "3'ETS"                      
+#[3] "5'ETS"                       "IGS"                        
+#[5] "ITS1"                        "ITS2"                       
+#[7] "Promoter"                    "Promoter and 5'ETS junction"
+#[9] "5'ETS and 18S junction"      "18S"                        
+#[11] "18S and ITS1 junction"       "ITS1 and 5.8S junction"     
+#[13] "5.8S"                         "5.8S and ITS2 junction"     
+#[15] "ITS2 and 28S junction"       "28S and 3'ETS junction"     
+#[17] "3'ETS and IGS junction"
+
+
+row.names(entire_RLFSs_rdna_summary)<- entire_RLFSs_rdna_summary$rDNA_region
+entire_RLFSs_rdna_summary <- entire_RLFSs_rdna_summary[c("Promoter","Promoter and 5'ETS junction", "5'ETS", "5'ETS and 18S junction", 
+                                                         "18S", "18S and ITS1 junction", "ITS1", "ITS1 and 5.8S junction", "5.8S", 
+                                                         "5.8S and ITS2 junction",  "ITS2", "ITS2 and 28S junction","28S", 
+                                                         "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ),]
+
+
+
+names(entire_RLFSs_rdna_summary)[2] <- "RLFS_count"
+
+
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(norm_RLFS_count = RLFS_count/sum(entire_RLFSs_rdna_summary$RLFS_count)) %>% 
+  mutate(norm_RLFS_count= round(norm_RLFS_count, 2))
+
+fwrite(entire_RLFSs_rdna_summary, "RLFS_BK000964_added_5000nt_IGS_upstream_at_junctn_graphinput.csv", sep = ",")
+
+entire_RLFSs_rdna_summary$rDNA_region <- factor(entire_RLFSs_rdna_summary$rDNA_region, 
+                                                levels = c("Promoter","Promoter and 5'ETS junction", "5'ETS", "5'ETS and 18S junction", 
+                                                           "18S", "18S and ITS1 junction", "ITS1", "ITS1 and 5.8S junction", "5.8S", 
+                                                           "5.8S and ITS2 junction",  "ITS2", "ITS2 and 28S junction","28S", 
+                                                           "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ))
+
+
+RLFS_norm_5000igs<- ggplot(entire_RLFSs_rdna_summary, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+  geom_bar(stat= 'identity', color= "black") +
+  labs(title= "Normalized RLFS distribution in the Mouse rDNA locus", 
+       x= "Mouse rDNA region", 
+       y= "Normalized RLFS count")+
+  scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
+  geom_text(aes(label= RLFS_count, vjust= -0.5, size= 50))+
+  scale_fill_manual(values= c( "#F5FEFB","maroon", "#E21515", "steelblue", "#5AAA46","darkviolet", "#F36017","burlywood2", "#6B1519", 
+                               "pink", "#818689","aquamarine", "#ECE612","greenyellow", "#E07F80","turquoise2", "#DE9A22"))+
+  #scale_fill_manual(values = combined_colors)+
+  theme_minimal()+
+  theme(axis.text.x = element_blank())+ 
+  theme(panel.grid = element_blank())+
   theme(plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
         text = element_text(size = 30),
         axis.line = element_line(color = "black"),
         theme(panel.grid = element_blank()),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25)) +  # Center Y-axis title
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +  # Center Y-axis title
   theme(axis.ticks.y = element_line(color = "black"))
+#coord_flip()
 
-ggsave( "rdna_mouse_2013_sequences_nucleotide_distribution.tiff", 
-        plot = rdna_2013_sequences_nucleotide_distribution, width=15,height=10, dpi=150)
-
-
-
-##put these sequences in qmrlfs_finder and save results in QmRLFS results folder 2018
-#Open terminal, go to downloads where qmrlfs.py file exits, copy paste rDNA_mouse_2013_sequence_fasta_format.TXT
-#in downloads and run the code 
-#default output is always txt file which is "\t" separated file 
-#python QmRLFS-finder.py -bed -i rDNA_mouse_2013_sequence_fasta_format.txt -o rDNA_mouse_2013_qmrlfs
-#out will be saved as rDNA_mouse_2013_qmrlfs.out.bed
-
-#similarly run this code to download table format
-#python QmRLFS-finder.py -i rDNA_mouse_2013_sequence_fasta_format.txt -o rDNA_mouse_2013_qmrlfs
-
-#i also saved the rloop_db pdf file 
+ggsave( "Normalized_RLFS_distribution_in_mouse_rDNA_subcomponents_incld_junctn_AR.tiff", 
+        plot = RLFS_norm_3500igs, width=18,height=10, dpi=150)
 
 
+
+
+
+
+RLFSs_rdna_summary<- entire_RLFSs_rdna_summary[!grepl("junction", entire_RLFSs_rdna_summary$rDNA_region),]
+
+
+#When you use coord_flip(), the order of the factor levels in rDNA_region determines how the categories are displayed along the flipped y-axis.
+#By default, the first factor level appears at the bottom when flipped, and the last factor level appears at the top.
+
+RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region, 
+                                         levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                        "ITS2","28S", "3'ETS", "IGS" )))
+
+
+
+#To reverse the order so that "Promoter" appears at the top when flipped, modify the levels of the factor like this
+
+
+
+RLFS_norm_5000igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+  geom_bar(stat= 'identity', color= "black") +
+  labs(title= "Normalized RLFS distribution in the Mouse rDNA locus", 
+       x= "Mouse rDNA region", 
+       y= "Normalized RLFS count", 
+       fill = "rDNA")+
+  scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
+  geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50))+
+  scale_fill_manual(values= rev(c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
+                                  "#818689", "#ECE612", "#E07F80", "#DE9A22")))+
+  #guides(fill = guide_legend(reverse = TRUE))
+  theme_minimal()+
+  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
+        axis.ticks.x = element_line(color = "black"),
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"))+
+  coord_flip()
+
+ggsave("Normalized_RLFS_distribution_in_mouse_rDNA_subcomponents_after_rule.tiff", 
+       plot = RLFS_norm_5000igs_nojuntn, width=18,height=10, dpi=150)
+
+
+
+#to make template and non-template
+entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna %>% group_by(rDNA_region, strand) %>% count()
+names(entire_RLFSs_rdna_summary2)[3] <- "RLFS_count"
+
+new_rows<- data.table(rDNA_region = c("Promoter","3'ETS","18S","18S","5.8S","5.8S"),
+                      strand= c("-","-","+","-", "+", "-"),
+                      RLFS_count = c(0, 0,0,0,0,0))
+
+entire_RLFSs_rdna_summary2<- rbind(entire_RLFSs_rdna_summary2, new_rows)
+entire_RLFSs_rdna_summary2$rDNA_region <- factor(entire_RLFSs_rdna_summary2$rDNA_region, 
+                                                 levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                            "ITS2","28S", "3'ETS", "IGS" ))
+
+entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna_summary2 %>% mutate(norm_RLFS_count = RLFS_count/sum(entire_RLFSs_rdna_summary2$RLFS_count)) %>% 
+  mutate(norm_RLFS_count= round(norm_RLFS_count, 2))
+
+fwrite(entire_RLFSs_rdna_summary2, "RLFS_KY962518_added_5000nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv")
+
+
+rlfs_strandwise<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = norm_RLFS_count, fill= strand)) + 
+  geom_bar(stat= "identity", position ="dodge", color = "black") +
+  labs(title= "Normalized RLFS strandwise distribution in the mouse rDNA locus", 
+       x= "Mouse rDNA region", 
+       y= "Normalized RLFS count", 
+       fill= "RLFS strand")+
+  scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
+  geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  scale_fill_manual(values= c("+" = "royalblue", "-" = "maroon3"), 
+                    labels = c("+" = "Non-template", "-" = "Template"))+
+  #scale_fill_manual(values = combined_colors)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
+        #panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        panel.grid = element_blank(),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+        axis.ticks.y = element_line(color = "black")) #facet_wrap (~strand or ~rDNA region doesnt look good)
+
+
+
+ggsave( "Normalized_strandwise_RLFS_distribution_in_mouse_rDNA_subcomponents_AR.tiff", 
+        plot = rlfs_strandwise, width=18,height=10, dpi=150)
+
+
+
+
+nontemplate<- entire_RLFSs_rdna_summary2 %>% filter(strand == "+")
+nontemplate$rDNA_region <- factor(nontemplate$rDNA_region, 
+                                  levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                             "ITS2","28S", "3'ETS", "IGS" ))
+
+
+template<- entire_RLFSs_rdna_summary2 %>% filter(strand == "-")
+template$rDNA_region <- factor(template$rDNA_region, 
+                               levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                          "ITS2","28S", "3'ETS", "IGS" ))
+
+
+
+rlfs_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+  geom_bar(stat= "identity", position ="dodge", color = "black") +
+  labs(title= "Normalized Non-template RLFS distribution in the Mouse rDNA locus", 
+       x= "Mouse rDNA region", 
+       y= "Normalized Non-template RLFS count", 
+       fill= "rDNA")+
+  scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
+  geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  
+  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
+                              "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        panel.grid = element_blank(),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"))
+
+
+ggsave( "Normalized_nontemplate_RLFS_distribution_in_mouse_rDNA_subcomponents_AR.tiff", 
+        plot = rlfs_nontemplate, width=18,height=10, dpi=150)
+
+rlfs_template <- ggplot(template, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+  geom_bar(stat= "identity", position ="dodge", color = "black") +
+  labs(title= "Normalized Template RLFS distribution in the Mouse rDNA locus", 
+       x= "Mouse rDNA region", 
+       y= "Normalized Template RLFS count", 
+       fill= "rDNA")+
+  scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
+  geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  
+  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
+                              "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        panel.grid = element_blank(),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"))
+
+
+ggsave( "Normalized_template_RLFS_distribution_in_mouse_rDNA_subcomponents_AR.tiff", 
+        plot = rlfs_template, width=18,height=10, dpi=150)
+
+
+
+
+
+######All of these are incorrect due to wrong input entry
+
+#here strand was not considered and promoter region was not considered
+{
 
 ##I need to make graph with how many rlfs are found in each compartment
 
@@ -241,7 +411,6 @@ norm_stack<- ggplot(mouse_rdna_rlfs_summary, aes(mouse_rdna_region, y=norm_rlfs_
 ggsave( "Normalised RLFS distribution in mouse rDNA subcomponents.tiff", 
         plot = norm_stack, width=11,height=10, dpi=600)
                                    
-
 
 ##for junction, 
 
@@ -409,14 +578,14 @@ ggsave( "Normalised RLFS distribution in mouse rDNA subcomponents junctn.tiff",
 
 
 
-
+}
 
 
 ##plotting with IGS on start and promoter at end.
-###Plot4 showing entire rDNA and begining of next
+###Plot4 showing entire rDNA and begining of next but this is incorrect because the promoter RLFS was present in IGS
 
 
-
+{
 #open terminal
 #(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % conda activate python2.7
 #(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i BK000964_added_3500nt_IGS_upstream_nontemplate.fasta -o BK000964_added_3500nt_IGS_upstream_qmrlfs
@@ -618,6 +787,6 @@ RLFS_norm_3500igs<- ggplot(entire_RLFSs_rdna_summary, aes(x= rDNA_region, y = no
 
 ggsave( "Normalized_RLFS_distribution_in_mouse_rDNA_subcomponents_after_rule.tiff", 
         plot = RLFS_norm_3500igs, width=18,height=10, dpi=150)
-
+}
 
 
