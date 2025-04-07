@@ -279,7 +279,7 @@ entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_reg
 entire_g4s_rdna_summary2<- entire_g4s_rdna_summary2 %>% mutate(norm_pG4CS_count = pG4CS_count/sum(entire_g4s_rdna_summary2$pG4CS_count)) %>% 
   mutate(norm_pG4CS_count= round(norm_pG4CS_count, 2))
 
-fwrite(entire_g4s_rdna_summary2, "pG4CS_KY962518_added_5000nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv")
+fwrite(entire_g4s_rdna_summary2, "pG4CS_BK000964_added_5000nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv")
 
 
 g4s_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm_pG4CS_count, fill= strand)) + 
