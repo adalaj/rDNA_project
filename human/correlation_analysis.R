@@ -203,7 +203,7 @@ for ( i in unique(rdna_rlfs_table_filt$rDNA_region)){
   
 }
 
-#as we also want to see avlues in 18s and 5.8 we will create new rows
+#as we also want to see values in 18s and 5.8 we will create new rows
 
 new_rows <- data.frame(rDNA_region= c("18S", "5.8S", "5.8S"),
                        length_RIZ=c(0, 0, 0),
@@ -331,7 +331,7 @@ names(list_of_data)<- c("entire_rDNA_pG4CS", "template_rDNA_pG4CS", "nontemplate
 
 for ( i in 1: length(list_of_data)){
   g4s_length_distribution_graph<- data.frame(matrix(nrow = 0, ncol=5))
-  colnames(length_distribution_graph)<- c("rDNA_region", "Mean_pG4CS_length")
+  colnames(g4s_length_distribution_graph)<- c("rDNA_region", "Mean_pG4CS_length")
   
   data_of_interest <- as.data.frame(list_of_data[[i]])
   for (j in unique(data_of_interest$rDNA_region)) {
@@ -403,8 +403,8 @@ setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUnivers
 
 entire_rlfs<- fread("length_distribution_entire_rDNA_RLFS.csv", sep = ",", header = TRUE)
 entire_riz<- entire_rlfs %>% select(rDNA_region, Mean_RIZ_length)
-colnames(entire_rlfs)<- c("rDNA_region", "length")
-entire_rlfs$non_canonical_str <- "RIZ"
+colnames(entire_riz)<- c("rDNA_region", "length")
+entire_riz$non_canonical_str <- "RIZ"
 
 
 entire_g4s<- fread("length_distribution_entire_rDNA_pG4CS.csv", sep = ",", header = TRUE)
