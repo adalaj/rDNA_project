@@ -60,7 +60,7 @@ ggsave("KY962518_full_length_normalised_gc_skew.tiff",
 full_length_gc_skew_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = norm_GC_skew)) +
   geom_line(color = "blue") +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  labs(title = "GC Skew Across rDNA Sequence KY962518",
+  labs(title = "GC Skew Across rDNA Sequence KY962518 (Exculding IGS)",
        x = "rDNA",
        y = "Normalised GC Skew") +
   scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
@@ -104,14 +104,26 @@ bin_size=c(30, 70, 100)
 for ( i in bin_size){
   
   gc_skew_data<- gc_skew(seq2, window_size = i)
-  ovlp_skew<- gc_skew_data$sliding_window_results
-  fwrite(ovlp_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_ovlp_data_", i,"bp.csv"))
+  sliding_skew<- gc_skew_data$sliding_window_results
+  fwrite(sliding_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_data_", i,"bp.csv"))
   
-  ovlp_graph<- ggplot(ovlp_skew, aes(x = start, y = GC_skew_value)) +
+  non_sliding_skew<- gc_skew_data$fixed_window_results
+  fwrite(non_sliding_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_data_", i,"bp.csv"))
+  
+  #if you want to run GC skew separately: 
+  #for ( i in bin_size){
+  filename1<- paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_data_", i,"bp.csv")
+  sliding_skew<- fread(filename1, sep = ",", header = TRUE)
+  
+  filename2<- paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_data_", i,"bp.csv")
+  non_sliding_skew<- fread(filename2, sep = ",", header = TRUE)
+  
+  
+  sliding_graph<- ggplot(sliding_skew, aes(x = start, y = GC_skew_value)) +
     geom_line(color = "blue") +
     geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
     labs(title = "GC Skew Across rDNA Sequence KY962518",
-         subtitle= paste0(i, " bp ovlp Window Size"),
+         subtitle= paste0(i, " bp Sliding window size"),
          x = "Position (bp)",
          y = "GC Skew ") +
     scale_x_continuous(breaks = c(0, 3657,5526, 6596, 6753, 7920, 12971, 13333), 
@@ -126,18 +138,16 @@ for ( i in bin_size){
           axis.ticks.y = element_line(color = "black"),
           axis.text.x = element_text(angle = 45, hjust = 1, size=20))
   
-  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_ovlp_", i, "bp.tiff"), 
-         plot = ovlp_graph, width=18, height = 10, dpi = 150)
+  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_", i, "bp.tiff"), 
+         plot = sliding_graph, width=18, height = 10, dpi = 150)
   
   
-  non_ovlp_skew<- gc_skew_data$fixed_window_results
-  fwrite(non_ovlp_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_ovlp_data_", i,"bp.csv"))
   
-  non_ovlp_graph<- ggplot(non_ovlp_skew, aes(x = start, y = GC_skew_value)) +
+  non_sliding_graph<- ggplot(non_sliding_skew, aes(x = start, y = GC_skew_value)) +
     geom_line(color = "blue") +
     geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
     labs(title = "GC Skew Across rDNA Sequence KY962518",
-         subtitle= paste0(i, " bp non ovlp Window Size"),
+         subtitle= paste0(i, " bp non sliding window size"),
          x = "Position (bp)",
          y = "GC Skew ") +
     scale_x_continuous(breaks = c(0, 3657,5526, 6596, 6753, 7920, 12971, 13333), 
@@ -152,24 +162,38 @@ for ( i in bin_size){
           axis.ticks.y = element_line(color = "black"),
           axis.text.x = element_text(angle = 45, hjust = 1, size=20))
   
-  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_ovlp_", i, "bp.tiff"), 
-         plot = non_ovlp_graph, width=18, height = 10, dpi = 150)
-  
+  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_", i, "bp.tiff"), 
+         plot = non_sliding_graph, width=18, height = 10, dpi = 150)
+  #}
   
   
   
   gc_content_data<- gc_content(seq2, window_size = i)
-  ovlp_content<- gc_content_data$sliding_window_results
-  fwrite(ovlp_content, paste0("KY962518_5ETS_TO_3ETS_gc_content_ovlp_data_", i,"bp.csv"))
+  sliding_content<- gc_content_data$sliding_window_results
+  fwrite(sliding_content, paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv"))
+  
+  non_sliding_content<- gc_content_data$fixed_window_results
+  fwrite(non_sliding_content, paste0("KY962518_5ETS_TO_3ETS_gc_content_non_sliding_data_", i,"bp.csv"))
   
   
-  ovlp_content_graph<- ggplot(ovlp_content, aes(x = start, y = gc_content_value)) +
+  #if you want to re-run only GC content thing
+  
+  #for ( i in bin_size){
+    sliding<- paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv")
+    sliding_content<- fread(sliding, sep = ",", header = TRUE)
+    
+    non_sliding<- paste0("KY962518_5ETS_TO_3ETS_gc_content_non_sliding_data_", i,"bp.csv")
+    non_sliding_content<- fread(non_sliding, sep = ",", header = TRUE)
+    
+  sliding_content_graph<- ggplot(sliding_content, aes(x = start, y = gc_content_perc)) +
     geom_line(color = "blue") +
     geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+    geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen")+
     labs(title = "GC Content Across rDNA Sequence KY962518",
-         subtitle= paste0(i, " bp ovlp Window Size"),
+         subtitle= paste0(i, " bp sliding window size"),
          x = "Position (bp)",
-         y = "GC content") +
+         y = "GC content percent") +
+    scale_y_continuous(limits= c(0,100), breaks=seq(0,100, by=20))+
     scale_x_continuous(breaks = c(0, 3657,5526, 6596, 6753, 7920, 12971, 13333), 
                        labels =c(0,"5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -182,21 +206,21 @@ for ( i in bin_size){
           axis.ticks.y = element_line(color = "black"),
           axis.text.x = element_text(angle = 45, hjust = 1, size=20))
   
-  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_ovlp_", i, "bp.tiff"), 
-         plot =  ovlp_content_graph, width=18, height = 10, dpi = 150)
+  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_", i, "bp.tiff"), 
+         plot =  sliding_content_graph, width=18, height = 10, dpi = 150)
   
   
-  non_ovlp_content<- gc_content_data$fixed_window_results
-  fwrite(non_ovlp_content, paste0("KY962518_5ETS_TO_3ETS_gc_content_non_ovlp_data_", i,"bp.csv"))
   
   
-  non_ovlp_content_graph<- ggplot(non_ovlp_content, aes(x = start, y = gc_content_value)) +
+  non_sliding_content_graph<- ggplot(non_sliding_content, aes(x = start, y = gc_content_perc)) +
     geom_line(color = "blue") +
     geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+    geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen")+
     labs(title = "GC Content Across rDNA Sequence KY962518",
-         subtitle= paste0(i, " bp non ovlp Window Size"),
+         subtitle= paste0(i, " bp non sliding window size"),
          x = "Position (bp)",
-         y = "GC content") +
+         y = "GC content percent") +
+    scale_y_continuous(limits= c(0,100), breaks=seq(0,100, by=20))+
     scale_x_continuous(breaks = c(0, 3657,5526, 6596, 6753, 7920, 12971, 13333), 
                        labels =c(0,"5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -209,8 +233,8 @@ for ( i in bin_size){
           axis.ticks.y = element_line(color = "black"),
           axis.text.x = element_text(angle = 45, hjust = 1, size=20))
   
-  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_non_ovlp_", i, "bp.tiff"), 
-         plot = non_ovlp_content_graph, width=18, height = 10, dpi = 150)
+  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_non_sliding_", i, "bp.tiff"), 
+         plot = non_sliding_content_graph, width=18, height = 10, dpi = 150)
   
 }
 
