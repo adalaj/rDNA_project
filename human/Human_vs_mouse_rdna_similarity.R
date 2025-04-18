@@ -2,9 +2,9 @@
 
 
 #To calculate sequence similarity between human and mouse rDNA. 
-#for simiplicity I am just using 5'ets to 3'ets of human and mouse 
+#for simplicity I am just using 5'ets to 3'ets of human and mouse 
 
-#first i will do full length followed by indiviual comaprison and will make similarity matrix
+#first i will do full length followed by individual comaprison and will make similarity matrix
 
 
 #load libraries:
@@ -12,20 +12,17 @@
 library(tidyverse)
 library(data.table)
 library(Biostrings)
-library(pheatmap)
-library(seqinr)
-
 
 #read required files for human
 
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/input")
-human_entire_rdna<- read.fasta(file = "KY962518_added_3500nt_IGS_upstream_nontemplate.fasta", forceDNAtolower = FALSE, as.string = TRUE)
-human_entire_rdna_seq<- human_entire_rdna[[1]]
+human_entire_rdna<- readDNAStringSet("KY962518_added_3500nt_IGS_upstream_nontemplate.fasta", format = "fasta", use.names = FALSE)
+human_entire_rdna_seq<- as.character(human_entire_rdna[[1]])
 nchar(human_entire_rdna_seq)
 #48338
 
 
-human_coding_rdna<- str_sub(human_entire_rdna_seq, start = 3501, end= 16832)
+human_coding_rdna<- subseq(human_entire_rdna_seq, start = 3501, end= 16832)
 nchar(human_coding_rdna)
 #13332
 
@@ -37,13 +34,13 @@ human<- fread("rdna_hg38_chr21_2018_dataset_details_v3.csv", sep = ",", header =
 
 #read required files for mouse
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/mouse/input")
-mouse_entire_rdna<- read.fasta(file = "BK000964_added_5000nt_IGS_upstream_nontemplate.fasta", forceDNAtolower = FALSE, as.string = TRUE)
-mouse_entire_rdna_seq<- mouse_entire_rdna[[1]]
+mouse_entire_rdna<- readDNAStringSet("BK000964_added_5000nt_IGS_upstream_nontemplate.fasta", format = "fasta", use.names = FALSE)
+mouse_entire_rdna_seq<- as.character(mouse_entire_rdna[[1]])
 nchar(mouse_entire_rdna_seq)
 #50306
 
 
-mouse_coding_rdna<- str_sub(mouse_entire_rdna_seq, start = 5001, end= 18403)
+mouse_coding_rdna<- subseq(mouse_entire_rdna_seq, start = 5001, end= 18403)
 nchar(mouse_coding_rdna)
 #13403
 
