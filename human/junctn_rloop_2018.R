@@ -129,8 +129,8 @@ RLFS_norm_3500igs<- ggplot(entire_RLFSs_rdna_summary, aes(x= rDNA_region, y = no
        fill = "rDNA region")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= RLFS_count), vjust= -0.5, size= 5)+
-  scale_fill_manual(values= c( "#F5FEFB","maroon", "#E21515", "steelblue", "#5AAA46","darkviolet", "#F36017","burlywood2", "#6B1519", 
-                               "pink", "#818689","aquamarine", "#ECE612","greenyellow", "#E07F80","turquoise2", "#DE9A22"))+
+  scale_fill_manual(values= c( "#FFB6C1","maroon", "#D0B6FF", "steelblue", "#E5FFB6","darkviolet", "#FFE0C2","burlywood2", "#B6FFF4", 
+                               "pink4", "#FFFFE0","aquamarine", "#E8E8FB","greenyellow", "#B6E5FF","turquoise2", "#DCDCDC"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
   theme(axis.text.x = element_blank(), 
@@ -158,7 +158,6 @@ RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region,
                                                             "ITS2","28S", "3'ETS", "IGS" )))
 
 
-
 #To reverse the order so that "Promoter" appears at the top when flipped, modify the levels of the factor like this
 
 
@@ -171,8 +170,8 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = n
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50))+
-  scale_fill_manual(values= rev(c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                                  "#818689", "#ECE612", "#E07F80", "#DE9A22")))+
+  scale_fill_manual(values= rev(c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
+                                  "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
   theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
@@ -192,6 +191,7 @@ ggsave("Normalized_RLFS_distribution_in_human_rDNA_subcomponents_after_rule.tiff
 
 
 #to make template and non-template
+entire_RLFSs_rdna<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_details_after_rule.csv", sep = ",", header = TRUE)
 entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna %>% group_by(rDNA_region, strand) %>% count()
 names(entire_RLFSs_rdna_summary2)[3] <- "RLFS_count"
 
@@ -218,7 +218,7 @@ rlfs_strandwise<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = nor
        fill= "RLFS strand")+
   scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
-  scale_fill_manual(values= c("+" = "royalblue", "-" = "maroon3"), 
+  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), #changed the non template and template colors
                     labels = c("+" = "Non-template", "-" = "Template"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
@@ -262,8 +262,8 @@ rlfs_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_RLFS_count,
   scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                                  "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
+                                  "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -287,8 +287,8 @@ rlfs_template <- ggplot(template, aes(x= rDNA_region, y = norm_RLFS_count, fill=
   scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                              "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
+                              "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -304,4 +304,38 @@ ggsave( "Normalized_template_RLFS_distribution_in_human_rDNA_subcomponents_AR.ti
         plot = rlfs_template, width=18,height=10, dpi=150)
 
 
+##Thinking of making a pie chart with RLFS percentage
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
+
+entire_RLFSs_rdna_summary <- fread("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(perc=paste0(norm_RLFS_count*100, "%"))
+
+fwrite(entire_RLFSs_rdna_summary, "RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv")
+
+RLFSs_rdna_summary<- entire_RLFSs_rdna_summary[!grepl("junction", entire_RLFSs_rdna_summary$rDNA_region),]
+
+RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region, 
+                                         levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                    "ITS2","28S", "3'ETS", "IGS" ))
+
+# Reorder the dataframe so that ggplot uses it properly
+RLFSs_rdna_summary <- RLFSs_rdna_summary[order(RLFSs_rdna_summary$rDNA_region), ]
+
+RLFSs_rdna_summary<- RLFSs_rdna_summary %>% mutate(perc=norm_RLFS_count*100)
+fwrite()
+
+RLFS_perc<- ggplot(RLFSs_rdna_summary, aes(x = "", y = perc, fill = rDNA_region)) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  geom_text(aes(label = ifelse(perc == 0, "0%", paste0(perc, "%"))),
+            position = position_stack(vjust = 0.5),
+            color = "black", size = 10, fontface = "bold") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_void() +
+  scale_fill_manual(values = c(
+    "#FFB6C1","#D0B6FF","#E5FFB6","#FFE0C2","#B6FFF4",
+    "#FFFFE0", "#E8E8FB","#B6E5FF","#DCDCDC" )) +
+  guides(fill = guide_legend(title = "rDNA"))
+
+ggsave("Normalized_RLFS_pie_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+       plot=RLFS_perc, width=18, height=10, dpi=150)
 
