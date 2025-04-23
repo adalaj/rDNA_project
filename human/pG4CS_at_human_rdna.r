@@ -125,7 +125,9 @@ names(entire_g4s_rdna_summary)[2] <- "pG4CS_count"
 entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(norm_pG4CS_count = pG4CS_count/sum(entire_g4s_rdna_summary$pG4CS_count)) %>% 
   mutate(norm_pG4CS_count= round(norm_pG4CS_count, 2))
 
-fwrite(entire_g4s_rdna_summary, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_graphinput.csv", sep = ",")
+fwrite(entire_g4s_rdna_summary, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
+
+entire_g4s_rdna_summary <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
 
 entire_g4s_rdna_summary$rDNA_region <- factor(entire_g4s_rdna_summary$rDNA_region, 
                                                 levels = c("Promoter","Promoter and 5'ETS junction", "5'ETS", "5'ETS and 18S junction", 
@@ -142,8 +144,8 @@ pG4CS_norm_3500igs<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = nor
        fill = "rDNA region")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= pG4CS_count), vjust= -0.5, size= 5)+
-  scale_fill_manual(values= c( "#F5FEFB","maroon", "#E21515", "steelblue", "#5AAA46","darkviolet", "#F36017","burlywood2", "#6B1519", 
-                               "pink", "#818689","aquamarine", "#ECE612","greenyellow", "#E07F80","turquoise2", "#DE9A22"))+
+  scale_fill_manual(values= c( "#FFB6C1","maroon", "#D0B6FF", "steelblue", "#E5FFB6","darkviolet", "#FFE0C2","burlywood2", "#B6FFF4", 
+                               "pink4", "#FFFFE0","aquamarine", "#E8E8FB","greenyellow", "#B6E5FF","turquoise2", "#DCDCDC"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
   theme(axis.text.x = element_blank(),
@@ -184,8 +186,8 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = no
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= pG4CS_count, hjust= -1.0, vjust= 0.5, size= 50))+
-  scale_fill_manual(values= rev(c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                                  "#818689", "#ECE612", "#E07F80", "#DE9A22")))+
+  scale_fill_manual(values= rev(c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
+                                  "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
   theme(axis.text.x = element_blank(), 
@@ -230,7 +232,7 @@ pG4CS_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm
        fill= "pG4CS strand")+
   scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
   geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
-  scale_fill_manual(values= c("+" = "royalblue", "-" = "maroon3"), 
+  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template", "-" = "Template"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
@@ -270,8 +272,8 @@ g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_pG4CS_count,
   scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
   geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                              "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
+                              "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -295,8 +297,8 @@ g4s_template <- ggplot(template, aes(x= rDNA_region, y = norm_pG4CS_count, fill=
   scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
   geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                              "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
+                              "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -310,6 +312,40 @@ g4s_template <- ggplot(template, aes(x= rDNA_region, y = norm_pG4CS_count, fill=
 
 ggsave( "Normalized_template_pG4CS_distribution_in_human_rDNA_subcomponents_AR.tiff", 
         plot = g4s_template, width=18,height=10, dpi=150)
+
+
+#Thinking of making a pie chart with pG4CS percentage
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
+
+entire_g4s_rdna_summary <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(perc=norm_pG4CS_count*100)
+
+fwrite(entire_g4s_rdna_summary, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv")
+
+g4s_rdna_summary<- entire_g4s_rdna_summary[!grepl("junction", entire_g4s_rdna_summary$rDNA_region),]
+
+g4s_rdna_summary$rDNA_region <- factor(g4s_rdna_summary$rDNA_region, 
+                                         levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                    "ITS2","28S", "3'ETS", "IGS" ))
+
+# Reorder the dataframe so that ggplot uses it properly
+g4s_rdna_summary <- g4s_rdna_summary[order(g4s_rdna_summary$rDNA_region), ]
+
+g4s_perc<- ggplot(g4s_rdna_summary, aes(x = "", y = perc, fill = rDNA_region)) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  geom_text(aes(label = paste0(perc, "%")),
+            position = position_stack(vjust = 0.5),
+            color = "black", size = 10, fontface = "bold") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_void() +
+  scale_fill_manual(values = c(
+    "#FFB6C1","#D0B6FF","#E5FFB6","#FFE0C2","#B6FFF4",
+    "#FFFFE0", "#E8E8FB","#B6E5FF","#DCDCDC")) +
+  guides(fill = guide_legend(title = "rDNA"))
+
+ggsave("Normalized_pG4CS_pie_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+       plot=g4s_perc, width=18, height=10, dpi=150)
+
 
 
 
