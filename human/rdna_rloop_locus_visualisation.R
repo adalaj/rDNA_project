@@ -56,8 +56,8 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 7921, x1 = 12971, y0 = 0, y1 = 1, col = "lig
 kpRect(kp, chr = 'rDNA_locus', x0 = 12972, x1 = 13332, y0 = 0, y1 = 1, col = "salmon", data.panel = "ideogram", borders= NA) #marks 3'ETS
 kpRect(kp, chr = 'rDNA_locus', x0 = 13333, x1 = 44838, y0 = 0, y1 = 1, col = "peachpuff", data.panel = "ideogram", borders= NA) #marks IGS
 
-kpPlotRegions(kp, data=rdna6_template, col="maroon3", r0= -0.5, r1= -1.9)
-kpPlotRegions(kp, data=rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+kpPlotRegions(kp, data=rdna6_template, col="#1414E1", r0= -0.5, r1= -1.9)
+kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
 
 # I open this plots in full screen in a monitor and then took the snip using snipping tool and paste in a powerpoint.
 #dev.off()
@@ -105,8 +105,8 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #
  
  
  
- kpPlotRegions(kp, data=promoter_rdna6_template, col="maroon3", r0= -0.5, r1= -1.9)
- kpPlotRegions(kp, data=promoter_rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+ kpPlotRegions(kp, data=promoter_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.9)
+ kpPlotRegions(kp, data=promoter_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
 
  
   
@@ -147,8 +147,8 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #
  
  
  
- kpPlotRegions(kp, data=promoter_rdna6_template_no_igs, col="maroon3", r0= -0.5, r1= -1.9)
- kpPlotRegions(kp, data=promoter_rdna6_nontemplate_no_igs, col="royalblue", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+ kpPlotRegions(kp, data=promoter_rdna6_template_no_igs, col="#1414E1", r0= -0.5, r1= -1.9)
+ kpPlotRegions(kp, data=promoter_rdna6_nontemplate_no_igs, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
  
  
  
@@ -193,45 +193,82 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #
  
  kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#DE9A22", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
- kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#F5FEFB", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#DCDCDC", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#E21515", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+ kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
  #3501+(3657-1) = 7157
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#5AAA46", data.panel = "ideogram", borders= NA) #marks 18S
+ kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 18S
  #7158+ (1869-1) = 9026
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#F36017", data.panel = "ideogram", borders= NA) #marks ITS1S
+ kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1S
  #9027+ (1070-1) = 10096 
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#6B1519", data.panel = "ideogram", borders= NA) #marks 5.8S
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 5.8S
  #10097+ (157-1) = 10253
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#818689", data.panel = "ideogram", borders= NA) #marks ITS2
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
  #10254+(1167-1) = 11420
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#ECE612", data.panel = "ideogram", borders= NA) #marks 28S
+ kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
  #11421+(5051-1) = 16471
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#E07F80", data.panel = "ideogram", borders= NA) #marks 3'ETS
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#B6E5FF", data.panel = "ideogram", borders= NA) #marks 3'ETS
  #16472+(361-1) = 16832
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 48338, y0 = 0, y1 = 1, col = "#DE9A22", data.panel = "ideogram", borders= NA) #marks IGS
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 48338, y0 = 0, y1 = 1, col = "#DCDCDC", data.panel = "ideogram", borders= NA) #marks IGS
  #16833+ (31506-1)= 48338
  
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 46137, x1 = 48338, y0 = 0, y1 = 1, col = "#F5FEFB", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
+ kpRect(kp, chr = 'rDNA_locus', x0 = 46137, x1 = 48338, y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
  #48338-2201
  
- kpPlotRegions(kp, data=entire_rdna6_template, col="maroon3", r0= -0.5, r1= -1.9)
- kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+ kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.9)
+ kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
  
 
  #use zoom option, took screenshot and edited in powerpoint
  
  
  #for checking how many RLFS are formed after rule count please see junction_rloop_2018.R file
+ 
+ #need to plot only from 5'ETS to 3'ETS
+ custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=16832))
+ #end is 48338 because I added 3500 to 44838
+ 
+ ##make separate data.table for each rdna components
+ 
+ #"yellowgreen", "red", "green", "orange", "brown", "pink", "lightyellow", "salmon", "peachpuff"
+ 
+ kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#DCDCDC", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+ #3501+(3657-1) = 7157
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 18S
+ #7158+ (1869-1) = 9026
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1S
+ #9027+ (1070-1) = 10096 
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 5.8S
+ #10097+ (157-1) = 10253
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
+ #10254+(1167-1) = 11420
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
+ #11421+(5051-1) = 16471
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#B6E5FF", data.panel = "ideogram", borders= NA) #marks 3'ETS
+ #16472+(361-1) = 16832
+ 
+ 
+ kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
  
  
  
