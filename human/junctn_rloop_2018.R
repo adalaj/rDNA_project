@@ -304,11 +304,11 @@ ggsave( "Normalized_template_RLFS_distribution_in_human_rDNA_subcomponents_AR.ti
         plot = rlfs_template, width=18,height=10, dpi=150)
 
 
-##Thinking of making a pie chart with RLFS percentage
+#Thinking of making a pie chart with RLFS percentage
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
 
 entire_RLFSs_rdna_summary <- fread("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
-entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(perc=paste0(norm_RLFS_count*100, "%"))
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(perc=norm_RLFS_count*100)
 
 fwrite(entire_RLFSs_rdna_summary, "RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv")
 
@@ -321,8 +321,6 @@ RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region,
 # Reorder the dataframe so that ggplot uses it properly
 RLFSs_rdna_summary <- RLFSs_rdna_summary[order(RLFSs_rdna_summary$rDNA_region), ]
 
-RLFSs_rdna_summary<- RLFSs_rdna_summary %>% mutate(perc=norm_RLFS_count*100)
-fwrite()
 
 RLFS_perc<- ggplot(RLFSs_rdna_summary, aes(x = "", y = perc, fill = rDNA_region)) +
   geom_bar(stat = "identity", width = 1, color = "black") +
