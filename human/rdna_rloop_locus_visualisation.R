@@ -271,4 +271,98 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
  
  
+ #I am trying to make bedgraphs directly in karyoplote
+ 
+ entire_rdna<- fread("KY962518_added_3500nt_IGS_upstream_qmrlfs.out.bed", sep = "\t", header = FALSE) #208, this contain double entry for promoter and IGS. 
+ entire_rdna$V1= "rDNA_locus"
+ entire_rdna6<- entire_rdna %>% select(1:6)
+ colnames(entire_rdna6)<- c("chr", "start", "end", "name", "score", "strand")
+ 
+ ##separate as per strand
+ entire_rdna6_nontemplate<- entire_rdna6 %>% filter(strand=="+") #94
+ #because in NCBI keep nontemplate sequence.
+ 
+ 
+ entire_rdna6_template<- entire_rdna6 %>% filter(strand=="-")#114
+ 
+ 
+ ##plotting begins
+ 
+ ##non template
+ custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=48338))
+ kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#DCDCDC", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+ #3501+(3657-1) = 7157
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 18S
+ #7158+ (1869-1) = 9026
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1S
+ #9027+ (1070-1) = 10096 
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 5.8S
+ #10097+ (157-1) = 10253
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
+ #10254+(1167-1) = 11420
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
+ #11421+(5051-1) = 16471
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#B6E5FF", data.panel = "ideogram", borders= NA) #marks 3'ETS
+ #16472+(361-1) = 16832
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 48338, y0 = 0, y1 = 1, col = "#DCDCDC", data.panel = "ideogram", borders= NA) #marks IGS
+ #16833+ (31506-1)= 48338
+ 
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 46137, x1 = 48338, y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
+ #48338-2201
+ 
+ kpPlotCoverage(kp, data=entire_rdna6_nontemplate, col = "#E21515")
+ kpPlotRegions(kp, data=entire_rdna6_nontemplate, data.panel=2, col = "#E21515")
+
+ 
+ 
+ #template
+ custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=48338))
+ kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#DCDCDC", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+ #3501+(3657-1) = 7157
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 18S
+ #7158+ (1869-1) = 9026
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1S
+ #9027+ (1070-1) = 10096 
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 5.8S
+ #10097+ (157-1) = 10253
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
+ #10254+(1167-1) = 11420
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
+ #11421+(5051-1) = 16471
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#B6E5FF", data.panel = "ideogram", borders= NA) #marks 3'ETS
+ #16472+(361-1) = 16832
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 48338, y0 = 0, y1 = 1, col = "#DCDCDC", data.panel = "ideogram", borders= NA) #marks IGS
+ #16833+ (31506-1)= 48338
+ 
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 46137, x1 = 48338, y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
+ #48338-2201
+ 
+ kpPlotCoverage(kp, data=entire_rdna6_template, col = "#1414E1")
+ kpPlotRegions(kp, data=entire_rdna6_template, data.panel=2, col = "#1414E1")
  
