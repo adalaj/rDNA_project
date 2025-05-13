@@ -37,7 +37,7 @@ nchar(hg38_rDNA_seq)
 #I assume 13333 ..44838 - intergenic spacer; IGS
 
 
-promoter<- str_sub(hg38_rDNA_seq, start= 1299, end = 3500)
+promoter<- str_sub(hg38_rDNA_seq, start= 1299, end = 3500) # my defined promoter
 ets5<- str_sub(hg38_rDNA_seq, start = 3501, end = 7157)
 s18<- str_sub(hg38_rDNA_seq, start= 7158, end = 9026)
 its1<- str_sub(hg38_rDNA_seq, start= 9027, end = 10096)
@@ -45,7 +45,7 @@ s5.8 <- str_sub(hg38_rDNA_seq, start= 10097, end = 10253)
 its2<- str_sub(hg38_rDNA_seq, start= 10254, end = 11420)
 s28<- str_sub(hg38_rDNA_seq, start= 11421, end = 16471)
 ets3<- str_sub(hg38_rDNA_seq, start= 16472, end = 16832)
-igs<- str_sub(hg38_rDNA_seq, start= 16833, end = 48338)
+igs<- str_sub(hg38_rDNA_seq, start= 16833, end = 46137) # my defined IGS 
 
 Name<- c("Promoter_KY962518", "5'ETS_KY962518", "18S_KY962518", "ITS1_KY962518", "5.8S_KY962518", "ITS2_KY962518", 
          "28S_KY962518", "3'ETS_KY962518", "IGS_KY962518")
