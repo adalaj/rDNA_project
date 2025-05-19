@@ -170,8 +170,8 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = n
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50))+
-  scale_fill_manual(values= rev(c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
-                                  "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC")))+
+  scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
+                                  "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
   theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
@@ -230,7 +230,7 @@ rlfs_strandwise<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = nor
         axis.line = element_line(color = "black"),
         panel.grid = element_blank(),
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
-        axis.ticks.y = element_line(color = "black")) #facet_wrap (~strand or ~rDNA region doesnt look good)
+        axis.ticks.y = element_line(color = "black"))#facet_wrap (~strand or ~rDNA region doesnt look good)
 
         
 
@@ -238,6 +238,38 @@ ggsave( "Normalized_strandwise_RLFS_distribution_in_human_rDNA_subcomponents_AR.
         plot = rlfs_strandwise, width=18,height=10, dpi=150)
 
 
+entire_RLFSs_rdna_summary2$rDNA_region <- factor(entire_RLFSs_rdna_summary2$rDNA_region, 
+                                         levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                        "ITS2","28S", "3'ETS", "IGS" )))
+
+
+
+rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = norm_RLFS_count, fill= strand)) + 
+  geom_bar(stat= "identity", position ="dodge", color = "black") +
+  labs(title= "Normalized RLFS strandwise distribution in the Human rDNA locus", 
+       x= "Human rDNA region", 
+       y= "Normalized RLFS count", 
+       fill= "RLFS strand")+
+  scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
+  geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50), position = position_dodge(width = 0.9))+
+  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), #changed the non template and template colors
+                    labels = c("+" = "Non-template", "-" = "Template"))+
+  #scale_fill_manual(values = combined_colors)+
+  theme_minimal()+
+  theme(axis.title.x = element_text(vjust = -0.5, hjust = 0.5),
+        axis.ticks.x = element_line(color = "black"), 
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"))+
+  coord_flip()
+
+
+ggsave( "Normalized_strandwise_RLFS_flipped_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+        plot = rlfs_strandwise_flip, width=18,height=10, dpi=150)
 
 
 nontemplate<- entire_RLFSs_rdna_summary2 %>% filter(strand == "+")
