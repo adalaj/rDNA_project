@@ -186,8 +186,8 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = no
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= pG4CS_count, hjust= -1.0, vjust= 0.5, size= 50))+
-  scale_fill_manual(values= rev(c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
-                                  "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC")))+
+  scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
+                                  "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
   theme(axis.text.x = element_blank(), 
@@ -249,6 +249,37 @@ pG4CS_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm
 ggsave( "Normalized_strandwise_pG4CS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
         plot = pG4CS_strandwise, width=18,height=10, dpi=150)
 
+
+entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_region, 
+                                                 levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                                "ITS2","28S", "3'ETS", "IGS" )))
+
+
+pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm_pG4CS_count, fill= strand)) + 
+  geom_bar(stat= "identity", position ="dodge", color = "black") +
+  labs(title= "Normalized pG4CS strandwise distribution in the Human rDNA locus", 
+       x= "Human rDNA region", 
+       y= "Normalized pG4CS count", 
+       fill= "pG4CS strand")+
+  scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
+  geom_text(aes(label= pG4CS_count, hjust=-1.0, vjust=0.5, size=50), position = position_dodge(width = 0.9))+
+  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
+                    labels = c("+" = "Non-template", "-" = "Template"))+
+  #scale_fill_manual(values = combined_colors)+
+  theme_minimal()+
+  theme(axis.title.x = element_text(vjust = -0.5, hjust = 0.5),
+        axis.ticks.x = element_line(color = "black"), 
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"))+
+  coord_flip()
+
+ggsave( "Normalized_strandwise_pG4CS_flipped_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+        plot = pG4CS_strandwise_flip, width=18,height=10, dpi=150)
 
 nontemplate<- entire_g4s_rdna_summary2 %>% filter(strand == "+")
 nontemplate$rDNA_region <- factor(nontemplate$rDNA_region, 
