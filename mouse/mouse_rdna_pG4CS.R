@@ -33,45 +33,138 @@ custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=50306))
 
 #"yellowgreen", "red", "green", "orange", "brown", "pink", "lightyellow", "salmon", "peachpuff"
 
+png("mouse_rdna_both_strand_pG4CS.png", width = 50, height= 30, units= "in", res = 150)
+
 kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =2000 , y0 = 0, y1 = 1, col = "#DE9A22", data.panel = "ideogram", borders= NA) #marks last 2000bp from IGS representing previous rdna 
-kpRect(kp, chr = 'rDNA_locus', x0 = 2001, x1 =5000 , y0 = 0, y1 = 1, col = "#F5FEFB", data.panel = "ideogram", borders= NA) #marks 3000 bp of  promoter
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =2000 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks last 2000bp from IGS representing previous rdna 
+kpRect(kp, chr = 'rDNA_locus', x0 = 2001, x1 =5000 , y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 3000 bp of  promoter
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 5001, x1 = 9007 , y0 = 0, y1 = 1, col = "#E21515", data.panel = "ideogram", borders= NA) #marks 5'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 5001, x1 = 9007 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS
 #5001+(4007-1) = 9007
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 9008, x1 = 10877, y0 = 0, y1 = 1, col = "#5AAA46", data.panel = "ideogram", borders= NA) #marks 18S
+kpRect(kp, chr = 'rDNA_locus', x0 = 9008, x1 = 10877, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
 #9008+(1870-1) = 10877
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 10877, x1 = 11877, y0 = 0, y1 = 1, col = "#F36017", data.panel = "ideogram", borders= NA) #marks ITS1
+kpRect(kp, chr = 'rDNA_locus', x0 = 10877, x1 = 11877, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1
 #10877+(1000-1) = 11877
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 11878, x1 = 12034 , y0 = 0, y1 = 1, col = "#6B1519", data.panel = "ideogram", borders= NA) #marks 5.8S
+kpRect(kp, chr = 'rDNA_locus', x0 = 11878, x1 = 12034 , y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
 #11878+(157-1) = 12034
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 12035, x1 = 13122, y0 = 0, y1 = 1, col = "#818689", data.panel = "ideogram", borders= NA) #marks ITS2
+kpRect(kp, chr = 'rDNA_locus', x0 = 12035, x1 = 13122, y0 = 0, y1 = 1, col = "#FFCC17", data.panel = "ideogram", borders= NA) #marks ITS2
 #12035+(1088-1) = 13122
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 13123 , x1 = 17852, y0 = 0, y1 = 1, col = "#ECE612", data.panel = "ideogram", borders= NA) #marks 28S
+kpRect(kp, chr = 'rDNA_locus', x0 = 13123 , x1 = 17852, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 28S
 #13123+(4730-1)= 17852
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 17853, x1 = 18403, y0 = 0, y1 = 1, col = "#E07F80", data.panel = "ideogram", borders= NA) #marks 3'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 17853, x1 = 18403, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram", borders= NA) #marks 3'ETS
 #17853+(551-1) = 18403
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 18404, x1 = 50306, y0 = 0, y1 = 1, col = "#DE9A22", data.panel = "ideogram", borders= NA) #marks IGS
+kpRect(kp, chr = 'rDNA_locus', x0 = 18404, x1 = 50306, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks IGS
 #18404+(31903-1)= 50306
 
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 47306, x1 = 50306, y0 = 0, y1 = 1, col = "#F5FEFB", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
+kpRect(kp, chr = 'rDNA_locus', x0 = 47306, x1 = 50306, y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
 #50306-3000 = 47306
 
-kpPlotRegions(kp, data=entire_rdna6_template, col="maroon3", r0= -0.5, r1= -1.3)
-kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
-
+kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.3)
+kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+dev.off()
 
 #use zoom option, took screenshot and edited in powerpoint
 
+
+##wanted to plot only till 3'ets and nontemplate
+##plotting begins
+
+png("mouse_rdna_nontemplate_pG4CS_coverage.png", width = 30, height= 30, units= "in", res = 150)
+custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=20403)) 
+
+##make separate data.table for each rdna components
+
+#"yellowgreen", "red", "green", "orange", "brown", "pink", "lightyellow", "salmon", "peachpuff"
+
+kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =2000 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks last 2000bp from IGS representing previous rdna 
+kpRect(kp, chr = 'rDNA_locus', x0 = 2001, x1 =5000 , y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 3000 bp of  promoter
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 5001, x1 = 9007 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS
+#5001+(4007-1) = 9007
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 9008, x1 = 10877, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
+#9008+(1870-1) = 10877
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 10877, x1 = 11877, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1
+#10877+(1000-1) = 11877
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 11878, x1 = 12034 , y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
+#11878+(157-1) = 12034
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 12035, x1 = 13122, y0 = 0, y1 = 1, col = "#FFCC17", data.panel = "ideogram", borders= NA) #marks ITS2
+#12035+(1088-1) = 13122
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 13123 , x1 = 17852, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 28S
+#13123+(4730-1)= 17852
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 17853, x1 = 18403, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram", borders= NA) #marks 3'ETS
+#17853+(551-1) = 18403
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 18404, x1 = 20403, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks 3'ETS
+
+
+
+
+kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.0) #-1.5 to make blue with more width
+
+kpPlotCoverage(kp, data=entire_rdna6_nontemplate, col = "#E21515")
+kpPlotRegions(kp, data=entire_rdna6_nontemplate, data.panel=2, col = "#E21515")
+dev.off()
+
+
+png("mouse_rdna_template_pG4CS_coverage.png", width = 30, height= 30, units= "in", res = 150)
+custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=20403))
+#end is 50306 because I added 5000 to 45306.
+
+##make separate data.table for each rdna components
+
+#"yellowgreen", "red", "green", "orange", "brown", "pink", "lightyellow", "salmon", "peachpuff"
+
+kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =2000 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks last 2000bp from IGS representing previous rdna 
+kpRect(kp, chr = 'rDNA_locus', x0 = 2001, x1 =5000 , y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 3000 bp of  promoter
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 5001, x1 = 9007 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS
+#5001+(4007-1) = 9007
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 9008, x1 = 10877, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
+#9008+(1870-1) = 10877
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 10877, x1 = 11877, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1
+#10877+(1000-1) = 11877
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 11878, x1 = 12034 , y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
+#11878+(157-1) = 12034
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 12035, x1 = 13122, y0 = 0, y1 = 1, col = "#FFCC17", data.panel = "ideogram", borders= NA) #marks ITS2
+#12035+(1088-1) = 13122
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 13123 , x1 = 17852, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 28S
+#13123+(4730-1)= 17852
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 17853, x1 = 18403, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram", borders= NA) #marks 3'ETS
+#17853+(551-1) = 18403
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 18404, x1 = 20403, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks 3'ETS
+
+
+kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.0) #-1.5 to make blue with more width
+
+kpPlotCoverage(kp, data=entire_rdna6_template, col = "#1414E1")
+kpPlotRegions(kp, data=entire_rdna6_template, data.panel=2, col = "#1414E1")
+dev.off()
 
 
 ##i want plot bar graph after the rule for G4s that has 3500 bp added to 5ETS and also has promoter at the end. 
@@ -200,8 +293,8 @@ g4s_norm_5000igs<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = norm_
        y= "Normalized pG4CS count")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= pG4CS_count, vjust= -0.5, size= 50))+
-  scale_fill_manual(values= c( "#F5FEFB","maroon", "#E21515", "steelblue", "#5AAA46","darkviolet", "#F36017","burlywood2", "#6B1519", 
-                               "pink", "#818689","aquamarine", "#ECE612","greenyellow", "#E07F80","turquoise2", "#DE9A22"))+
+  scale_fill_manual(values= c( "#B6FFF4","maroon", "#FDCCE5", "steelblue", "#D0B6FF","darkviolet", "#EF9B20","burlywood2", "#A0322B", 
+                               "pink", "#FFCC17","aquamarine", "#E5FFB6","greenyellow", "#3B8CC4","turquoise2", "#A4A2A8"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
   theme(axis.text.x = element_blank())+ 
@@ -243,8 +336,8 @@ g4s_norm_5000igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = norm
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= pG4CS_count, hjust= -1.0, vjust= 0.5, size= 50))+
-  scale_fill_manual(values= rev(c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                                  "#818689", "#ECE612", "#E07F80", "#DE9A22")))+
+  scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
+                                  "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
   theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
@@ -290,7 +383,7 @@ g4s_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm_p
        fill= "pG4CS strand")+
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
   geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
-  scale_fill_manual(values= c("+" = "royalblue", "-" = "maroon3"), 
+  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template", "-" = "Template"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
@@ -334,8 +427,8 @@ g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_pG4CS_count,
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
   geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                              "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  scale_fill_manual(values= c("#B6FFF4", "#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
+                              "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -359,8 +452,8 @@ g4s_template <- ggplot(template, aes(x= rDNA_region, y = norm_pG4CS_count, fill=
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
   geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c("#F5FEFB", "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                              "#818689", "#ECE612", "#E07F80", "#DE9A22"))+
+  scale_fill_manual(values= c("#B6FFF4", "#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
+                              "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
