@@ -190,7 +190,8 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = no
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.text.x = element_blank(), 
+  theme(axis.text.x = element_text(vjust = 0.5, hjust = 0.5), 
+        axis.ticks.x = element_line(color = "black"),
        panel.grid = element_blank(),
        plot.title = element_text(hjust = 0.5, face = "bold"),
        plot.subtitle = element_text(hjust = 0.5),
