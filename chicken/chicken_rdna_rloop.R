@@ -46,6 +46,7 @@ entire_RLFSs_rdna$rDNA_region <- "junction"
 # to do that, i will be creating a column that will have actual RLFS start based on strand specificity
 
 entire_RLFSs_rdna<- entire_RLFSs_rdna %>% mutate(actual_rlfs_start = ifelse(entire_RLFSs_rdna$strand == "+", RLFS_start, RLFS_end))
+entire_RLFSs_rdna<- entire_RLFSs_rdna %>% mutate(actual_rlfs_end = ifelse(entire_RLFSs_rdna$strand == "+", RLFS_end, RLFS_start))
 entire_RLFSs_rdna$RLFS_length<- abs(entire_RLFSs_rdna$RLFS_start-entire_RLFSs_rdna$RLFS_end)
 
 
@@ -127,8 +128,8 @@ RLFS_norm<- ggplot(entire_RLFSs_rdna_summary, aes(x= rDNA_region, y = norm_RLFS_
        y= "Normalized RLFS count")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= RLFS_count, vjust= -0.5, size= 50))+
-  scale_fill_manual(values= c( "#E21515", "steelblue", "#5AAA46","darkviolet", "#F36017","burlywood2", "#6B1519", 
-                               "pink", "#818689","aquamarine", "#ECE612","greenyellow", "#E07F80"))+
+  scale_fill_manual(values= c( "#FDCCE5", "steelblue", "#D0B6FF","darkviolet", "#EF9B20","burlywood2", "#A0322B", 
+                               "pink", "#FFCC17","aquamarine", "#E5FFB6","greenyellow", "#3B8CC4"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
   theme(axis.text.x = element_blank())+ 
@@ -174,8 +175,8 @@ RLFS_norm_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = norm_RLFS
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
   geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50))+
-  scale_fill_manual(values= rev(c("#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                                  "#818689", "#ECE612", "#E07F80")))+
+  scale_fill_manual(values= rev(c("#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
+                                  "#FFCC17", "#E5FFB6", "#3B8CC4")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
   theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
@@ -221,7 +222,7 @@ rlfs_strandwise<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = nor
        fill= "RLFS strand")+
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
-  scale_fill_manual(values= c("+" = "royalblue", "-" = "maroon3"), 
+  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template", "-" = "Template"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
@@ -265,8 +266,8 @@ rlfs_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_RLFS_count,
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c("#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                              "#818689", "#ECE612", "#E07F80"))+
+  scale_fill_manual(values= c("#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
+                              "#FFCC17", "#E5FFB6", "#3B8CC4"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -290,8 +291,8 @@ rlfs_template <- ggplot(template, aes(x= rDNA_region, y = norm_RLFS_count, fill=
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
-  scale_fill_manual(values= c( "#E21515", "#5AAA46", "#F36017", "#6B1519", 
-                              "#818689", "#ECE612", "#E07F80"))+
+  scale_fill_manual(values= c( "#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
+                              "#FFCC17", "#E5FFB6", "#3B8CC4"))+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -330,24 +331,79 @@ custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=11863))
 kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
 
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#E21515", data.panel = "ideogram", borders= NA) #marks 5'ETS
-kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#5AAA46", data.panel = "ideogram", borders= NA) #marks 18S
-kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#F36017", data.panel = "ideogram", borders= NA) #marks ITS1
-kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#6B1519", data.panel = "ideogram", borders= NA) #marks 5.8S
-kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#818689", data.panel = "ideogram", borders= NA) #marks ITS2
-kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#ECE612", data.panel = "ideogram", borders= NA) #marks 28S
-kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#E07F80", data.panel = "ideogram", borders= NA) #marks 3'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
+kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1
+kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
+kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFCC17", data.panel = "ideogram", borders= NA) #marks ITS2
+kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 28S
+kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram", borders= NA) #marks 3'ETS
 
 
-kpPlotRegions(kp, data=entire_rdna6_template, col="maroon3", r0= -0.5, r1= -1.3)
-kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="royalblue", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.3)
+kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
 
 
-#use zoom option, took screenshot and edited in powerpoint
+#Playing with colors use zoom option, took screenshot and edited in powerpoint
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#F5F5DC", data.panel = "ideogram", borders= NA) #marks 5'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#90EE90", data.panel = "ideogram", borders= NA) #marks 18S
+kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#E6E6FA", data.panel = "ideogram", borders= NA) #marks ITS1
+kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#ADD8E6", data.panel = "ideogram", borders= NA) #marks 5.8S
+kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#D3D3D3", data.panel = "ideogram", borders= NA) #marks ITS2
+kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks 28S
+kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 3'ETS
+
+
+#Playing with colors use zoom option, took screenshot and edited in powerpoint
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#ADD8E6", data.panel = "ideogram", borders= NA) #marks 18S
+kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFDAB9", data.panel = "ideogram", borders= NA) #marks ITS1
+kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#E6E6FA", data.panel = "ideogram", borders= NA) #marks 5.8S
+kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
+kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#AAF0D1", data.panel = "ideogram", borders= NA) #marks 28S
+kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#F7E7CE", data.panel = "ideogram", borders= NA) #marks 3'ETS
 
 
 
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#AAF0D1", data.panel = "ideogram", borders= NA) #marks 18S
+kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFDAB9", data.panel = "ideogram", borders= NA) #marks ITS1
+kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#924045", data.panel = "ideogram", borders= NA) #marks 5.8S
+kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
+kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E6E6FA", data.panel = "ideogram", borders= NA) #marks 28S
+kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#ADD8E6", data.panel = "ideogram", borders= NA) #marks 3'ETS
+
+kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.3)
+kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#FDCCE5", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
 
 
 
+##i like these but bruce needs to confirm.
+
+##template only
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#B5F2DC", data.panel = "ideogram", borders= NA) #marks 18S
+kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1
+kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#C98686", data.panel = "ideogram", borders= NA) #marks 5.8S
+kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
+kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
+kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#A2CCE9", data.panel = "ideogram", borders= NA) #marks 3'ETS
+
+kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.3)
+
+
+
+##non template only
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
+kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#B5F2DC", data.panel = "ideogram", borders= NA) #marks 18S
+kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1
+kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#C98686", data.panel = "ideogram", borders= NA) #marks 5.8S
+kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
+kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
+kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#A2CCE9", data.panel = "ideogram", borders= NA) #marks 3'ETS
+
+kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#FDCCE5", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+
+"#DCDCDC","#FFB6C1","#D0B6FF","#E5FFB6","#FFE0C2","#B6FFF4","#FFFFE0", "#E8E8FB","#B6E5FF","#E9BFA2"
 
