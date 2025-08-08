@@ -208,7 +208,7 @@ RLFS_norm_5000igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = n
   coord_flip()
 
 ggsave("Normalized_RLFS_distribution_in_mouse_rDNA_subcomponents_after_rule.tiff", 
-       plot = RLFS_norm_5000igs_nojuntn, width=18,height=10, dpi=150)
+       plot = RLFS_norm_5000igs_nojuntn, width=18,height=10, dpi=300)
 
 
 
