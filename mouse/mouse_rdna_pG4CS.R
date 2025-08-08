@@ -193,6 +193,9 @@ entire_g4s_rdna$rDNA_region <- "junction"
 # to do that, i will be creating a column that will have actual pG4CS start based on strand specificity
 
 entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_pG4CS_start = ifelse(entire_g4s_rdna$strand == "+", pG4CS_start, pG4CS_end))
+entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_pG4CS_end = ifelse(entire_g4s_rdna$strand == "+", pG4CS_end, pG4CS_start))
+
+
 entire_g4s_rdna$pG4CS_length<- abs(entire_g4s_rdna$pG4CS_start-entire_g4s_rdna$pG4CS_end)
 
 
