@@ -63,9 +63,28 @@ entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 16832] <- "3
 entire_RLFSs_rdna$rDNA_region[entire_RLFSs_rdna$actual_rlfs_start > 16833 & entire_RLFSs_rdna$actual_rlfs_start < 46137] <- "IGS"
 
 
+#rDNA_region_length is needed for downstream normalization. 
+#we will doing normalization over rDNA length 
+
+
+entire_RLFSs_rdna <- entire_RLFSs_rdna %>%
+  mutate(rDNA_region_length = case_when(
+    rDNA_region == "Promoter" ~ 2202,
+    rDNA_region == "5'ETS"    ~ 3657,
+    rDNA_region == "18S"      ~ 1869,
+    rDNA_region == "ITS1"     ~ 1070,
+    rDNA_region == "5.8S"     ~ 157,
+    rDNA_region =="ITS2"      ~ 1167,
+    rDNA_region =="28S"       ~ 5051,
+    rDNA_region == "3'ETS"    ~ 361,
+    rDNA_region == "IGS"      ~ 29305, 
+    TRUE ~ 0)) #unmatched make it zero
+      
+      
+      
 fwrite(entire_RLFSs_rdna, "RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_details_after_rule.csv", sep = ",")
 
-entire_RLFSs_rdna_summary<- entire_RLFSs_rdna %>% group_by(rDNA_region) %>% count()
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna %>% group_by(rDNA_region, rDNA_region_length) %>% count()
 #rows order is lost 
 
 sum(entire_RLFSs_rdna_summary$n)
@@ -81,10 +100,9 @@ entire_RLFSs_rdna_summary[,1]
 new_rows<- data.table(rDNA_region = c("Promoter and 5'ETS junction", "5'ETS and 18S junction", 
                                       "18S and ITS1 junction","ITS1 and 5.8S junction",
                                       "5.8S", "5.8S and ITS2 junction","ITS2 and 28S junction",
-                                      "28S and 3'ETS junction", "3'ETS and IGS junction"))
-
-new_rows$n<- 0
-
+                                      "28S and 3'ETS junction", "3'ETS and IGS junction"), 
+                      n= 0,
+                      rDNA_region_length=0)
 
 entire_RLFSs_rdna_summary<- rbind(entire_RLFSs_rdna_summary, new_rows)
 entire_RLFSs_rdna_summary$rDNA_region
@@ -105,12 +123,24 @@ entire_RLFSs_rdna_summary <- entire_RLFSs_rdna_summary[c("Promoter","Promoter an
                                                            "18S", "18S and ITS1 junction", "ITS1", "ITS1 and 5.8S junction", "5.8S", 
                                                            "5.8S and ITS2 junction",  "ITS2", "ITS2 and 28S junction","28S", 
                                                            "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ),]
+names(entire_RLFSs_rdna_summary)[2] <- "rDNA_region_length"
+names(entire_RLFSs_rdna_summary)[3] <- "RLFS_count"
+entire_RLFSs_rdna_summary <- entire_RLFSs_rdna_summary %>%
+  mutate(rDNA_region_length = case_when(
+    rDNA_region == "Promoter" ~ 2202,
+    rDNA_region == "5'ETS"    ~ 3657,
+    rDNA_region == "18S"      ~ 1869,
+    rDNA_region == "ITS1"     ~ 1070,
+    rDNA_region == "5.8S"     ~ 157,
+    rDNA_region =="ITS2"      ~ 1167,
+    rDNA_region =="28S"       ~ 5051,
+    rDNA_region == "3'ETS"    ~ 361,
+    rDNA_region == "IGS"      ~ 29305, 
+    TRUE ~ 0)) #unmatched make it zero
 
-names(entire_RLFSs_rdna_summary)[2] <- "RLFS_count"
 
-
-entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(norm_RLFS_count = RLFS_count/sum(entire_RLFSs_rdna_summary$RLFS_count)) %>% 
-  mutate(norm_RLFS_count= round(norm_RLFS_count, 2))
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(RLFS_density = RLFS_count/rDNA_region_length)%>% 
+  mutate(RLFS_density= round(RLFS_density, 3))
 
 fwrite(entire_RLFSs_rdna_summary, "RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
 
@@ -121,13 +151,15 @@ entire_RLFSs_rdna_summary$rDNA_region <- factor(entire_RLFSs_rdna_summary$rDNA_r
                                                          "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ))
 
 
-RLFS_norm_3500igs<- ggplot(entire_RLFSs_rdna_summary, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+max_value<- round(max(entire_RLFSs_rdna_summary$RLFS_density, na.rm = TRUE),2)
+
+RLFS_norm_3500igs<- ggplot(entire_RLFSs_rdna_summary, aes(x= rDNA_region, y = RLFS_density, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
   labs(title= "Normalized RLFS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Normalized RLFS count", 
+       y= "RLFS density", 
        fill = "rDNA region")+
-  scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value))+
   geom_text(aes(label= RLFS_count), vjust= -0.5, size= 5)+
   scale_fill_manual(values= c( "#FFB6C1","maroon", "#D0B6FF", "steelblue", "#E5FFB6","darkviolet", "#FFE0C2","burlywood2", "#B6FFF4", 
                                "pink4", "#FFFFE0","aquamarine", "#E8E8FB","greenyellow", "#B6E5FF","turquoise2", "#DCDCDC"))+
@@ -147,6 +179,7 @@ ggsave( "Normalized_RLFS_distribution_in_human_rDNA_subcomponents_incld_junctn_A
         plot = RLFS_norm_3500igs, width=18,height=10, dpi=150) #AR is after rule, bcoz powerpoint is not accepting too long image name
 
 
+
 RLFSs_rdna_summary<- entire_RLFSs_rdna_summary[!grepl("junction", entire_RLFSs_rdna_summary$rDNA_region),]
 
 
@@ -160,15 +193,16 @@ RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region,
 
 #To reverse the order so that "Promoter" appears at the top when flipped, modify the levels of the factor like this
 
+max_value<- round(max(RLFSs_rdna_summary$RLFS_density, na.rm = TRUE),2)
 
 
-RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = RLFS_density, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
   labs(title= "Normalized RLFS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Normalized RLFS count", 
+       y= "RLFS density", 
        fill = "rDNA")+
-  scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.60))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value))+
   geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50))+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
@@ -186,37 +220,59 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = n
   coord_flip()
 
 ggsave("Normalized_RLFS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = RLFS_norm_3500igs_nojuntn, width=18,height=10, dpi=150)
+        plot = RLFS_norm_3500igs_nojuntn, width=18,height=10, dpi=300)
 
 
 
 #to make template and non-template
+
 entire_RLFSs_rdna<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_details_after_rule.csv", sep = ",", header = TRUE)
-entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna %>% group_by(rDNA_region, strand) %>% count()
-names(entire_RLFSs_rdna_summary2)[3] <- "RLFS_count"
+
+      
+entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna %>% group_by(rDNA_region, rDNA_region_length, strand) %>% count()
+names(entire_RLFSs_rdna_summary2)[4] <- "RLFS_count"
 
 new_rows<- data.table(rDNA_region = c("18S", "5.8S","5.8S"),
+                      rDNA_region_length = c(0, 0, 0),
                       strand= c("+", "+", "-"),
                       RLFS_count = c(0, 0,0))
 
 entire_RLFSs_rdna_summary2<- rbind(entire_RLFSs_rdna_summary2, new_rows)
+
+
+entire_RLFSs_rdna_summary2 <- entire_RLFSs_rdna_summary %>%
+  mutate(rDNA_region_length = case_when(
+    rDNA_region == "Promoter" ~ 2202,
+    rDNA_region == "5'ETS"    ~ 3657,
+    rDNA_region == "18S"      ~ 1869,
+    rDNA_region == "ITS1"     ~ 1070,
+    rDNA_region == "5.8S"     ~ 157,
+    rDNA_region =="ITS2"      ~ 1167,
+    rDNA_region =="28S"       ~ 5051,
+    rDNA_region == "3'ETS"    ~ 361,
+    rDNA_region == "IGS"      ~ 29305, 
+    TRUE ~ 0)) #unmatched make it zero
+
+
 entire_RLFSs_rdna_summary2$rDNA_region <- factor(entire_RLFSs_rdna_summary2$rDNA_region, 
                                                 levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                                         "ITS2","28S", "3'ETS", "IGS" ))
                                                             
-entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna_summary2 %>% mutate(norm_RLFS_count = RLFS_count/sum(entire_RLFSs_rdna_summary2$RLFS_count)) %>% 
-  mutate(norm_RLFS_count= round(norm_RLFS_count, 2))
+entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna_summary2 %>% mutate(RLFS_density = RLFS_count/rDNA_region_length) %>% 
+  mutate(RLFS_density= round(RLFS_density, 4))
 
 fwrite(entire_RLFSs_rdna_summary2, "RLFS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv")
 
 
-rlfs_strandwise<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = norm_RLFS_count, fill= strand)) + 
+max_value<- round(max(entire_RLFSs_rdna_summary2$RLFS_density, na.rm = TRUE),4)
+
+rlfs_strandwise<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = RLFS_density, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
   labs(title= "Normalized RLFS strandwise distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Normalized RLFS count", 
+       y= "RLFS density", 
        fill= "RLFS strand")+
-  scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), #changed the non template and template colors
                     labels = c("+" = "Non-template", "-" = "Template"))+
@@ -242,15 +298,15 @@ entire_RLFSs_rdna_summary2$rDNA_region <- factor(entire_RLFSs_rdna_summary2$rDNA
                                          levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                                         "ITS2","28S", "3'ETS", "IGS" )))
 
+max_value<- round(max(entire_RLFSs_rdna_summary2$RLFS_density, na.rm = TRUE),4)
 
-
-rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = norm_RLFS_count, fill= strand)) + 
+rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = RLFS_density, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
   labs(title= "Normalized RLFS strandwise distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Normalized RLFS count", 
+       y= "RLFS density", 
        fill= "RLFS strand")+
-  scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.004), limits =c(0,max_value))+
   geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50), position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), #changed the non template and template colors
                     labels = c("+" = "Non-template", "-" = "Template"))+
@@ -272,26 +328,23 @@ ggsave( "Normalized_strandwise_RLFS_flipped_distribution_in_human_rDNA_subcompon
         plot = rlfs_strandwise_flip, width=18,height=10, dpi=150)
 
 
+
 nontemplate<- entire_RLFSs_rdna_summary2 %>% filter(strand == "+")
 nontemplate$rDNA_region <- factor(nontemplate$rDNA_region, 
                                                  levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                                             "ITS2","28S", "3'ETS", "IGS" ))
-
-
-template<- entire_RLFSs_rdna_summary2 %>% filter(strand == "-")
-template$rDNA_region <- factor(template$rDNA_region, 
-                                                 levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
-                                                            "ITS2","28S", "3'ETS", "IGS" ))
+max_value<- round(max(nontemplate$RLFS_density),4)
 
 
 
-rlfs_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+
+rlfs_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = RLFS_density, fill= rDNA_region)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized Non-template RLFS distribution in the Human rDNA locus", 
+  labs(title= "Non-template RLFS density distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Normalized Non-template RLFS count", 
+       y= "Non-template RLFS density", 
        fill= "rDNA")+
-  scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
   scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
@@ -310,13 +363,23 @@ rlfs_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_RLFS_count,
 ggsave( "Normalized_nontemplate_RLFS_distribution_in_human_rDNA_subcomponents_AR.tiff", 
         plot = rlfs_nontemplate, width=18,height=10, dpi=150)
 
-rlfs_template <- ggplot(template, aes(x= rDNA_region, y = norm_RLFS_count, fill= rDNA_region)) + 
+
+
+template<- entire_RLFSs_rdna_summary2 %>% filter(strand == "-")
+template$rDNA_region <- factor(template$rDNA_region, 
+                               levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                          "ITS2","28S", "3'ETS", "IGS" ))
+
+max_value<- round(max(template$RLFS_density),4)
+
+
+rlfs_template <- ggplot(template, aes(x= rDNA_region, y = RLFS_density, fill= rDNA_region)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized Template RLFS distribution in the Human rDNA locus", 
+  labs(title= "Template RLFS density distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Normalized Template RLFS count", 
+       y= "Template RLFS density", 
        fill= "rDNA")+
-  scale_y_continuous(breaks= seq(0, 0.30, by = 0.1), limits =c(0,0.30))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
   geom_text(aes(label= RLFS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
   scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
@@ -340,9 +403,8 @@ ggsave( "Normalized_template_RLFS_distribution_in_human_rDNA_subcomponents_AR.ti
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
 
 entire_RLFSs_rdna_summary <- fread("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
-entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(perc=norm_RLFS_count*100)
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(perc=(RLFS_density/ sum(entire_RLFSs_rdna_summary$RLFS_density))*100)
 
-fwrite(entire_RLFSs_rdna_summary, "RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv")
 
 RLFSs_rdna_summary<- entire_RLFSs_rdna_summary[!grepl("junction", entire_RLFSs_rdna_summary$rDNA_region),]
 
