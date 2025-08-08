@@ -198,6 +198,21 @@ source("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniver
 #calculate CpG content
 source("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/rDNA_project/human/CpG_dinucleotides_function.R")
 
+
+
+# i did GC content of entire rdna 
+
+gc_content(entire_rdna) #entire rdna promoter to igs (1299 to 46136)
+#G_count C_count gc_content_value gc_content_perc
+#1   11682   14354        0.5806682        58.06682
+
+gc_content(entire_rdna_no_igs) #entire rdna promoter to igs (1299 to 16832)
+#G_count C_count gc_content_value gc_content_perc
+#1    5535    5446         0.706901         70.6901
+
+
+
+
 rdna_human_seq<- readDNAStringSet("KY962518_added_3500nt_IGS_upstream_nontemplate.fasta")
 seq<- as.character(rdna_human_seq[[1]]) 
 seq2<- str_sub(seq, 1299, 16832) #just decided to have 5'ETS to 3'ETS
