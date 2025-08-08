@@ -290,7 +290,7 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
  #7158+ (1869-1) = 9026
  
- kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1S
+ kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1
  #9027+ (1070-1) = 10096 
  
  kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
@@ -312,9 +312,71 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  kpPlotRegions(kp, data=entire_rdna6_template, data.panel=2, col = "#1414E1")
  dev.off()
  
+ #visually i dot think one can diffrentiate wher ITS2 RLFS is begining, it seems we have alot of ITS1 RLFS.
+ #to see that 
+ 
+ #i made three seperate garphs
+ its2_test <- entire_rdna6_nontemplate %>%
+               filter(start > 10254 & start < 11421)
+ 
+ its1_test<- entire_rdna6_nontemplate %>%
+              filter(start > 9027 & start < 10097)
+ 
+ its1and2_test<- entire_rdna6_nontemplate %>%
+                  filter(start > 9027 & start < 11421)
+ 
+ custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
+ kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+ #3501+(3657-1) = 7157
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
+ #7158+ (1869-1) = 9026
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1S
+ #9027+ (1070-1) = 10096 
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
+ #10097+ (157-1) = 10253
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#FFCC17", data.panel = "ideogram", borders= NA) #marks ITS2
+ #10254+(1167-1) = 11420
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 28S
+ #11421+(5051-1) = 16471
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram", borders= NA) #marks 3'ETS
+ #16472+(361-1) = 16832
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 19000, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks IGS
+ 
+ #16472+(361-1) = 16832
+ 
+ 
+ kpPlotCoverage(kp, data=its1_test, col = "#E21515")
+ kpPlotRegions(kp, data=its1_test, data.panel=2, col = "#E21515")
+ 
+ kpPlotCoverage(kp, data=its1and2_test, col = "#E21515")
+ kpPlotRegions(kp, data=its1and2_test, data.panel=2, col = "#E21515")
+ 
+ kpPlotCoverage(kp, data=its2_test, col = "#E21515")
+ kpPlotRegions(kp, data=its2_test, data.panel=2, col = "#E21515")
+ 
+ # i just took teh screenshot not saved as pdf. 
+ 
+ #after looking at it i can see that in the final image, you can differentiate the the one that starts from ITS2 are actually present at the bottom
+ #so last 7 RLFS between ITS1 to IT2 actually belong to ITS2
+ #bruce told table will have cooridnates so we dont need to show separate ITS RLFS
+ 
+ 
  
  
  #I am trying to make bedgraphs directly in karyoplote
+ ##plotting begins for entire region till IGS
  
  entire_rdna<- fread("KY962518_added_3500nt_IGS_upstream_qmrlfs.out.bed", sep = "\t", header = FALSE) #208, this contain double entry for promoter and IGS. 
  entire_rdna$V1= "rDNA_locus"
@@ -328,8 +390,6 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  
  entire_rdna6_template<- entire_rdna6 %>% filter(strand=="-")#114
  
- 
- ##plotting begins
  
  ##non template
  png("entire_rdna_nontemplate_rlfs_coverage.png", width = 30, height= 30, units= "in", res = 150)
@@ -408,4 +468,17 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#A4A2A8
  kpPlotCoverage(kp, data=entire_rdna6_template, col = "#1414E1")
  kpPlotRegions(kp, data=entire_rdna6_template, data.panel=2, col = "#1414E1")
  dev.off()
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  
