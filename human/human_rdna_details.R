@@ -46,15 +46,18 @@ its2<- str_sub(hg38_rDNA_seq, start= 10254, end = 11420)
 s28<- str_sub(hg38_rDNA_seq, start= 11421, end = 16471)
 ets3<- str_sub(hg38_rDNA_seq, start= 16472, end = 16832)
 igs<- str_sub(hg38_rDNA_seq, start= 16833, end = 46137) # my defined IGS 
+entire_rdna<- str_sub(hg38_rDNA_seq, start= 1299, end=46136)
+entire_rdna_no_igs<- str_sub(hg38_rDNA_seq, start= 1299, end=16832)
+
 
 Name<- c("Promoter_KY962518", "5'ETS_KY962518", "18S_KY962518", "ITS1_KY962518", "5.8S_KY962518", "ITS2_KY962518", 
-         "28S_KY962518", "3'ETS_KY962518", "IGS_KY962518")
+         "28S_KY962518", "3'ETS_KY962518", "IGS_KY962518", "entire_rdna_KY962518", "no_igs_KY962518")
 
 
-Sequences <- c(promoter,ets5, s18, its1, s5.8, its2, s28, ets3,igs)
+Sequences <- c(promoter,ets5, s18, its1, s5.8, its2, s28, ets3,igs, entire_rdna, entire_rdna_no_igs)
 
 Details <- c("1299_3500","3501_7157", "7158_9026", "9027_10096", "10097_10253",
-             "10254_11420", "11421_16471", "16472_16832","16833_48338")
+             "10254_11420", "11421_16471", "16472_16832","16833_48338", "1299_46136", "1299_16832")
 
 
 
@@ -92,7 +95,7 @@ rdna_hg38_dataset_sequences<- rdna_hg38_dataset_details_v2 %>% select(1,2)
 
 
 ##create FASTA format
-for (j in 1: nrow(rdna_hg38_dataset_sequences)){
+for (j in 1: nrow(rdna_hg38_dataset_sequences)[1:9]){
   
   write(paste(">",rdna_hg38_dataset_sequences[j,1], sep=''),                                            
         file = "rDNA_KY962518_2018_sequence_fasta_format.txt",
@@ -113,6 +116,7 @@ for (j in 1: nrow(rdna_hg38_dataset_sequences)){
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rloop_and_rdna/human/one_rDNA_seq/output")
 rdna_2018<- fread("rdna_hg38_chr21_2018_dataset_details_v2.csv", header = TRUE, sep = ",")
 # select only nucleotide percent and identifier 
+rdna_2018<- rdna_2018[c(1:9,),]
 nucleotide<- rdna_2018 %>% select(Name,"A%","G%","C%", "T%")
 nucleotide_new<- separate(nucleotide, Name, "Name", sep = "_")
 
