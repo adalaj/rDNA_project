@@ -312,7 +312,7 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  kpPlotRegions(kp, data=entire_rdna6_template, data.panel=2, col = "#1414E1")
  dev.off()
  
- #visually i dot think one can diffrentiate wher ITS2 RLFS is begining, it seems we have alot of ITS1 RLFS.
+ #visually i dot think one can differentiate where ITS2 RLFS is beginning, it seems we have alot of ITS1 RLFS.
  #to see that 
  
  #i made three seperate garphs
