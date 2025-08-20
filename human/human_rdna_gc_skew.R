@@ -13,11 +13,12 @@ source("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniver
 library(stringr) #needed for GC skew function
 library(tidyverse)
 library(data.table)
+library(Biostrings)
 
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output")
 rdna_human<- fread ("rdna_hg38_chr21_2018_dataset_details_v2.csv", sep = ",", header = TRUE)
 
-attempt1<- data.frame((matrix(nrow = 0, ncol=6)))
+attempt1<- data.frteame((matrix(nrow = 0, ncol=6))) #6 coloumns because Gc skew has 6 columns
 
 for ( i in 1:nrow(rdna_human)){
   gc_skew_data<- gc_skew(rdna_human$Sequences[i])
@@ -48,8 +49,11 @@ rdna_human<- rdna_human %>% mutate(temp_norm_GC_skew = temp_GC_skew_value/sum(GC
 
 rdna_human$x_axis <- cumsum(rdna_human$Total_nucleotides)
 
-#calculated GC perc
+#calculated GC and AT perc
 rdna_human<- rdna_human %>% mutate(GC_perc = round(((G+C)/(Total_nucleotides))*100,2))
+rdna_human<- rdna_human %>% mutate(AT_perc = round(((A+T)/(Total_nucleotides))*100,2))
+
+
 
 
 #also wanted to calculate CpG or CG dinucleotide
@@ -63,7 +67,6 @@ rdna_human <- rdna_human %>%
 
 
 fwrite(rdna_human, "rdna_hg38_chr21_2018_dataset_details_v3.csv")
-
 
 
 
