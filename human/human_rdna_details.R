@@ -181,9 +181,11 @@ for (nm in names(datasets)) {
           panel.grid = element_blank(),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30),
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
+          axis.text.x = element_text(angle = 45, hjust = 1, size = 30, color = "black"),
+          axis.text.y  = element_text(color = "black"),
           panel.background = element_blank(),   # removes grey background
-          plot.background  = element_blank())
+          plot.background  = element_blank()) 
+          
   
   ggsave(paste0(nm, "_entire_sequences_nucleotide_distribution.tiff"),
          plot = p, width = 15, height = 10, dpi = 150)
@@ -217,10 +219,11 @@ for (nm in names(datasets)) {
           panel.grid = element_blank(),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30),
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
+          axis.text.x = element_text(angle = 45, hjust = 1, size = 30, color = "black"),
+          axis.text.y  = element_text(color = "black"),
           panel.background = element_blank(),   # removes grey background
-          plot.background  = element_blank())
-  
+          plot.background  = element_blank()) 
+ 
   ggsave(paste0(nm, "_AT_vs_GC_sequences_nucleotide_distribution.tiff"),
          plot = p_atgc, width = 15, height = 10, dpi = 150)
   
@@ -257,9 +260,10 @@ for (nm in names(datasets)) {
           panel.grid = element_blank(),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30),
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
+          axis.text.x = element_text(angle = 45, hjust = 1, size = 30, color = "black"),
+          axis.text.y  = element_text(color = "black"),
           panel.background = element_blank(),   # removes grey background
-          plot.background  = element_blank())
+          plot.background  = element_blank()) 
   
   ggsave(paste0(nm, "_ATGC_only_sequences_nucleotide_distribution.tiff"),
          plot = p_atgc_only, width = 15, height = 10, dpi = 150)
