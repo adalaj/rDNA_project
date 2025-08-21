@@ -183,7 +183,7 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  entire_rdna6_template<- entire_rdna6 %>% filter(strand=="-")#114
  
 
- png("rdna_both_strand_rlfs.png", width = 50, height= 30, units= "in", res = 150)
+ png("rdna_both_strand_rlfs.png", width = 15, height= 10, units= "in", res = 600) #png is supported by biorender
  
  ##plotting begins
  custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=48338))
@@ -237,7 +237,7 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  
 
  #need to plot only from 5'ETS to 3'ETS
- png("rdna_nontemplate_rlfs_coverage.png", width = 30, height= 30, units= "in", res = 150)
+ png("rdna_nontemplate_rlfs_coverage.png", width = 15, height= 10, units= "in", res = 600)
  
  custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
  kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
@@ -276,7 +276,7 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  
  
  #need to plot only from 5'ETS to 3'ETS
- png("rdna_template_rlfs_coverage.png", width = 30, height= 30, units= "in", res = 150)
+ png("rdna_template_rlfs_coverage.png", width = 15, height= 10, units= "in", res = 600)
  
  custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
  kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
