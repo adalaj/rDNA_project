@@ -138,6 +138,8 @@ entire_RLFSs_rdna_summary <- entire_RLFSs_rdna_summary %>%
     rDNA_region == "IGS"      ~ 29305, 
     TRUE ~ 0)) #unmatched make it zero
 
+#Which regions are enriched for RLFS relative to their size.
+#Removes the bias of region length — highlights hotspots where RLFS are concentrated
 
 entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(RLFS_density = RLFS_count/rDNA_region_length)%>% 
   mutate(RLFS_density= round(RLFS_density, 3))
@@ -180,6 +182,7 @@ ggsave( "Normalized_RLFS_distribution_in_human_rDNA_subcomponents_incld_junctn_A
 
 
 
+entire_RLFSs_rdna_summary<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
 RLFSs_rdna_summary<- entire_RLFSs_rdna_summary[!grepl("junction", entire_RLFSs_rdna_summary$rDNA_region),]
 
 
@@ -203,24 +206,65 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
        y= "RLFS density", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value))+
-  geom_text(aes(label= RLFS_count, hjust= -1.0, vjust= 0.5, size= 50))+
+  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
+  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, colour = "black"),
         axis.ticks.x = element_line(color = "black"), 
         panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 30),
+        text = element_text(size = 40),
         axis.line = element_line(color = "black"),
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"))+
+        axis.ticks.y = element_line(color = "black"),
+        axis.text.x  = element_text(color = "black"),
+        axis.text.y  = element_text(color = "black"))+
   coord_flip()
 
 ggsave("Normalized_RLFS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
         plot = RLFS_norm_3500igs_nojuntn, width=18,height=10, dpi=300)
+
+
+#Out of all RLFS across the rDNA locus, what fraction comes from each region?
+entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(RLFS_proportion_perc = round((RLFS_count/sum(RLFS_count)*100),2))
+#Which region contributes the largest share of RLFS overall.
+#Biased toward longer regions (they naturally accumulate more RLFS simply because they have more bases)
+
+
+max_value<- round(max(RLFSs_rdna_summary$RLFS_proportion_perc, na.rm = TRUE),2)
+
+
+RLFS_prop_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = RLFS_proportion_perc, fill= rDNA_region)) + 
+  geom_bar(stat= 'identity', color= "black") +
+  labs(title= "Normalized RLFS distribution in the Human rDNA locus", 
+       x= "Human rDNA region", 
+       y= "RLFS proportion (%)", 
+       fill = "rDNA")+
+  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value))+
+  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
+  scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
+                                  "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
+  #guides(fill = guide_legend(reverse = TRUE))
+  theme_minimal()+
+  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, colour = "black"),
+        axis.ticks.x = element_line(color = "black"), 
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 40),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"),
+        axis.text.x  = element_text(color = "black"),
+        axis.text.y  = element_text(color = "black"))+
+  coord_flip()
+
+ggsave("RLFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+       plot = RLFS_prop_3500igs_nojuntn, width=18,height=10, dpi=300)
+
 
 
 
