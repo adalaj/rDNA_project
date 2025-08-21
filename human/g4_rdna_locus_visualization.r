@@ -47,7 +47,7 @@ rdna_template<- rdna %>% filter(strand=="-") #150
 ##Initiate the steps to save the plot
 ##search code
 
-#png("canonicalg4s_rdna.png", width = 30, height= 30, units= "in", res = 600) # at this moment I have not saved the file because we might have to increase the resolution as paper writing begins 
+#png("canonicalg4s_rdna.png", width = 30, height= 30, units= "in", res = 1000) # at this moment I have not saved the file because we might have to increase the resolution as paper writing begins 
 
 
 #Step 1: create custom genome for entire rdna locus
@@ -183,7 +183,7 @@ entire_rdna_nontemplate<- entire_rdna %>% filter(strand=="+") #60
 entire_rdna_template<- entire_rdna %>% filter(strand=="-") #162
 
 
-png("rdna_both_strand_pG4CS.png", width = 50, height= 30, units= "in", res = 150)
+png("rdna_both_strand_pG4CS.png", width = 15, height= 10, units= "in", res = 1000)
 ##plotting begins
 custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=48338))
 #end is 48338 because I added 3500 to 44838
@@ -233,7 +233,7 @@ dev.off()
 #for checking how many pG4CS are formed after rule count please see junction_rloop_2018.R file
 
 #need to plot only from 5'ETS to 3'ETS
-png("rdna_nontemplate_pG4CS_coverage.png", width = 30, height= 30, units= "in", res = 150)
+png("rdna_nontemplate_pG4CS_coverage.png", width = 10, height= 10, units= "in", res = 1000)
 
 custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
 kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
@@ -272,7 +272,7 @@ dev.off()
 
 
 #need to plot only from 5'ETS to 3'ETS
-png("rdna_template_pG4CS_coverage.png", width = 30, height= 30, units= "in", res = 150)
+png("rdna_template_pG4CS_coverage.png", width = 15, height= 10, units= "in", res = 1000)
 
 custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
 kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
