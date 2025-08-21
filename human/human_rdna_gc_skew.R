@@ -86,7 +86,8 @@ full_length_gc_skew<- ggplot(rdna_human, aes(x = x_axis, y = norm_GC_skew)) +
         panel.background = element_rect(fill = "white", color = "black"),
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+        axis.text.y = element_text(color = "black"))
 
 ggsave("KY962518_full_length_normalised_gc_skew.tiff", 
        plot = full_length_gc_skew, width=18, height = 10, dpi = 150)
@@ -107,7 +108,8 @@ full_length_gc_skew_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = nor
         panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+        axis.text.y = element_text(color = "black"))
 
 ggsave("KY962518_full_length_excld_IGS_normalised_gc_skew.tiff", 
        plot = full_length_gc_skew_excld_igs, width=18, height = 10, dpi = 150)
@@ -129,7 +131,8 @@ full_length_gc_content_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = 
         panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+        axis.text.y = element_text(color = "black"))
 
 ggsave("KY962518_full_length_excld_IGS_GC_content.tiff", 
        plot = full_length_gc_content_excld_igs, width=18, height = 10, dpi = 150)
@@ -153,7 +156,8 @@ full_length_CpG_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = CpG_OE)
         panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+        axis.text.y = element_text(color = "black"))
 
 ggsave("KY962518_full_length_excld_IGS_CpG_dinucleotides_OE_ratio.tiff", 
        plot = full_length_CpG_excld_igs, width=18, height = 10, dpi = 150)
@@ -174,7 +178,8 @@ full_length_CpG_perc_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = Cp
         panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+        axis.text.y = element_text(color = "black"))
 
 ggsave("KY962518_full_length_excld_IGS_CpG_dinucleotides_perc.tiff", 
        plot = full_length_CpG_perc_excld_igs, width=18, height = 10, dpi = 150)
@@ -257,16 +262,17 @@ for ( i in bin_size){
                        labels =c("Promoter","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS", "IGS"))+
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 30),
-          axis.line = element_line(color = "black"),
-          panel.grid = element_blank(),
-          panel.background = element_rect(fill = "white", color = "black"),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+          text = element_text(size = 40),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),  # <-- the rectangle
+          panel.background = element_rect(fill = "white", color = NA),
+          plot.background  = element_rect(fill = "white", color = NA),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30), # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
   
-  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_", i, "bp.tiff"), 
-         plot = sliding_graph, width=18, height = 10, dpi = 150)
+  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_", i, "bp.png"), 
+         plot = sliding_graph, width=18, height = 10, dpi = 300)
   
   
   #sliding<- paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv")
@@ -277,27 +283,32 @@ for ( i in bin_size){
     geom_line(color = "#E21515") +
     geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
     geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen")+
-    labs(title = "GC base pairs Content Across rDNA Sequence KY962518",
+    labs(title = "GC Content Across rDNA Sequence KY962518",
          subtitle= paste0(i, " bp sliding window size"),
          x = "Position (bp)",
-         y = "GC Fraction (G+C / A+T+G+C)") +
+         y = "GC Content") +
     scale_y_continuous(limits= c(0,100), breaks=seq(0,100, by=20))+
     scale_x_continuous(breaks = c(0, 2202, 5859, 7728,8798, 8955, 10122, 15173, 15534), 
                        labels =c("Promoter","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS", "IGS"))+
+    
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 30),
-          axis.line = element_line(color = "black"),
-          panel.grid = element_blank(),
-          panel.background = element_rect(fill = "white", color = "black"),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+          text = element_text(size = 40),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),  # <-- the rectangle
+          panel.background = element_rect(fill = "white", color = NA),
+          plot.background  = element_rect(fill = "white", color = NA),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30), # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
   
-  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_", i, "bp.tiff"), 
-         plot =  sliding_content_graph, width=18, height = 10, dpi = 150)
+  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_", i, "bp.png"), 
+         plot =  sliding_content_graph, width=18, height = 10, dpi = 300)
   
 } 
+
+
+
   #CpG dinucleotides 
 # as per Gardiner-Garden and Frommer: paper title : CpG Islands in vertebrate genomes (1987) teh CpG has to have a length of 200, GC >50%, and CpG O/E >0.6
 # but in 2002 a new paper published takai and Jones (Comprehensive analysis of CpG islands in human chromosomes 21 and 22)
@@ -330,7 +341,8 @@ for ( i in bin_size){
           panel.background = element_rect(fill = "white", color = "black"),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
   
   ggsave(paste0("KY962518_5ETS_TO_3ETS_sliding_CpG_graph_", i, "bp.tiff"), 
          plot =  sliding_CpG_graph, width=18, height = 10, dpi = 150)
@@ -365,7 +377,8 @@ fwrite(non_sliding_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_data_
           panel.background = element_rect(fill = "white", color = "black"),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
   
   ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_", i, "bp.tiff"), 
          plot = non_sliding_graph, width=18, height = 10, dpi = 150)
@@ -403,7 +416,8 @@ fwrite(non_sliding_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_data_
           panel.background = element_rect(fill = "white", color = "black"),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20))
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
   
   ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_non_sliding_", i, "bp.tiff"), 
          plot = non_sliding_content_graph, width=18, height = 10, dpi = 150)
@@ -413,43 +427,41 @@ fwrite(non_sliding_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_data_
   #if you want to visualize 
   library(karyoploteR)
   
-  custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=48338)) #entire region rDNA including IGS
+  #need to plot only from 5'ETS to 3'ETS
+  png("rdna.png", width = 15, height= 10, units= "in", res = 600)
+  
+  custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
   kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "#DE9A22", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
-  kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#F5FEFB", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+  kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "white", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
+  kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#E21515", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+  kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
   #3501+(3657-1) = 7157
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#5AAA46", data.panel = "ideogram", borders= NA) #marks 18S
+  kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
   #7158+ (1869-1) = 9026
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#F36017", data.panel = "ideogram", borders= NA) #marks ITS1S
+  kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1S
   #9027+ (1070-1) = 10096 
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#6B1519", data.panel = "ideogram", borders= NA) #marks 5.8S
+  kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
   #10097+ (157-1) = 10253
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#818689", data.panel = "ideogram", borders= NA) #marks ITS2
+  kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#FFCC17", data.panel = "ideogram", borders= NA) #marks ITS2
   #10254+(1167-1) = 11420
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#ECE612", data.panel = "ideogram", borders= NA) #marks 28S
+  kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 28S
   #11421+(5051-1) = 16471
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#E07F80", data.panel = "ideogram", borders= NA) #marks 3'ETS
+  kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram", borders= NA) #marks 3'ETS
   #16472+(361-1) = 16832
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 48338, y0 = 0, y1 = 1, col = "#DE9A22", data.panel = "ideogram", borders= NA) #marks IGS
-  #16833+ (31506-1)= 48338
+  kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 19000, y0 = 0, y1 = 1, col = "white", data.panel = "ideogram", borders= NA) #marks IGS
   
+  #16472+(361-1) = 16832
   
-  kpRect(kp, chr = 'rDNA_locus', x0 = 46137, x1 = 48338, y0 = 0, y1 = 1, col = "#F5FEFB", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
-  #48338-2201
-  
-  
-  kpLines(kp, chr = "rDNA_locus", x=gc_skew_50bp_data$start , y = gc_skew_50bp_data$GC_skew_value, col= "blue", lwd=2.0, r0= -1.2, r1=-2.0)
-  
+  dev.off()
   
   
 
