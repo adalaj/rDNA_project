@@ -272,7 +272,7 @@ dev.off()
 
 
 #need to plot only from 5'ETS to 3'ETS
-png("rdna_template_pG4CS_coverage.png", width = 15, height= 10, units= "in", res = 1000)
+png("rdna_template_pG4CS_coverage.png", width = 10, height= 10, units= "in", res = 1000)
 
 custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
 kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
