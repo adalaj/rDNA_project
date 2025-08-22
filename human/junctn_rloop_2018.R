@@ -311,6 +311,7 @@ entire_RLFSs_rdna_summary2<- entire_RLFSs_rdna_summary2 %>% mutate(RLFS_density 
 
 fwrite(entire_RLFSs_rdna_summary2, "RLFS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv")
 
+entire_RLFSs_rdna_summary2<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv", sep = ",", header = TRUE)
 
 entire_RLFSs_rdna_summary2$rDNA_region <- factor(entire_RLFSs_rdna_summary2$rDNA_region, 
                                          levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
@@ -343,7 +344,7 @@ rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y 
         panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 30),
+        text = element_text(size = 40),
         axis.line = element_line(color = "black"),
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
