@@ -238,7 +238,7 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG
        panel.grid = element_blank(),
        plot.title = element_text(hjust = 0.5, face = "bold"),
        plot.subtitle = element_text(hjust = 0.5),
-       text = element_text(size = 30),
+       text = element_text(size = 40),
        axis.line = element_line(color = "black"),
        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
        axis.ticks.y = element_line(color = "black"),
@@ -330,6 +330,7 @@ entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_reg
                                                  levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                                                 "ITS2","28S", "3'ETS", "IGS" )))
 
+max_value<- round(max(entire_g4s_rdna_summary$pG4CS_density, na.rm = TRUE)+0.001,2) #i added 0.001 because round was making 0.015 to  0.01 instead of 0.02. 
 
 pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = pG4CS_density, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
@@ -349,7 +350,7 @@ pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y =
         panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 30),
+        text = element_text(size = 40),
         axis.line = element_line(color = "black"),
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
