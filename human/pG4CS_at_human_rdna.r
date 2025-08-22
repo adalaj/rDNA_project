@@ -153,6 +153,8 @@ entire_g4s_rdna_summary <- entire_g4s_rdna_summary %>%
     TRUE ~ 0)) #unmatched make it zero
 
 
+#Which regions are enriched for pG4CS relative to their size.
+#Removes the bias of region length — highlights hotspots where pG4CS are concentrated
 
 entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(pG4CS_density = pG4CS_count/rDNA_region_length) %>% 
   mutate(pG4CS_density= round(pG4CS_density, 3))
@@ -196,6 +198,12 @@ pG4CS_norm_3500igs<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = pG4
 ggsave( "Normalized_pG4CS_distribution_in_human_rDNA_subcomponents_incld_junctn_after_rule.tiff", 
         plot = pG4CS_norm_3500igs, width=18,height=10, dpi=150)
 
+entire_g4s_rdna_summary<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+#Out of all pG4CS across the rDNA locus, what fraction comes from each region?
+entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(pG4CS_proportion_perc = round((pG4CS_count/sum(pG4CS_count)*100),2))
+#Which region contributes the largest share of pG4CS overall.
+#Biased toward longer regions (they naturally accumulate more pG4CS simply because they have more bases)
+fwrite(entire_g4s_rdna_summary, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
 
 g4s_rdna_summary<- entire_g4s_rdna_summary[!grepl("junction", entire_g4s_rdna_summary$rDNA_region),]
 
@@ -220,12 +228,12 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG
        y= "pG4CS density", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.005), limits =c(0,max_value))+
-  geom_text(aes(label= pG4CS_count, hjust= -1.0, vjust= 0.5, size= 50))+
+  geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 12)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.text.x = element_text(vjust = 0.5, hjust = 0.5), 
+  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, color = "black"), 
         axis.ticks.x = element_line(color = "black"),
        panel.grid = element_blank(),
        plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -233,13 +241,48 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG
        text = element_text(size = 30),
        axis.line = element_line(color = "black"),
        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
-       axis.ticks.y = element_line(color = "black"))+
+       axis.ticks.y = element_line(color = "black"),
+       axis.text.x  = element_text(color = "black"),
+       axis.text.y  = element_text(color = "black"))+
   coord_flip()
 
 ggsave( "Normalized_pG4CS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
         plot = pG4CS_norm_3500igs_nojuntn, width=18,height=10, dpi=300)
 
 
+max_value<- round(max(g4s_rdna_summary$pG4CS_proportion_perc, na.rm = TRUE)+1,2)
+
+pG4CS_prop_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG4CS_proportion_perc, fill= rDNA_region)) + 
+  geom_bar(stat= 'identity', color= "black") +
+  labs(title= "Normalized pG4CS distribution in the Human rDNA locus", 
+       x= "Human rDNA region", 
+       y= "pG4CS proportion (%)", 
+       fill = "rDNA")+
+  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value))+
+  geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 12)+
+  scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
+                                  "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
+  #guides(fill = guide_legend(reverse = TRUE))
+  theme_minimal()+
+  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, colour = "black"),
+        axis.ticks.x = element_line(color = "black"), 
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 40),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"),
+        axis.text.x  = element_text(color = "black"),
+        axis.text.y  = element_text(color = "black"))+
+  coord_flip()
+
+ggsave("pG4CS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+       plot = pG4CS_prop_3500igs_nojuntn, width=18,height=10, dpi=300)
+
+
+
+entire_g4s_rdna<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", sep = ",", header = TRUE)
 
 #to make template and non-template
 entire_g4s_rdna_summary2<- entire_g4s_rdna %>% group_by(rDNA_region, rDNA_region_length, strand) %>% count()
@@ -276,34 +319,12 @@ entire_g4s_rdna_summary2<- entire_g4s_rdna_summary2 %>% mutate(pG4CS_density = p
 
 fwrite(entire_g4s_rdna_summary2, "pG4CS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv")
 
-max_value<- round(max(entire_g4s_rdna_summary2$pG4CS_density, na.rm = TRUE),4)
+entire_g4s_rdna_summary2<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv", sep = ",", header = TRUE)
 
-
-pG4CS_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = pG4CS_density, fill= strand)) + 
-  geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized pG4CS strandwise distribution in the Human rDNA locus", 
-       x= "Human rDNA region", 
-       y= "pG4CS density", 
-       fill= "pG4CS strand")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
-  geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
-  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
-                    labels = c("+" = "Non-template", "-" = "Template"))+
-  #scale_fill_manual(values = combined_colors)+
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust=1),
-        panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
-        plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"))
-#coord_flip()
-
-ggsave( "Normalized_strandwise_pG4CS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = pG4CS_strandwise, width=18,height=10, dpi=150)
-
+entire_g4s_rdna_summary2$strand <- factor(
+  entire_g4s_rdna_summary2$strand,
+  levels = rev(c("+", "-"))  # "+" = Non-template first, "-" = Template second
+)
 
 entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_region, 
                                                  levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
@@ -317,9 +338,10 @@ pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y =
        y= "pG4CS density", 
        fill= "pG4CS strand")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
-  geom_text(aes(label= pG4CS_count, hjust=-1.0, vjust=0.5, size=50), position = position_dodge(width = 0.9))+
+  geom_text(aes(label= pG4CS_count, hjust=-0.2, vjust=0.5), size=12, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
-                    labels = c("+" = "Non-template", "-" = "Template"))+
+                    labels = c("+" = "Non-template", "-" = "Template"),
+                    breaks = c("+", "-"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
   theme(axis.title.x = element_text(vjust = -0.5, hjust = 0.5),
@@ -330,14 +352,20 @@ pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y =
         text = element_text(size = 30),
         axis.line = element_line(color = "black"),
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"))+
+        axis.ticks.y = element_line(color = "black"),
+        axis.text.x  = element_text(color = "black"),
+        axis.text.y  = element_text(color = "black"),
+        legend.position = "top", 
+        legend.title = element_text(size=30), 
+        legend.text = element_text(size=30))+
   coord_flip()
 
+
 ggsave( "Normalized_strandwise_pG4CS_flipped_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = pG4CS_strandwise_flip, width=18,height=10, dpi=150)
+        plot = pG4CS_strandwise_flip, width=18,height=10, dpi=300)
 
 
-
+####horizontal ones not flipped
 
 nontemplate<- entire_g4s_rdna_summary2 %>% filter(strand == "+")
 nontemplate$rDNA_region <- factor(nontemplate$rDNA_region, 
@@ -346,6 +374,43 @@ nontemplate$rDNA_region <- factor(nontemplate$rDNA_region,
 max_value<- round(max(nontemplate$pG4CS_density),4)
 
 
+
+max_value<- round(max(entire_g4s_rdna_summary2$pG4CS_density, na.rm = TRUE),4)
+
+
+pG4CS_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = pG4CS_density, fill= strand)) + 
+  geom_bar(stat= "identity", position ="dodge", color = "black") +
+  labs(title= "Normalized pG4CS strandwise distribution in the Human rDNA locus", 
+       x= "Human rDNA region", 
+       y= "pG4CS density", 
+       fill= "pG4CS strand")+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
+  geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= -1.0), size= 12, position = position_dodge(width = 0.9))+
+  scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
+                    labels = c("+" = "Non-template", "-" = "Template"),
+                    breaks = c("+", "-"))+
+  #scale_fill_manual(values = combined_colors)+
+  theme_minimal()+
+  theme(axis.title.x = element_text(vjust = -0.5, hjust = 0.5),
+        axis.ticks.x = element_line(color = "black"), 
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"),
+        axis.text.x  = element_text(color = "black"),
+        axis.text.y  = element_text(color = "black"),
+        legend.position = "top", 
+        legend.title = element_text(size=30), 
+        legend.text = element_text(size=30))
+
+
+#coord_flip()
+
+ggsave( "Normalized_strandwise_pG4CS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+        plot = pG4CS_strandwise, width=18,height=10, dpi=150)
 
 
 
