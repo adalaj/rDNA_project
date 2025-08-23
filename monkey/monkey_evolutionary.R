@@ -50,7 +50,7 @@ for (i in names(datasets)) {
 
 
 for (i in names(template_filt_datasets)[1:2]){
-  png(paste0("monkey_rdna_template_KX065350_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("monkey_transcribed_rdna_template_KX065350_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 600)
   
   
   custom_genome <- toGRanges(data.frame(chr="KX065350", start=1, end=12979))
@@ -79,14 +79,14 @@ for (i in names(template_filt_datasets)[1:2]){
   kpRect(kp, chr = 'KX065350', x0 = 12649, x1 = 12979, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1")
+  kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1",lwd = 6)
   dev.off()
   
 }
 
 
 for (i in names(nontemplate_filt_datasets)[1:2]){
-  png(paste0("monkey_rdna_nontemplate_KX065350_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("monkey_transcribed_rdna_nontemplate_KX065350_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 600)
   
   
   custom_genome <- toGRanges(data.frame(chr="KX065350", start=1, end=12979))
@@ -114,14 +114,14 @@ for (i in names(nontemplate_filt_datasets)[1:2]){
   kpRect(kp, chr = 'KX065350', x0 = 12649, x1 = 12979, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515")
+  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515", lwd = 6)
   dev.off()
   
 }
 
 
 for (i in names(template_filt_datasets)[3]){
-  png(paste0("monkey_rdna_template_KX065350_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("monkey_transcribed_rdna_template_KX065350_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 1000)
   
   
   custom_genome <- toGRanges(data.frame(chr="KX065350", start=1, end=12979))
@@ -150,14 +150,14 @@ for (i in names(template_filt_datasets)[3]){
   kpRect(kp, chr = 'KX065350', x0 = 12649, x1 = 12979, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=template_filt_datasets[[i]],  data.panel = 2, col = "#1414E1", r0= -0.5, r1= -0.7)
+  kpPlotCoverage(kp, data=template_filt_datasets[[i]],  data.panel = 2, col = "#1414E1", r0= -0.5, r1= -0.7,  lwd = 6)
   dev.off()
   
 }
 
 
 for (i in names(nontemplate_filt_datasets)[3]){
-  png(paste0("monkey_rdna_nontemplate_KX065350_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("monkey_transcribed_rdna_nontemplate_KX065350_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 1000)
   
   
   custom_genome <- toGRanges(data.frame(chr="KX065350", start=1, end=12979))
@@ -185,7 +185,7 @@ for (i in names(nontemplate_filt_datasets)[3]){
   kpRect(kp, chr = 'KX065350', x0 = 12649, x1 = 12979, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7)
+  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7,  lwd = 5)
   dev.off()
   
 }
@@ -193,7 +193,7 @@ for (i in names(nontemplate_filt_datasets)[3]){
 
 
 
-# make new for KX065350_and_NR_146166, custome genome to 12980
+# make new for KX065350_and_NR_146166, custom genome to 12980
 
   setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/monkey")
   entire_g4s_rdna <- fread("pG4CS_KX065350_and_NR_146166_monkey_junctn_details.csv", header = TRUE, sep = ",")
@@ -240,7 +240,7 @@ for (i in names(nontemplate_filt_datasets)[3]){
   
   
   for (i in names(template_filt_datasets)[1:2]){
-    png(paste0("monkey_rdna_template_KX065350_and_NR_146166_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+    png(paste0("monkey_transcribed_rdna_template_KX065350_and_NR_146166_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 200)
     
     
     custom_genome <- toGRanges(data.frame(chr="KX065350_and_NR_146166", start=1, end=12980))
@@ -269,14 +269,14 @@ for (i in names(nontemplate_filt_datasets)[3]){
     kpRect(kp, chr = 'KX065350_and_NR_146166', x0 = 12649, x1 = 12980, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
     #17853+(551-1) = 18403
     
-    kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1")
+    kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1", lwd = 6)
     dev.off()
     
   }
   
   
   for (i in names(nontemplate_filt_datasets)[1:2]){
-    png(paste0("monkey_rdna_nontemplate_KX065350_and_NR_146166_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+    png(paste0("monkey_transcribed_rdna_nontemplate_KX065350_and_NR_146166_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 200)
     
     
     custom_genome <- toGRanges(data.frame(chr="KX065350_and_NR_146166", start=1, end=12980))
@@ -304,13 +304,13 @@ for (i in names(nontemplate_filt_datasets)[3]){
     kpRect(kp, chr = 'KX065350_and_NR_146166', x0 = 12649, x1 = 12980, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
     #17853+(551-1) = 18403
     
-    kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515")
+    kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515", lwd = 6)
     dev.off()
     
   }
   
   for (i in names(template_filt_datasets)[3]){
-    png(paste0("monkey_rdna_template_KX065350_and_NR_146166_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+    png(paste0("monkey_transcribed_rdna_template_KX065350_and_NR_146166_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 200)
     
     
     custom_genome <- toGRanges(data.frame(chr="KX065350_and_NR_146166", start=1, end=12980))
@@ -339,14 +339,14 @@ for (i in names(nontemplate_filt_datasets)[3]){
     kpRect(kp, chr = 'KX065350_and_NR_146166', x0 = 12649, x1 = 12980, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
     #17853+(551-1) = 18403
     
-    kpPlotCoverage(kp, data=template_filt_datasets[[i]],  data.panel = 2, col = "#1414E1",  r0= -0.5, r1= -0.7)
+    kpPlotCoverage(kp, data=template_filt_datasets[[i]],  data.panel = 2, col = "#1414E1",  r0= -0.5, r1= -0.7, lwd = 6)
     dev.off()
     
   }
   
   
   for (i in names(nontemplate_filt_datasets)[3]){
-    png(paste0("monkey_rdna_nontemplate_KX065350_and_NR_146166_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+    png(paste0("monkey_transcribed_rdna_nontemplate_KX065350_and_NR_146166_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 200)
     
     
     custom_genome <- toGRanges(data.frame(chr="KX065350_and_NR_146166", start=1, end=12980))
@@ -374,7 +374,7 @@ for (i in names(nontemplate_filt_datasets)[3]){
     kpRect(kp, chr = 'KX065350_and_NR_146166', x0 = 12649, x1 = 12980, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
     #17853+(551-1) = 18403
     
-    kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515", data.panel = 2, r0= -0.5, r1= -0.7)
+    kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515", data.panel = 2, r0= -0.5, r1= -0.7,  lwd = 6)
     dev.off()
     
   }

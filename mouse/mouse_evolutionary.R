@@ -19,7 +19,7 @@ imotif<- imotif %>% select(chr, actual_imotif_start, actual_imotif_end, rDNA_reg
 
 #prepare datasets:
 
-datasets<- list(pG4CS=,
+datasets<- list(pG4CS= entire_g4s_rdna,
                 RLFS=rlfs)
 
 nontemplate_filt_datasets <- list()  # initialize new list
@@ -51,7 +51,7 @@ for (i in names(datasets)) {
 
 
 for (i in names(template_filt_datasets)){
-  png(paste0("mouse_rdna_template_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("mouse_transcribed_rdna_template_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 600)
   
   
   custom_genome <- toGRanges(data.frame(chr="BK000964", start=1, end=13403))
@@ -80,14 +80,14 @@ for (i in names(template_filt_datasets)){
   kpRect(kp, chr = 'BK000964', x0 = 12853, x1 = 13403, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1")
+  kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1", lwd = 6)
   dev.off()
   
 }
 
 
 for (i in names(nontemplate_filt_datasets)){
-  png(paste0("mouse_rdna_nontemplate_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("mouse_transcribed_rdna_nontemplate_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 600)
   
   
   custom_genome <- toGRanges(data.frame(chr="BK000964", start=1, end=13403))
@@ -115,7 +115,7 @@ for (i in names(nontemplate_filt_datasets)){
   kpRect(kp, chr = 'BK000964', x0 = 12853, x1 = 13403, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515")
+  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515", lwd = 6)
   dev.off()
   
 }
@@ -134,7 +134,7 @@ imotif_nontemplate<- imotif_filt %>% filter(strand=="+")
 
 
 
-  png("mouse_rdna_template_imotif_coverage.png", width = 30, height= 30, units= "in", res = 200)
+  png("mouse_transcribed_rdna_template_imotif_coverage.png", width = 10, height = 10, units= "in", res = 1000)
   
   
   custom_genome <- toGRanges(data.frame(chr="BK000964", start=1, end=13403))
@@ -163,13 +163,13 @@ imotif_nontemplate<- imotif_filt %>% filter(strand=="+")
   kpRect(kp, chr = 'BK000964', x0 = 12853, x1 = 13403, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=imotif_template, data.panel = 2, col ="#1414E1",  r0= -0.5, r1= -0.7)
+  kpPlotCoverage(kp, data=imotif_template, data.panel = 2, col ="#1414E1",  r0= -0.5, r1= -0.7,lwd = 6)
   dev.off()
   
 
 
 
-  png("mouse_rdna_nontemplate_imotif_coverage.png", width = 30, height= 30, units= "in", res = 200)
+  png("mouse_transcribed_rdna_nontemplate_imotif_coverage.png", width = 10, height = 10, units= "in", res = 1000)
   
   
   custom_genome <- toGRanges(data.frame(chr="BK000964", start=1, end=13403))
@@ -197,6 +197,6 @@ imotif_nontemplate<- imotif_filt %>% filter(strand=="+")
   kpRect(kp, chr = 'BK000964', x0 = 12853, x1 = 13403, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=imotif_nontemplate, data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7)
+  kpPlotCoverage(kp, data=imotif_nontemplate, data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7, lwd = 6)
   dev.off()
   

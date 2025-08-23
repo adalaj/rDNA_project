@@ -48,7 +48,7 @@ for (i in names(datasets)) {
 
 
 for (i in names(template_filt_datasets)){
-  png(paste0("chicken_rdna_template_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("chicken_transcribed_rdna_template_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 600)
   
   
   custom_genome <- toGRanges(data.frame(chr="KT445934", start=1, end=11863))
@@ -77,14 +77,14 @@ for (i in names(template_filt_datasets)){
   kpRect(kp, chr = 'KT445934', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1")
+  kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1", lwd = 6 )
   dev.off()
   
 }
 
 
 for (i in names(nontemplate_filt_datasets)){
-  png(paste0("chicken_rdna_nontemplate_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("chicken_transcribed_nontemplate_", i , "_coverage.png"), width = 10, height = 10, units= "in", res = 600)
   
   
   custom_genome <- toGRanges(data.frame(chr="KT445934", start=1, end=11863))
@@ -112,7 +112,7 @@ for (i in names(nontemplate_filt_datasets)){
   kpRect(kp, chr = 'KT445934', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #17853+(551-1) = 18403
   
-  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515")
+  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515", lwd = 6 )
   dev.off()
   
 }
@@ -131,7 +131,7 @@ imotif_nontemplate<- imotif_filt %>% filter(strand=="+")
 
 
 
-png("chicken_rdna_template_imotif_coverage.png", width = 30, height= 30, units= "in", res = 200)
+png("chicken_transcribed_template_imotif_coverage.png", width = 10, height = 10, units= "in", res = 1000)
 
 
 custom_genome <- toGRanges(data.frame(chr="KT445934", start=1, end=11863))
@@ -160,13 +160,13 @@ kpRect(kp, chr = 'KT445934', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E5F
 kpRect(kp, chr = 'KT445934', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
 #17853+(551-1) = 18403
 
-kpPlotCoverage(kp, data=imotif_template, data.panel = 2, col ="#1414E1",  r0= -0.5, r1= -0.7)
+kpPlotCoverage(kp, data=imotif_template, data.panel = 2, col ="#1414E1",  r0= -0.5, r1= -0.7, lwd = 6 )
 dev.off()
 
 
 
 
-png("chicken_rdna_nontemplate_imotif_coverage.png", width = 30, height= 30, units= "in", res = 200)
+png("chicken_transcribed_nontemplate_imotif_coverage.png", width = 10, height = 10, units= "in", res = 1000)
 
 
 custom_genome <- toGRanges(data.frame(chr="KT445934", start=1, end=11863))
@@ -194,5 +194,6 @@ kpRect(kp, chr = 'KT445934', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E5F
 kpRect(kp, chr = 'KT445934', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
 #17853+(551-1) = 18403
 
-kpPlotCoverage(kp, data=imotif_nontemplate, data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7)
+kpPlotCoverage(kp, data=imotif_nontemplate, data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7, lwd = 6 )
 dev.off()
+
