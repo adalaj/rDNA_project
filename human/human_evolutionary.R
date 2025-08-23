@@ -12,7 +12,7 @@ rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_
 rlfs<- rlfs %>% select("#Name", actual_RLFS_start, actual_RLFS_end, rDNA_region, strand)
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/imotif/output/files")
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/imotif/human/output/files")
 imotif<- fread("imotif_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #85
 imotif<- imotif %>% select(chr, actual_imotif_start, actual_imotif_end, rDNA_region, strand)
 
@@ -54,7 +54,7 @@ for (i in names(datasets)) {
 
 
 for (i in names(template_filt_datasets)[1:2]){
-png(paste0("rdna_template_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+png(paste0("transcribed_rdna_template_", i , "_coverage.png"), width = 10, height= 10, units= "in", res = 600)
 
 
 custom_genome <- toGRanges(data.frame(chr="KY962518", start=1, end=13332))
@@ -83,14 +83,14 @@ kpRect(kp, chr = 'KY962518', x0 = 7921, x1 = 12971, y0 = 0, y1 = 1, col = "#E5FF
 kpRect(kp, chr = 'KY962518', x0 = 12972, x1 = 13332, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
 #16472+(361-1) = 16832
 
-kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1")
+kpPlotCoverage(kp, data=template_filt_datasets[[i]], col = "#1414E1", lwd=5)
 dev.off()
 
 }
 
 
 for (i in names(nontemplate_filt_datasets)[1:2]){
-  png(paste0("rdna_nontemplate_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("transcribed_rdna_nontemplate_", i , "_coverage.png"), width = 10, height= 10, units= "in", res = 600)
   
   
   custom_genome <- toGRanges(data.frame(chr="KY962518", start=1, end=13332))
@@ -118,7 +118,7 @@ for (i in names(nontemplate_filt_datasets)[1:2]){
   kpRect(kp, chr = 'KY962518', x0 = 12972, x1 = 13332, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #16472+(361-1) = 16832
   
-  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515")
+  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], col = "#E21515", lwd=5)
   dev.off()
   
 }
@@ -127,7 +127,7 @@ for (i in names(nontemplate_filt_datasets)[1:2]){
 
 # for i motif i want vertical lines to be shorter
 for (i in names(nontemplate_filt_datasets)[3]){
-  png(paste0("rdna_nontemplate_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("transcribed_rdna_nontemplate_", i , "_coverage.png"), width = 10, height= 10, units= "in", res = 1000)
   
   
   custom_genome <- toGRanges(data.frame(chr="KY962518", start=1, end=13332))
@@ -155,7 +155,7 @@ for (i in names(nontemplate_filt_datasets)[3]){
   kpRect(kp, chr = 'KY962518', x0 = 12972, x1 = 13332, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #16472+(361-1) = 16832
   
-  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7)
+  kpPlotCoverage(kp, data=nontemplate_filt_datasets[[i]], data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.7, lwd = 5)
   dev.off()
   
 }
@@ -164,7 +164,7 @@ for (i in names(nontemplate_filt_datasets)[3]){
 
 # for i motif i want vertical lines to be shorter
 for (i in names(template_filt_datasets)[3]){
-  png(paste0("rdna_template_", i , "_coverage.png"), width = 30, height= 30, units= "in", res = 200)
+  png(paste0("transcribed_rdna_template_", i , "_coverage.png"), width = 10, height= 10, units= "in", res = 1000)
   
   
   custom_genome <- toGRanges(data.frame(chr="KY962518", start=1, end=13332))
@@ -192,7 +192,7 @@ for (i in names(template_filt_datasets)[3]){
   kpRect(kp, chr = 'KY962518', x0 = 12972, x1 = 13332, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram") #marks 3'ETS
   #16472+(361-1) = 16832
   
-  kpPlotCoverage(kp, data=template_filt_datasets[[i]], data.panel = 2, col = "#1414E1",  r0= -0.5, r1= -0.7)
+  kpPlotCoverage(kp, data=template_filt_datasets[[i]], data.panel = 2, col = "#1414E1",  r0= -0.5, r1= -0.7, lwd =5)
   dev.off()
   
 }
