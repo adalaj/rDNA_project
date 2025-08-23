@@ -157,8 +157,8 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 19000, y0 = 0, y1 = 1, col = "#A
 
 #16472+(361-1) = 16832
 
-kpPlotRegions(kp, data=entire_rdna6_nontemplate,data.panel = 1, col = "#E21515", r0= -0.5, r1= -0.6)
-kpPlotCoverage(kp, data=entire_rdna6_nontemplate, data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.6)
+kpPlotRegions(kp, data=entire_rdna6_nontemplate,data.panel = 1, col = "#E21515", r0= -0.5, r1= -0.6,lwd=5)
+kpPlotCoverage(kp, data=entire_rdna6_nontemplate, data.panel = 2, col = "#E21515",  r0= -0.5, r1= -0.6, lwd=5)
 dev.off()
 
 
@@ -194,8 +194,8 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#3
 kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 19000, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks IGS
 #16472+(361-1) = 16832
 
-kpPlotRegions(kp, data=entire_rdna6_template,data.panel = 1, col = "#1414E1", r0= -0.5, r1= -0.6)
-kpPlotCoverage(kp, data=entire_rdna6_template, data.panel = 2, col = "#1414E1",  r0= -0.5, r1= -0.6)
+kpPlotRegions(kp, data=entire_rdna6_template,data.panel = 1, col = "#1414E1", r0= -0.5, r1= -0.6, lwd = 5)
+kpPlotCoverage(kp, data=entire_rdna6_template, data.panel = 2, col = "#1414E1",  r0= -0.5, r1= -0.6, lwd =5)
 dev.off()
 
 
