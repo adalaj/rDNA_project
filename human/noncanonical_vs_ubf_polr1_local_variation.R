@@ -151,396 +151,493 @@ fwrite(chip_with_template, "Template_non_canonical_with_Chip_UBF_POLR1A_graph_in
 
 ###################################################
 
-#plotting begins
 
-plot_rlfs_with_chip <- function(data, label_suffix) {
-  ggplot() +
-    geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = data, aes(x = bin_midpoints, y = POLR1A, color = "POLR1A"), size = 1.2) +
-    
-    geom_line(data = data,
-              aes(x = bin_midpoints, y = RLFS_counts * 1000),
-              color = "black", size = 0.8) +
-    geom_point(data = data,
-               aes(x = bin_midpoints, y = RLFS_counts * 1000, shape = "RLFS"),
-               color = "black", size = 3) +
-    
-    scale_color_manual(name = "Signal", values = c("UBF" = "#f609b4", "POLR1A" = "#75E11E")) +
-    scale_shape_manual(name = "Non-canonical structure", values = c("RLFS" = 16)) +
-    scale_x_continuous(breaks = seq(0, 50000, by = 5000)) +
-    scale_y_continuous(
-      name = "Signal Intensity (UBF / POLR1A)",
-      breaks = c(0, 5000, 10000, 15000, 20000),
-      sec.axis = sec_axis(~ . / 1000, 
-                          breaks = c(0,4,10,15,20),
-                          name = "Non-canonical structure Count")
-    ) +
-    labs(
-      title = paste("RLFS (", label_suffix, "), UBF, and POLR1A ChIP signal over human rDNA", sep = ""),
-      x = "Human rDNA region with 100 bins"
-    ) +
-  theme_minimal() +
-    theme_minimal() +
-    theme(
-      panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
-      axis.text.y.left = element_text(size = 30),
-      axis.text.y.right = element_text(size = 30),
-      axis.title.y.left = element_text(size = 30),
-      axis.title.y.right = element_text(size = 30),
-      panel.grid = element_blank(),
-      plot.title = element_text(hjust = 0.5, face = "bold"),
-      text = element_text(size = 16),
-      axis.line = element_line(color = "black"),
-      axis.ticks = element_line(color = "black"),
-      legend.position = "bottom"
-    )
-  
+Entire<- fread("Entire_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
+Nontemplate<- fread("Nontemplate_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
+Template<- fread("Template_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
+
+data_of_interest<- list(
+  Entire = Entire,
+  Nontemplate = Nontemplate,
+  Template = Template
+)
+
+for (i in names(data_of_interest)){
+colnames(data_of_interest[[i]])[9]<- "iMFS_counts" #previously it was imotif_counts
+
+#need to scale both the axis as between zero to 1 for all UBF, POLR1A, RLFS, pG4CS, iMFS
+data_of_interest[[i]]<- data_of_interest[[i]] %>% mutate(norm_UBF= (UBF- min(UBF))/(max(UBF)-min(UBF)),
+                                                         norm_POLR1A= (POLR1A- min(POLR1A))/(max(POLR1A)-min(POLR1A)),
+                                                         norm_pG4CS_counts= (pG4CS_counts- min(pG4CS_counts))/(max(pG4CS_counts)-min(pG4CS_counts)),
+                                                         norm_RLFS_counts= (RLFS_counts- min(RLFS_counts))/(max(RLFS_counts)-min(RLFS_counts)),
+                                                         norm_iMFS_counts= (iMFS_counts- min(iMFS_counts))/(max(iMFS_counts)-min(iMFS_counts)))
+
+
+#When POLR1A increases from one bin to the next, does RLFS tend to decrease, and vice versa?
+#what percent of times, we see this scenario
+
+#idea is to the difference of current value subtracted by previous value. 
+
+#you are not measuring whether the value itself is high or low, but rather whether the signal changed upward or downward compared to the previous bin.
+
+#Then sign(diff) tells you:
+#+1 → increase compared to previous bin
+#-1 → decrease compared to previous bin
+# 0 → no change
+
+#example: Case 1: POLR1A value = 0.6, previous = 0.8
+#diff = -0.2, sign = -1 → interpreted as a decrease, even though the absolute signal is still positive.
+
+
+#This measures whether the signal increased or decreased compared to the previous bin.
+
+data_of_interest[[i]] <- data_of_interest[[i]] %>%
+  mutate(
+    diff_norm_UBF = norm_UBF - lag(norm_UBF, default = 0),
+    diff_norm_POLR1A = norm_POLR1A - lag(norm_POLR1A),
+    diff_norm_pG4CS_counts = norm_pG4CS_counts - lag(norm_pG4CS_counts),
+    diff_norm_RLFS_counts = norm_RLFS_counts - lag(norm_RLFS_counts),
+    diff_norm_iMFS_counts = norm_iMFS_counts - lag(norm_iMFS_counts)
+  )
+
+
+#If one goes up and the other goes down (opposite signs), you mark it as 1 (a “mismatch” in direction)
+data_of_interest[[i]] <- data_of_interest[[i]] %>%
+  mutate(POLR1_RLFS_sign_match = ifelse(sign(diff_norm_POLR1A) != sign(diff_norm_RLFS_counts), 1, 0))
+
+data_of_interest[[i]] <- data_of_interest[[i]] %>%
+  mutate(POLR1_pG4CS_sign_match = ifelse(sign(diff_norm_POLR1A) != sign(diff_norm_pG4CS_counts), 1, 0))
+
+data_of_interest[[i]] <- data_of_interest[[i]] %>%
+  mutate(POLR1_iMFS_sign_match = ifelse(sign(diff_norm_POLR1A) != sign(diff_norm_iMFS_counts), 1, 0))
+
+
+fwrite(data_of_interest[[i]], paste0(i, "_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv"))
+
 }
 
 
+#####read again
+zoom_start <- 7000
+zoom_end <- 23000
 
-
-# Create plots
-plot_rlfs_entire <- plot_rlfs_with_chip(chip_with_entire, "entire")
-plot_rlfs_template <- plot_rlfs_with_chip(chip_with_template, "template")
-plot_rlfs_nontemplate <- plot_rlfs_with_chip(chip_with_nontemplate, "nontemplate")
-
-# Save if needed
-ggsave("RLFS_entire_with_UBF_POLR1A.tiff", plot_rlfs_entire, width = 18, height = 10, dpi = 150)
-ggsave("RLFS_template_with_UBF_POLR1A.tiff", plot_rlfs_template, width = 18, height = 10, dpi = 150)
-ggsave("RLFS_nontemplate_with_UBF_POLR1A.tiff", plot_rlfs_nontemplate, width = 18, height = 10, dpi = 150)
-
-
+Entire<- fread("Entire_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
+Nontemplate<- fread("Nontemplate_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
+Template<- fread("Template_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
+Entire_zoom <- Entire %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
+Nontemplate_zoom <- Nontemplate %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
+Template_zoom <- Template %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
 
 
 
-############ zoom in version
+region_marks <- c(1, 7137, 9339, 12996, 14865, 15935, 16092, 17259, 22310,22671, 44838)
+region_labels <- c("start","Pro", "5′ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ETS","IGS", "end")
 
-zoom_plot_rlfs_with_chip <- function(zoom_data, label_suffix) {
-  zoom_start <- 7000
-  zoom_end <- 23000
-  
-  chip_zoom <- zoom_data %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
-  
-  region_marks <- c(7137, 9339, 12996, 14865, 15935, 16092, 17259, 22310,22671)
-  region_labels <- c("Promoter", "5′ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ETS","IGS")
-  
-  ggplot() +
-    # ChIP signal
-    geom_line(data = chip_zoom, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = chip_zoom, aes(x = bin_midpoints, y = POLR1A, color = "POLR1A"), size = 1.2) +
-    geom_line(data = chip_zoom,
-              aes(x = bin_midpoints, y = RLFS_counts * 1000),
-              color = "black", size = 0.8) +
-    geom_point(data = chip_zoom,
-               aes(x = bin_midpoints, y = RLFS_counts * 1000, shape = "RLFS"),
-               color = "black", size = 3) +
+
+data_of_interest<- list(
+  Entire = Entire,
+  Entire_zoom = Entire_zoom,
+  Nontemplate = Nontemplate,
+  Nontemplate_zoom = Nontemplate_zoom,
+  Template = Template,
+  Template_zoom = Template_zoom
+)
+
+
+for (i in names(data_of_interest)){
+  ##plot the RLFS with POLR1A
+  plot_rlfs_polr1a <-
+    ggplot() +
+    #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
+    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 1.2) +
     
-    scale_color_manual(name = "Signal", values = c("UBF" = "#f609b4", "POLR1A" = "#75E11E")) +
-    scale_shape_manual(name = "Non-canonical structure", values = c("RLFS" = 16)) +
+    geom_line(data = data_of_interest[[i]],
+              aes(x = bin_midpoints, y = norm_RLFS_counts, color = "RLFS"), size = 1.2) +
+    #geom_point(data = chip_with_nontemplate,
+    #aes(x = bin_midpoints, y = norm_RLFS_counts, shape = "RLFS", color = "RLFS"), size = 3) +
+    
+    scale_color_manual(name = "Signal", values = c("RLFS" = "#aa2a85","POLR1A" = "#E68532")) +#"UBF" = "#f609b4" #CD32A0, #9e277b
+    #scale_shape_manual(name = "Non-canonical structure", values = c("RLFS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
-      name = "Signal Intensity (UBF / POLR1A)",
-      breaks = c(0, 5000, 10000, 15000, 20000),
-      sec.axis = sec_axis(~ . / 1000, 
-                          breaks = c(0,4,10,15,20),
-                          name = "Non-canonical structure Count")
+      name = "Normalized POLR1A ChIP-seq signal(0-1)",
+      limits = c(0,1),
+      breaks = seq(0, 1, 0.2),
+      sec.axis = sec_axis(~., breaks = seq(0, 1, 0.2),
+                          name = "Normalized RLFS counts(0-1)")
     ) +
     labs(
-      title = paste("RLFS (", label_suffix, "), UBF, and POLR1A ChIP signal over human rDNA", sep = ""),
+      title = paste0(i," RLFS and POLR1A"),
       x = "Human rDNA region with 100 bins"
     ) +
-    theme_minimal() +
-    theme_minimal() +
-    theme(
-      panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
-      axis.text.y.left = element_text(size = 30),
-      axis.text.y.right = element_text(size = 30),
-      axis.title.y.left = element_text(size = 30),
-      axis.title.y.right = element_text(size = 30),
-      panel.grid = element_blank(),
-      plot.title = element_text(hjust = 0.5, face = "bold"),
-      text = element_text(size = 16),
-      axis.line = element_line(color = "black"),
-      axis.ticks = element_line(color = "black"),
-      legend.position = "bottom"
-    )
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 40),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
+          axis.title.y.right = element_text(color = "#aa2a85"),  # right axis purple
+          axis.text.y.left   = element_text(color = "#E68532"),
+          axis.text.y.right  = element_text(color = "#aa2a85"),
+          legend.position = "top", 
+          legend.title = element_text(size=30), 
+          legend.text = element_text(size=30))
   
-}
+  ggsave(paste0(i, "_RLFS_with_POLR1A.png"), plot_rlfs_polr1a, width = 20, height = 14, dpi = 300)
+  
+  
+  # correlation test
+  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
+                       data_of_interest[[i]]$norm_RLFS_counts,
+                       method = "pearson")
+  
+  # round values
+  r_val <- round(cor_test$estimate, 1)
+  p_val <- signif(cor_test$p.value, 3)
 
-# Create plots
-zoom_plot_rlfs_entire <- zoom_plot_rlfs_with_chip(chip_with_entire, "entire")
-zoom_plot_rlfs_template <- zoom_plot_rlfs_with_chip(chip_with_template, "template")
-zoom_plot_rlfs_nontemplate <- zoom_plot_rlfs_with_chip(chip_with_nontemplate, "nontemplate")
+  # correlation test
+  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
+                       data_of_interest[[i]]$norm_RLFS_counts,
+                       method = "pearson")
+  
+  # round values
+  r_val <- round(cor_test$estimate, 1)
+  p_val <- signif(cor_test$p.value, 3)
+  
+  # plot
+  pearson_rlfs_polr1a<- ggplot(data_of_interest[[i]],
+                               aes(x = norm_POLR1A, y = norm_RLFS_counts)) +
+    geom_point(alpha = 0.6, size = 3, color = "black") +
+    geom_smooth(method = "lm", color = "black", se = TRUE) +
+    annotate("text", 
+             x = 0.1, y = 0.9, hjust = 0,
+             label = paste0("Pearson r = ", r_val," ", 
+                            "\n P = ", p_val),
+             size = 12) +   # text size scales differently than theme text
+    labs(title = paste0(i, "Correlation between POLR1A and RLFS"),
+         x = "Normalized POLR1A ChIP-seq signal(0-1)",
+         y = "Normalized RLFS counts(0-1)") +
+    scale_x_continuous(limits = c(0,1), breaks = seq(0,1,0.2)) +
+    scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 40, color = "black"),
+          axis.title.x = element_text(color = "black"),
+          axis.title.y = element_text(color = "black"),
+          axis.text.x = element_text(color = "black"),
+          axis.text.y = element_text(color = "black"),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),
+          legend.position = "top", 
+          legend.title = element_text(size = 30), 
+          legend.text = element_text(size = 30))
+  
+  ggsave(paste0(i, "_RLFS_with_POLR1A_pearson.png"), pearson_rlfs_polr1a, width = 15, height = 14, dpi = 300)
 
-# Save if needed
-ggsave("RLFS_zoom_entire_with_UBF_POLR1A.tiff", zoom_plot_rlfs_entire, width = 18, height = 10, dpi = 150)
-ggsave("RLFS_zoom_template_with_UBF_POLR1A.tiff", zoom_plot_rlfs_template, width = 18, height = 10, dpi = 150)
-ggsave("RLFS_zoom_nontemplate_with_UBF_POLR1A.tiff", zoom_plot_rlfs_nontemplate, width = 18, height = 10, dpi = 150)
-
-
-
-
-#####################################################################
-
-#did the same for pG4CS
-
-plot_pG4CS_with_chip <- function(data, label_suffix) {
-  ggplot() +
-    geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = data, aes(x = bin_midpoints, y = POLR1A, color = "POLR1A"), size = 1.2) +
+  
+  
+  ############ plot pG4CS
+  plot_g4s_polr1a <-
+    ggplot() +
+    #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
+    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 1.2) +
     
-    geom_line(data = data,
-              aes(x = bin_midpoints, y = pG4CS_counts * 1000),
-              color = "black", size = 0.8) +
-    geom_point(data = data,
-               aes(x = bin_midpoints, y = pG4CS_counts * 1000, shape = "pG4CS"),
-               color = "black", size = 3) +
+    geom_line(data = data_of_interest[[i]],
+              aes(x = bin_midpoints, y = norm_pG4CS_counts, color = "pG4CS"), size = 1.2) +
+    #geom_point(data = chip_with_nontemplate,
+    #aes(x = bin_midpoints, y = norm_pG4CS_counts, shape = "pG4CS", color = "pG4CS"), size = 3) +
     
-    scale_color_manual(name = "Signal", values = c("UBF" = "#f609b4", "POLR1A" = "#75E11E")) +
-    scale_shape_manual(name = "Non-canonical structure", values = c("pG4CS" = 18)) + #change will change circle to solid diamond
-    scale_x_continuous(breaks = seq(0, 50000, by = 5000)) +
-    scale_y_continuous(
-      name = "Signal Intensity (UBF / POLR1A)",
-      breaks = c(0, 5000, 10000, 15000, 20000),
-      sec.axis = sec_axis(~ . / 1000, 
-                          breaks = c(0,4,10,15,20),
-                          name = "Non-canonical structure Count")
-    ) +
-    labs(
-      title = paste("pG4CS (", label_suffix, "), UBF, and POLR1A ChIP signal over human rDNA", sep = ""),
-      x = "Human rDNA region with 100 bins"
-    ) +
-    theme_minimal() +
-    theme_minimal() +
-    theme(
-      panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
-      axis.text.y.left = element_text(size = 30),
-      axis.text.y.right = element_text(size = 30),
-      axis.title.y.left = element_text(size = 30),
-      axis.title.y.right = element_text(size = 30),
-      panel.grid = element_blank(),
-      plot.title = element_text(hjust = 0.5, face = "bold"),
-      text = element_text(size = 16),
-      axis.line = element_line(color = "black"),
-      axis.ticks = element_line(color = "black"),
-      legend.position = "bottom"
-    )
-  
-}
-
-
-
-
-# Create plots
-plot_pG4CS_entire <- plot_pG4CS_with_chip(chip_with_entire, "entire")
-plot_pG4CS_template <- plot_pG4CS_with_chip(chip_with_template, "template")
-plot_pG4CS_nontemplate <- plot_pG4CS_with_chip(chip_with_nontemplate, "nontemplate")
-
-# Save if needed
-ggsave("pG4CS_entire_with_UBF_POLR1A.tiff", plot_pG4CS_entire, width = 18, height = 10, dpi = 150)
-ggsave("pG4CS_template_with_UBF_POLR1A.tiff", plot_pG4CS_template, width = 18, height = 10, dpi = 150)
-ggsave("pG4CS_nontemplate_with_UBF_POLR1A.tiff", plot_pG4CS_nontemplate, width = 18, height = 10, dpi = 150)
-
-
-
-
-
-############ zoom in version
-
-zoom_plot_pG4CS_with_chip <- function(zoom_data, label_suffix) {
-  zoom_start <- 7000
-  zoom_end <- 23000
-  
-  chip_zoom <- zoom_data %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
-  
-  region_marks <- c(7137, 9339, 12996, 14865, 15935, 16092, 17259, 22310,22671)
-  region_labels <- c("Promoter", "5′ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ETS","IGS")
-  
-  ggplot() +
-    # ChIP signal
-    geom_line(data = chip_zoom, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = chip_zoom, aes(x = bin_midpoints, y = POLR1A, color = "POLR1A"), size = 1.2) +
-    geom_line(data = chip_zoom,
-              aes(x = bin_midpoints, y = pG4CS_counts * 1000),
-              color = "black", size = 0.8) +
-    geom_point(data = chip_zoom,
-               aes(x = bin_midpoints, y = pG4CS_counts * 1000, shape = "pG4CS"),
-               color = "black", size = 3) +
-    
-    scale_color_manual(name = "Signal", values = c("UBF" = "#f609b4", "POLR1A" = "#75E11E")) +
-    scale_shape_manual(name = "Non-canonical structure", values = c("pG4CS" = 18)) +
+    scale_color_manual(name = "Signal", values = c("pG4CS" = "#228B22","POLR1A" = "#E68532")) +#"UBF" = "#f609b4"
+    #scale_shape_manual(name = "Non-canonical structure", values = c("pG4CS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
-      name = "Signal Intensity (UBF / POLR1A)",
-      breaks = c(0, 5000, 10000, 15000, 20000),
-      sec.axis = sec_axis(~ . / 1000, 
-                          breaks = c(0,4,10,15,20),
-                          name = "Non-canonical structure Count")
+      name = "POLR1A Signal Intensity",
+      limits = c(0,1),
+      breaks = seq(0, 1, 0.2),
+      sec.axis = sec_axis(~., breaks = seq(0, 1, 0.2),
+                          name = "pG4CS structure Count")
     ) +
     labs(
-      title = paste("pG4CS (", label_suffix, "), UBF, and POLR1A ChIP signal over human rDNA", sep = ""),
+      title = paste0(i," pG4CS and POLR1A"),
       x = "Human rDNA region with 100 bins"
     ) +
-    theme_minimal() +
-    theme_minimal() +
-    theme(
-      panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
-      axis.text.y.left = element_text(size = 30),
-      axis.text.y.right = element_text(size = 30),
-      axis.title.y.left = element_text(size = 30),
-      axis.title.y.right = element_text(size = 30),
-      panel.grid = element_blank(),
-      plot.title = element_text(hjust = 0.5, face = "bold"),
-      text = element_text(size = 16),
-      axis.line = element_line(color = "black"),
-      axis.ticks = element_line(color = "black"),
-      legend.position = "bottom"
-    )
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 40),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
+          axis.title.y.right = element_text(color = "#228B22"),  # right axis purple
+          axis.text.y.left   = element_text(color = "#E68532"),
+          axis.text.y.right  = element_text(color = "#228B22"),
+          legend.position = "top", 
+          legend.title = element_text(size=30), 
+          legend.text = element_text(size=30))
+
+  ggsave(paste0(i, "_pG4CS_with_POLR1A.png"), plot_g4s_polr1a, width = 20, height = 14, dpi = 300)
   
-}
-
-# Create plots
-zoom_plot_pG4CS_entire <- zoom_plot_pG4CS_with_chip(chip_with_entire, "entire")
-zoom_plot_pG4CS_template <- zoom_plot_pG4CS_with_chip(chip_with_template, "template")
-zoom_plot_pG4CS_nontemplate <- zoom_plot_pG4CS_with_chip(chip_with_nontemplate, "nontemplate")
-
-# Save if needed
-ggsave("pG4CS_zoom_entire_with_UBF_POLR1A.tiff", zoom_plot_pG4CS_entire, width = 18, height = 10, dpi = 150)
-ggsave("pG4CS_zoom_template_with_UBF_POLR1A.tiff", zoom_plot_pG4CS_template, width = 18, height = 10, dpi = 150)
-ggsave("pG4CS_zoom_nontemplate_with_UBF_POLR1A.tiff", zoom_plot_pG4CS_nontemplate, width = 18, height = 10, dpi = 150)
-
-
-
-#####################################################################
-#did the same for imotif
-
-
-
-plot_imotif_with_chip <- function(data, label_suffix) {
-  ggplot() +
-    geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = data, aes(x = bin_midpoints, y = POLR1A, color = "POLR1A"), size = 1.2) +
     
-    geom_line(data = data,
-              aes(x = bin_midpoints, y = imotif_counts * 1000),
-              color = "black", size = 0.8) +
-    geom_point(data = data,
-               aes(x = bin_midpoints, y = imotif_counts * 1000, shape = "imotif"),
-               color = "black", size = 3) +
+  
+ 
+  
+  
+  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
+                       data_of_interest[[i]]$norm_pG4CS_counts,
+                       method = "pearson")
+  
+  # round values
+  r_val <- round(cor_test$estimate, 1)
+  p_val <- signif(cor_test$p.value, 3)
+
+  
+  # correlation test
+  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
+                       data_of_interest[[i]]$norm_pG4CS_counts,
+                       method = "pearson")
+  
+  # round values
+  r_val <- round(cor_test$estimate, 1)
+  p_val <- signif(cor_test$p.value, 3)
+  
+  # plot
+  pearson_g4s_polr1a<- ggplot(data_of_interest[[i]],
+         aes(x = norm_POLR1A, y = norm_pG4CS_counts)) +
+    geom_point(alpha = 0.6, size = 3, color = "black") +
+    geom_smooth(method = "lm", color = "black", se = TRUE) +
+    annotate("text", 
+             x = 0.1, y = 0.9, hjust = 0,
+             label = paste0("Pearson r = ", r_val," ", 
+                            "\n P = ", p_val),
+             size = 12) +   # text size scales differently than theme text
+    labs(title = paste0(i, "Correlation between POLR1A and pG4CS"),
+         x = "Normalized POLR1A ChIP-seq signal(0-1)",
+         y = "Normalized pG4CS counts(0-1)") +
+    scale_x_continuous(limits = c(0,1), breaks = seq(0,1,0.2)) +
+    scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 40, color = "black"),
+          axis.title.x = element_text(color = "black"),
+          axis.title.y = element_text(color = "black"),
+          axis.text.x = element_text(color = "black"),
+          axis.text.y = element_text(color = "black"),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),
+          legend.position = "top", 
+          legend.title = element_text(size = 30), 
+          legend.text = element_text(size = 30))
+  
+  ggsave(paste0(i, "_pG4CS_with_POLR1A_pearson.png"), pearson_g4s_polr1a, width = 15, height = 14, dpi = 300)
+  
+  
+  ###############plot imotif
+  plot_imfs_polr1a <-
+    ggplot() +
+    #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
+    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 1.2) +
     
-    scale_color_manual(name = "Signal", values = c("UBF" = "#f609b4", "POLR1A" = "#75E11E")) +
-    scale_shape_manual(name = "Non-canonical structure", values = c("imotif" = 15)) +
-    scale_x_continuous(breaks = seq(0, 50000, by = 5000)) +
-    scale_y_continuous(
-      name = "Signal Intensity (UBF / POLR1A)",
-      breaks = c(0, 5000, 10000, 15000, 20000),
-      sec.axis = sec_axis(~ . / 1000, 
-                          breaks = c(0,4,10,15,20),
-                          name = "Non-canonical structure Count")
-    ) +
-    labs(
-      title = paste("imotif (", label_suffix, "), UBF, and POLR1A ChIP signal over human rDNA", sep = ""),
-      x = "Human rDNA region with 100 bins"
-    ) +
-    theme_minimal() +
-    theme(
-      panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
-      axis.text.y.left = element_text(size = 30),
-      axis.text.y.right = element_text(size = 30),
-      axis.title.y.left = element_text(size = 30),
-      axis.title.y.right = element_text(size = 30),
-      panel.grid = element_blank(),
-      plot.title = element_text(hjust = 0.5, face = "bold"),
-      text = element_text(size = 16),
-      axis.line = element_line(color = "black"),
-      axis.ticks = element_line(color = "black"),
-      legend.position = "bottom"
-    )
-  
-}
-
-
-
-
-# Create plots
-plot_imotif_entire <- plot_imotif_with_chip(chip_with_entire, "entire")
-plot_imotif_template <- plot_imotif_with_chip(chip_with_template, "template")
-plot_imotif_nontemplate <- plot_imotif_with_chip(chip_with_nontemplate, "nontemplate")
-
-# Save if needed
-ggsave("imotif_entire_with_UBF_POLR1A.tiff", plot_imotif_entire, width = 18, height = 10, dpi = 150)
-ggsave("imotif_template_with_UBF_POLR1A.tiff", plot_imotif_template, width = 18, height = 10, dpi = 150)
-ggsave("imotif_nontemplate_with_UBF_POLR1A.tiff", plot_imotif_nontemplate, width = 18, height = 10, dpi = 150)
-
-############ zoom in version
-
-zoom_plot_imotif_with_chip <- function(zoom_data, label_suffix) {
-  zoom_start <- 7000
-  zoom_end <- 23000
-  
-  chip_zoom <- zoom_data %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
-  
-  region_marks <- c(7137, 9339, 12996, 14865, 15935, 16092, 17259, 22310,22671)
-  region_labels <- c("Promoter", "5′ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ETS","IGS")
-  
-  ggplot() +
-    # ChIP signal
-    geom_line(data = chip_zoom, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = chip_zoom, aes(x = bin_midpoints, y = POLR1A, color = "POLR1A"), size = 1.2) +
-    geom_line(data = chip_zoom,
-              aes(x = bin_midpoints, y = imotif_counts * 1000),
-              color = "black", size = 0.8) +
-    geom_point(data = chip_zoom,
-               aes(x = bin_midpoints, y = imotif_counts * 1000, shape = "imotif"),
-               color = "black", size = 3) +
+    geom_line(data = data_of_interest[[i]],
+              aes(x = bin_midpoints, y = norm_iMFS_counts, color = "iMFS"), size = 1.2) +
+    #geom_point(data = chip_with_nontemplate,
+    #aes(x = bin_midpoints, y = norm_iMFS_counts, shape = "iMFS", color = "iMFS"), size = 3) +
     
-    scale_color_manual(name = "Signal", values = c("UBF" = "#f609b4", "POLR1A" = "#75E11E")) +
-    scale_shape_manual(name = "Non-canonical structure", values = c("imotif" = 15)) +
+    scale_color_manual(name = "Signal", values = c("iMFS" = "#32A0CD","POLR1A" = "#E68532")) +#"UBF" = "#f609b4"
+    #scale_shape_manual(name = "Non-canonical structure", values = c("iMFS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
-      name = "Signal Intensity (UBF / POLR1A)",
-      breaks = c(0, 5000, 10000, 15000, 20000),
-      sec.axis = sec_axis(~ . / 1000, 
-                          breaks = c(0,4,10,15,20),
-                          name = "Non-canonical structure Count")
+      name = "POLR1A Signal Intensity",
+      limits = c(0,1),
+      breaks = seq(0, 1, 0.2),
+      sec.axis = sec_axis(~., breaks = seq(0, 1, 0.2),
+                          name = "iMFS structure Count")
     ) +
     labs(
-      title = paste("imotif (", label_suffix, "), UBF, and POLR1A ChIP signal over human rDNA", sep = ""),
+      title = paste0(i," iMFS and POLR1A"),
       x = "Human rDNA region with 100 bins"
     ) +
-    theme_minimal() +
-    theme(
-      panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
-      axis.text.y.left = element_text(size = 30),
-      axis.text.y.right = element_text(size = 30),
-      axis.title.y.left = element_text(size = 30),
-      axis.title.y.right = element_text(size = 30),
-      panel.grid = element_blank(),
-      plot.title = element_text(hjust = 0.5, face = "bold"),
-      text = element_text(size = 16),
-      axis.line = element_line(color = "black"),
-      axis.ticks = element_line(color = "black"),
-      legend.position = "bottom"
-    )
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 40),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
+          axis.title.y.right = element_text(color = "#32A0CD"),  # right axis purple
+          axis.text.y.left   = element_text(color = "#E68532"),
+          axis.text.y.right  = element_text(color = "#32A0CD"),
+          legend.position = "top", 
+          legend.title = element_text(size=30), 
+          legend.text = element_text(size=30))
+  
+  ggsave(paste0(i, "_iMFS_with_POLR1A.png"), plot_imfs_polr1a, width = 15, height = 14, dpi = 300)
+  
+  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
+                       data_of_interest[[i]]$norm_iMFS_counts,
+                       method = "pearson")
+  
+  # round values
+  r_val <- round(cor_test$estimate, 1)
+  p_val <- signif(cor_test$p.value, 3)
+  
+  # correlation test
+  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
+                       data_of_interest[[i]]$norm_iMFS_counts,
+                       method = "pearson")
+  
+  # round values
+  r_val <- round(cor_test$estimate, 1)
+  p_val <- signif(cor_test$p.value, 3)
+  
+  # plot
+  pearson_imfs_polr1a<- ggplot(data_of_interest[[i]],
+                              aes(x = norm_POLR1A, y = norm_iMFS_counts)) +
+    geom_point(alpha = 0.6, size = 3, color = "black") +
+    geom_smooth(method = "lm", color = "black", se = TRUE) +
+    annotate("text", 
+             x = 0.1, y = 0.9, hjust = 0,
+             label = paste0("Pearson r = ", r_val," ", 
+                            "\n P = ", p_val),
+             size = 12) +   # text size scales differently than theme text
+    labs(title = paste0(i, "Correlation between POLR1A and iMFS"),
+         x = "Normalized POLR1A ChIP-seq signal(0-1)",
+         y = "Normalized iMFS counts(0-1)") +
+    scale_x_continuous(limits = c(0,1), breaks = seq(0,1,0.2)) +
+    scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 40, color = "black"),
+          axis.title.x = element_text(color = "black"),
+          axis.title.y = element_text(color = "black"),
+          axis.text.x = element_text(color = "black"),
+          axis.text.y = element_text(color = "black"),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),
+          legend.position = "top", 
+          legend.title = element_text(size = 30), 
+          legend.text = element_text(size = 30))
+  
+  ggsave(paste0(i, "_iMFS_with_POLR1A_pearson.png"), pearson_imfs_polr1a, width = 15, height = 14, dpi = 300)
   
 }
 
-# Create plots
-zoom_plot_imotif_entire <- zoom_plot_imotif_with_chip(chip_with_entire, "entire")
-zoom_plot_imotif_template <- zoom_plot_imotif_with_chip(chip_with_template, "template")
-zoom_plot_imotif_nontemplate <- zoom_plot_imotif_with_chip(chip_with_nontemplate, "nontemplate")
+data_of_interest1<- list(
+  Entire = Entire,
+  Nontemplate = Nontemplate,
+  Template = Template
+)
 
-# Save if needed
-ggsave("imotif_zoom_entire_with_UBF_POLR1A.tiff", zoom_plot_imotif_entire, width = 18, height = 10, dpi = 150)
-ggsave("imotif_zoom_template_with_UBF_POLR1A.tiff", zoom_plot_imotif_template, width = 18, height = 10, dpi = 150)
-ggsave("imotif_zoom_nontemplate_with_UBF_POLR1A.tiff", zoom_plot_imotif_nontemplate, width = 18, height = 10, dpi = 150)
+for (i in names(data_of_interest1)){
+  print(i)
+  print("RLFS")
+  proportion<- (sum(data_of_interest[[i]]$POLR1_RLFS_sign_match == 1, na.rm = TRUE)/99)*100 #99 because first entry of this column should be NA
+  print(paste0(proportion, "% of the time, the directions are opposite."))
+  #88.89%  (polr1a vs rloop)
+  #~88.9% of the time, the directions are opposite.
+  #This is a strong indicator of an inverse relationship.
+  
+  
+  print("pG4CS")
+  proportion2<- (sum(data_of_interest[[i]]$POLR1_pG4CS_sign_match == 1, na.rm = TRUE)/99)*100
+  print(paste0(proportion2, "% of the time, the directions are opposite."))
+  
+  
+  
+  print("iMFS")
+  proportion3<- (sum(data_of_interest[[i]]$POLR1_iMFS_sign_match == 1, na.rm = TRUE)/99)*100
+  print(paste0(proportion3, "% of the time, the directions are opposite."))
+  
+}
+
+#[1] "Entire"
+#[1] "RLFS"
+#[1] "82.8282828282828% of the time, the directions are opposite."
+#[1] "pG4CS"
+#[1] "83.8383838383838% of the time, the directions are opposite."
+#[1] "iMFS"
+#[1] "72.7272727272727% of the time, the directions are opposite."
+
+
+
+#[1] "Nontemplate"
+#[1] "RLFS"
+#[1] "88.8888888888889% of the time, the directions are opposite."
+#[1] "pG4CS"
+#[1] "93.9393939393939% of the time, the directions are opposite."
+#[1] "iMFS"
+#[1] "84.8484848484848% of the time, the directions are opposite."
+
+#[1] "Template"
+#[1] "RLFS"
+#[1] "82.8282828282828% of the time, the directions are opposite."
+#[1] "pG4CS"
+#[1] "85.8585858585859% of the time, the directions are opposite."
+#[1] "iMFS"
+#[1] "84.8484848484848% of the time, the directions are opposite."
+
+
+
+
+data_of_interest2<- list(
+  Entire_zoom = Entire_zoom,
+Nontemplate_zoom = Nontemplate_zoom,
+  Template_zoom = Template_zoom
+)
+
+for (i in names(data_of_interest2)){
+  data_of_interest2[[i]]$POLR1_RLFS_sign_match[1]<- NA
+  data_of_interest2[[i]]$POLR1_pG4CS_sign_match[1]<- NA
+  data_of_interest2[[i]]$POLR1_iMFS_sign_match[1]<- NA
+  print(i)
+  print("RLFS")
+  proportion<- (sum(data_of_interest2[[i]]$POLR1_RLFS_sign_match == 1, na.rm = TRUE)/34)*100
+  print(paste0(proportion, "% of the time, the directions are opposite."))
+  #88.89%  (polr1a vs rloop)
+  #~88.9% of the time, the directions are opposite.
+  #This is a strong indicator of an inverse relationship.
+  
+  
+  print("pG4CS")
+  proportion2<- (sum(data_of_interest2[[i]]$POLR1_pG4CS_sign_match == 1, na.rm = TRUE)/34)*100
+  print(paste0(proportion2, "% of the time, the directions are opposite."))
+  
+  
+  
+  print("iMFS")
+  proportion3<- (sum(data_of_interest2[[i]]$POLR1_iMFS_sign_match == 1, na.rm = TRUE)/34)*100
+  print(paste0(proportion3, "% of the time, the directions are opposite."))
+  
+}
+  
+
+
+#[1] "Entire_zoom"
+#[1] "RLFS"
+#[1] "76.4705882352941% of the time, the directions are opposite."
+#[1] "pG4CS"
+#[1] "85.2941176470588% of the time, the directions are opposite."
+#[1] "iMFS"
+#[1] "76.4705882352941% of the time, the directions are opposite."
+
+#[1] "Nontemplate_zoom"
+#[1] "RLFS"
+#[1] "76.4705882352941% of the time, the directions are opposite."
+#[1] "pG4CS"
+#[1] "85.2941176470588% of the time, the directions are opposite."
+#[1] "iMFS"
+#[1] "82.3529411764706% of the time, the directions are opposite."
+
+#[1] "Template_zoom"
+#[1] "RLFS"
+#[1] "76.4705882352941% of the time, the directions are opposite."
+#[1] "pG4CS"
+#[1] "91.1764705882353% of the time, the directions are opposite."
+#[1] "iMFS"
+#[1] "88.2352941176471% of the time, the directions are opposite."
+
+
+
 
 
 
