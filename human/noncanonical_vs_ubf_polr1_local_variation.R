@@ -4,6 +4,9 @@
 
 library(data.table)
 library(tidyverse)
+install.packages("ggtext")
+library(ggtext)
+library(karyoploteR)
 
 #set working directory
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/human/IGV_files/bedfiles")
@@ -231,7 +234,7 @@ Template_zoom <- Template %>% filter(bin_midpoints >= zoom_start & bin_midpoints
 
 
 region_marks <- c(1, 7137, 9339, 12996, 14865, 15935, 16092, 17259, 22310,22671, 44838)
-region_labels <- c("start","Pro", "5′ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ETS","IGS", "end")
+region_labels <- c("","Pro", "5′ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ETS","", "")
 
 
 data_of_interest<- list(
@@ -256,7 +259,12 @@ for (i in names(data_of_interest)){
     #geom_point(data = chip_with_nontemplate,
     #aes(x = bin_midpoints, y = norm_RLFS_counts, shape = "RLFS", color = "RLFS"), size = 3) +
     
-    scale_color_manual(name = "Signal", values = c("RLFS" = "#aa2a85","POLR1A" = "#E68532")) +#"UBF" = "#f609b4" #CD32A0, #9e277b
+    scale_color_manual(name = NULL, 
+                       values = c("RLFS" = "#aa2a85","POLR1A" = "#E68532"),
+                       labels = c(
+                         "RLFS"   = "<span style='color:#aa2a85;'>RLFS</span>",
+                         "POLR1A" = "<span style='color:#E68532;'>POLR1A</span>"
+                       )) +#"UBF" = "#f609b4" #CD32A0, #9e277b
     #scale_shape_manual(name = "Non-canonical structure", values = c("RLFS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
@@ -268,21 +276,21 @@ for (i in names(data_of_interest)){
     ) +
     labs(
       title = paste0(i," RLFS and POLR1A"),
-      x = "Human rDNA region with 100 bins"
+      x = "Human rDNA region (100 bins)"
     ) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           text = element_text(size = 40),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black"),
           axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
           axis.title.y.right = element_text(color = "#aa2a85"),  # right axis purple
           axis.text.y.left   = element_text(color = "#E68532"),
           axis.text.y.right  = element_text(color = "#aa2a85"),
           legend.position = "top", 
-          legend.title = element_text(size=30), 
-          legend.text = element_text(size=30))
+          legend.title = element_text(size=40), 
+          legend.text = ggtext::element_markdown(size=40))
   
   ggsave(paste0(i, "_RLFS_with_POLR1A.png"), plot_rlfs_polr1a, width = 20, height = 14, dpi = 300)
   
@@ -296,14 +304,6 @@ for (i in names(data_of_interest)){
   r_val <- round(cor_test$estimate, 1)
   p_val <- signif(cor_test$p.value, 3)
 
-  # correlation test
-  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
-                       data_of_interest[[i]]$norm_RLFS_counts,
-                       method = "pearson")
-  
-  # round values
-  r_val <- round(cor_test$estimate, 1)
-  p_val <- signif(cor_test$p.value, 3)
   
   # plot
   pearson_rlfs_polr1a<- ggplot(data_of_interest[[i]],
@@ -322,16 +322,16 @@ for (i in names(data_of_interest)){
     scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           text = element_text(size = 40, color = "black"),
-          axis.title.x = element_text(color = "black"),
-          axis.title.y = element_text(color = "black"),
-          axis.text.x = element_text(color = "black"),
-          axis.text.y = element_text(color = "black"),
+          axis.title.x = element_text(color = "#E68532"),
+          axis.title.y = element_text(color = "#aa2a85"),
+          axis.text.x = element_text(color = "#E68532"),
+          axis.text.y = element_text(color = "#aa2a85"),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),
           legend.position = "top", 
-          legend.title = element_text(size = 30), 
-          legend.text = element_text(size = 30))
+          legend.title = element_text(size = 40), 
+          legend.text = element_text(size = 40))
   
   ggsave(paste0(i, "_RLFS_with_POLR1A_pearson.png"), pearson_rlfs_polr1a, width = 15, height = 14, dpi = 300)
 
@@ -348,7 +348,12 @@ for (i in names(data_of_interest)){
     #geom_point(data = chip_with_nontemplate,
     #aes(x = bin_midpoints, y = norm_pG4CS_counts, shape = "pG4CS", color = "pG4CS"), size = 3) +
     
-    scale_color_manual(name = "Signal", values = c("pG4CS" = "#228B22","POLR1A" = "#E68532")) +#"UBF" = "#f609b4"
+    scale_color_manual(name = NULL, 
+                       values = c("pG4CS" = "#228B22","POLR1A" = "#E68532"),
+                       labels = c(
+                         "pG4CS"   = "<span style='color:#228B22;'>pG4CS</span>",
+                         "POLR1A" = "<span style='color:#E68532;'>POLR1A</span>"
+                       )) +#"UBF" = "#f609b4"
     #scale_shape_manual(name = "Non-canonical structure", values = c("pG4CS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
@@ -360,21 +365,22 @@ for (i in names(data_of_interest)){
     ) +
     labs(
       title = paste0(i," pG4CS and POLR1A"),
-      x = "Human rDNA region with 100 bins"
+      x = "Human rDNA region (100 bins)"
     ) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           text = element_text(size = 40),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black"),
           axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
           axis.title.y.right = element_text(color = "#228B22"),  # right axis purple
           axis.text.y.left   = element_text(color = "#E68532"),
           axis.text.y.right  = element_text(color = "#228B22"),
           legend.position = "top", 
-          legend.title = element_text(size=30), 
-          legend.text = element_text(size=30))
+          legend.title = element_text(size=40), 
+          legend.text = ggtext::element_markdown(size=40))
+
 
   ggsave(paste0(i, "_pG4CS_with_POLR1A.png"), plot_g4s_polr1a, width = 20, height = 14, dpi = 300)
   
@@ -383,6 +389,7 @@ for (i in names(data_of_interest)){
  
   
   
+  ###################### correlation test
   cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
                        data_of_interest[[i]]$norm_pG4CS_counts,
                        method = "pearson")
@@ -391,16 +398,7 @@ for (i in names(data_of_interest)){
   r_val <- round(cor_test$estimate, 1)
   p_val <- signif(cor_test$p.value, 3)
 
-  
-  # correlation test
-  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
-                       data_of_interest[[i]]$norm_pG4CS_counts,
-                       method = "pearson")
-  
-  # round values
-  r_val <- round(cor_test$estimate, 1)
-  p_val <- signif(cor_test$p.value, 3)
-  
+
   # plot
   pearson_g4s_polr1a<- ggplot(data_of_interest[[i]],
          aes(x = norm_POLR1A, y = norm_pG4CS_counts)) +
@@ -418,16 +416,16 @@ for (i in names(data_of_interest)){
     scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           text = element_text(size = 40, color = "black"),
-          axis.title.x = element_text(color = "black"),
-          axis.title.y = element_text(color = "black"),
-          axis.text.x = element_text(color = "black"),
-          axis.text.y = element_text(color = "black"),
+          axis.title.x = element_text(color = "#E68532"),
+          axis.title.y = element_text(color = "#228B22"),
+          axis.text.x = element_text(color = "#E68532"),
+          axis.text.y = element_text(color = "#228B22"),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),
           legend.position = "top", 
-          legend.title = element_text(size = 30), 
-          legend.text = element_text(size = 30))
+          legend.title = element_text(size = 40), 
+          legend.text = element_text(size = 40))
   
   ggsave(paste0(i, "_pG4CS_with_POLR1A_pearson.png"), pearson_g4s_polr1a, width = 15, height = 14, dpi = 300)
   
@@ -443,7 +441,12 @@ for (i in names(data_of_interest)){
     #geom_point(data = chip_with_nontemplate,
     #aes(x = bin_midpoints, y = norm_iMFS_counts, shape = "iMFS", color = "iMFS"), size = 3) +
     
-    scale_color_manual(name = "Signal", values = c("iMFS" = "#32A0CD","POLR1A" = "#E68532")) +#"UBF" = "#f609b4"
+    scale_color_manual(name = NULL, 
+                       values = c("iMFS" = "#32A0CD","POLR1A" = "#E68532"),
+                       labels = c(
+                         "iMFS"   = "<span style='color:#32A0CD;'>iMFS</span>",
+                         "POLR1A" = "<span style='color:#E68532;'>POLR1A</span>"
+                       )) +#"UBF" = "#f609b4"
     #scale_shape_manual(name = "Non-canonical structure", values = c("iMFS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
@@ -455,24 +458,31 @@ for (i in names(data_of_interest)){
     ) +
     labs(
       title = paste0(i," iMFS and POLR1A"),
-      x = "Human rDNA region with 100 bins"
+      x = "Human rDNA region (100 bins)"
     ) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           text = element_text(size = 40),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black"),
           axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
           axis.title.y.right = element_text(color = "#32A0CD"),  # right axis purple
           axis.text.y.left   = element_text(color = "#E68532"),
           axis.text.y.right  = element_text(color = "#32A0CD"),
           legend.position = "top", 
-          legend.title = element_text(size=30), 
-          legend.text = element_text(size=30))
+          legend.title = element_text(size=40), 
+          legend.text = ggtext::element_markdown(size=40))
   
-  ggsave(paste0(i, "_iMFS_with_POLR1A.png"), plot_imfs_polr1a, width = 15, height = 14, dpi = 300)
   
+  ggsave(paste0(i, "_iMFS_with_POLR1A.png"), plot_imfs_polr1a, width = 20, height = 14, dpi = 300)
+  
+  
+  
+  
+  
+  
+  ###################### correlation test
   cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
                        data_of_interest[[i]]$norm_iMFS_counts,
                        method = "pearson")
@@ -481,18 +491,10 @@ for (i in names(data_of_interest)){
   r_val <- round(cor_test$estimate, 1)
   p_val <- signif(cor_test$p.value, 3)
   
-  # correlation test
-  cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
-                       data_of_interest[[i]]$norm_iMFS_counts,
-                       method = "pearson")
-  
-  # round values
-  r_val <- round(cor_test$estimate, 1)
-  p_val <- signif(cor_test$p.value, 3)
   
   # plot
   pearson_imfs_polr1a<- ggplot(data_of_interest[[i]],
-                              aes(x = norm_POLR1A, y = norm_iMFS_counts)) +
+                               aes(x = norm_POLR1A, y = norm_iMFS_counts)) +
     geom_point(alpha = 0.6, size = 3, color = "black") +
     geom_smooth(method = "lm", color = "black", se = TRUE) +
     annotate("text", 
@@ -507,16 +509,16 @@ for (i in names(data_of_interest)){
     scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           text = element_text(size = 40, color = "black"),
-          axis.title.x = element_text(color = "black"),
-          axis.title.y = element_text(color = "black"),
-          axis.text.x = element_text(color = "black"),
-          axis.text.y = element_text(color = "black"),
+          axis.title.x = element_text(color = "#E68532"),
+          axis.title.y = element_text(color = "#32A0CD"),
+          axis.text.x = element_text(color = "#E68532"),
+          axis.text.y = element_text(color = "#32A0CD"),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),
           legend.position = "top", 
-          legend.title = element_text(size = 30), 
-          legend.text = element_text(size = 30))
+          legend.title = element_text(size = 40), 
+          legend.text = element_text(size = 40))
   
   ggsave(paste0(i, "_iMFS_with_POLR1A_pearson.png"), pearson_imfs_polr1a, width = 15, height = 14, dpi = 300)
   
@@ -638,6 +640,69 @@ for (i in names(data_of_interest2)){
 
 
 
+png("rdna_black_and_white.png", width = 15, height= 10, units= "in", res = 600)
+##plotting begins
+custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=44838))
+kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =9339 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #IGS plus promoter
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 9340, x1 = 12996 , y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+#3501+(3657-1) = 7157
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 12997, x1 = 14865, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 18S
+#7158+ (1869-1) = 9026
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 14866, x1 = 15935, y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks ITS1S
+#9027+ (1070-1) = 10096 
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 15936, x1 = 16092, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 5.8S
+#10097+ (157-1) = 10253
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 16093, x1 = 17259, y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks ITS2
+#10254+(1167-1) = 11420
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 17260, x1 = 22310, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 28S
+#11421+(5051-1) = 16471
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 22311, x1 = 22671, y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 3'ETS
+#16472+(361-1) = 16832
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 22672, x1 = 44838, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks IGS
+#16833+ (31506-1)= 48338
+dev.off()
+
+
+png("rdna_zoom_black_and_white.png", width = 15, height= 10, units= "in", res = 600)
+##plotting begins
+custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=7137, end=22671))
+
+kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 7137, x1 =9339 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 9340, x1 = 12996 , y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+#3501+(3657-1) = 7157
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 12997, x1 = 14865, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 18S
+#7158+ (1869-1) = 9026
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 14866, x1 = 15935, y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks ITS1S
+#9027+ (1070-1) = 10096 
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 15936, x1 = 16092, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 5.8S
+#10097+ (157-1) = 10253
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 16093, x1 = 17259, y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks ITS2
+#10254+(1167-1) = 11420
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 17260, x1 = 22310, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 28S
+#11421+(5051-1) = 16471
+
+kpRect(kp, chr = 'rDNA_locus', x0 = 22311, x1 = 22671, y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 3'ETS
+#16472+(361-1) = 16832
+
+dev.off()
 
 
 
@@ -723,7 +788,7 @@ for (i in names(list_of_files)) {
                        labels = seq(0, 50000, by = 5000)) +
     
     labs(title = "Distribution of non-canonical structures in the human rDNA",
-         x = "Human rDNA region with 100 bins",
+         x = "Human rDNA region (100 bins)",
          y = "Bin Density (Smooth)") +
     
     theme_minimal() +
@@ -742,12 +807,6 @@ for (i in names(list_of_files)) {
 }
 
 
-geom_point(data = chip_zoom,
-           aes(x = bin_midpoints, y = imotif_counts * 1000, shape = "imotif"),
-           color = "black", size = 3) +
-
-
-  
 
 
 
