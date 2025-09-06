@@ -18,7 +18,7 @@ library(Biostrings)
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output")
 rdna_human<- fread ("rdna_hg38_chr21_2018_dataset_details_v2.csv", sep = ",", header = TRUE)
 
-attempt1<- data.frteame((matrix(nrow = 0, ncol=6))) #6 coloumns because Gc skew has 6 columns
+attempt1<- data.frame((matrix(nrow = 0, ncol=6))) #6 coloumns because Gc skew has 6 columns
 
 for ( i in 1:nrow(rdna_human)){
   gc_skew_data<- gc_skew(rdna_human$Sequences[i])
