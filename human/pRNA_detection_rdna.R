@@ -125,21 +125,32 @@ nchar(promoter_ets5_s18)
   
 
 
-  # i simply used wedsite and got the output
+#  (base) jyotiadala@Mac-519 Downloads % conda activate python2.7
+#  (python2.7) jyotiadala@Mac-519 Downloads % python QmRLFS-finder.py -bed -i pRNA_U13369_rdna.fasta -o pRNA_U13369_rdna
+#  QmRLFS-finder.py (version v1.5)
+#  run on Sat Sep 06 2025 15:40:12 
+#  command line: python QmRLFS-finder.py -bed -i pRNA_U13369_rdna.fasta -o pRNA_U13369_rdna_qmrlfs
   
-  entire_rdna<- fread("pRNA_U13369_rdna_qmrlfs.out.bed", sep = "\t", header = FALSE) #208, this contain double entry for promoter and IGS. 
+#  Time used: 0.16 mins
+#  (python2.7) jyotiadala@Mac-519 Downloads % python QmRLFS-finder.py -i pRNA_U13369_rdna.fasta -o pRNA_U13369_rdna 
+#  QmRLFS-finder.py (version v1.5)
+#  run on Sat Sep 06 2025 15:40:31 
+#  command line: python QmRLFS-finder.py -i pRNA_U13369_rdna.fasta -o pRNA_U13369_rdna_qmrlfs
   
+#  Time used: 0.16 mins
+  
+  entire_rdna<- fread("pRNA_U13369_rdna_qmrlfs.out.bed", sep = "\t", header = FALSE) 
   
   entire_rdna$V1= "rDNA_locus"
   entire_rdna6<- entire_rdna %>% select(1:6)
   colnames(entire_rdna6)<- c("chr", "start", "end", "name", "score", "strand")
   
   ##separate as per strand
-  entire_rdna6_nontemplate<- entire_rdna6 %>% filter(strand=="+") #94
+  entire_rdna6_nontemplate<- entire_rdna6 %>% filter(strand=="+")
   #because in NCBI keep nontemplate sequence.
   
   
-  entire_rdna6_template<- entire_rdna6 %>% filter(strand=="-")#114
+  entire_rdna6_template<- entire_rdna6 %>% filter(strand=="-")
   
   
   
@@ -155,10 +166,10 @@ nchar(promoter_ets5_s18)
   kpRect(kp, chr = 'rDNA_locus', x0 = 5658, x1 = 7528, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
   #5658+1870 = 9026
   
-  kpPlotRegions(kp, data=test, col="black", r0= -0.5, r1= -0.6) # you will see two black lines
+  kpPlotRegions(kp, data=prna_details, col="black", r0= -0.5, r1= -0.6) # you will see two black lines
   kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.9)
   kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
-  
+  #imaged saved using R save image option
   
   
 
@@ -167,4 +178,50 @@ nchar(promoter_ets5_s18)
   prna_details<-  prna_details %>% setkey(chr, start, end)
   
   prna_ovlp_rlfs <- foverlaps(prna_details,entire_rdna6) %>% na.omit()
-fwrite(prna_ovlp_rlfs, "prna_haripin_ovlp_rlfs.csv")
+  fwrite(prna_ovlp_rlfs, "prna_haripin_ovlp_rlfs.csv")
+
+
+
+# Now, i was interested if this hairpin sequence overlap with pG4CS or iMFS
+  
+# (base) jyotiadala@Mac-519 ~ % cd Downloads 
+# (base) jyotiadala@Mac-519 Downloads % conda activate python3.11
+# (python3.11) jyotiadala@Mac-519 Downloads % python g4_canonical_finder_3.11python.py pRNA_U13369_rdna.fasta >output_pG4CS_pRNA_U13369_rdna.txt
+ 
+ setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/pRNA_transcript_hairpin_seq_U13369")
+ 
+ entire_rdna<- fread("output_pG4CS_pRNA_U13369_rdna.txt", sep = "\t", header = FALSE) #35, this contain double entry for promoter and IGS.
+ 
+ entire_rdna$V1= "rDNA_locus"
+ colnames(entire_rdna)<- c("chr", "start", "end", "sequence", "name", "strand")
+ 
+ ##separate as per strand
+ entire_rdna_nontemplate<- entire_rdna %>% filter(strand=="+") #6
+ #because in NCBI keep nontemplate sequence.
+ 
+ 
+ entire_rdna_template<- entire_rdna %>% filter(strand=="-") #29
+ 
+ custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=7528))
+ 
+ kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =2000 , y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 2000, x1 = 5657 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+ #2000+3657 = 5657
+ 
+ kpRect(kp, chr = 'rDNA_locus', x0 = 5658, x1 = 7528, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
+ #5658+1870 = 9026
+ 
+ kpPlotRegions(kp, data=prna_details, col="black", r0= -0.5, r1= -0.6) # you will see two black lines
+ kpPlotRegions(kp, data=entire_rdna_template, col="#1414E1", r0= -0.5, r1= -1.9)
+ kpPlotRegions(kp, data=entire_rdna_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+ #imaged saved using R save image option
+ 
+ 
+ #I added pRNA_U13369_rdna.fasta>upload DNA FILE (FASTA FORMAT) (https://im-seeker.org/predict)>end to end with default model>predict
+ # wedbiste is taking time and not giving me results. 
+ 
+ # If got a csv file which i saved as imotif_prediction_default_setting_pRNA_U13369_rdna.csv
+ 
