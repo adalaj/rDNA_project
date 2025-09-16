@@ -248,31 +248,28 @@ for ( i in bin_size){
   sliding_content<- gc_content_data$sliding_window_results
   fwrite(sliding_content, paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv"))
   
-  
-  
-  
   sliding_graph<- ggplot(sliding_skew, aes(x = start, y = GC_skew_value)) +
     geom_line(color = "#E21515") +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-    labs(title = "GC Skew Across rDNA Sequence KY962518",
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =1.2) +
+    labs(title = "GC Skew across human rDNA",
          subtitle= paste0(i, " bp Sliding window size"),
          x = "Position (bp)",
-        y = "GC Skew (G−C / G+C)") +
-    scale_x_continuous(breaks = c(0, 2202, 5859, 7728,8798, 8955, 10122, 15173, 15534), 
-                       labels =c("Promoter","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS", "IGS"))+
+        y = "GC Skew") +
+    scale_x_continuous(breaks = c(0, 2202, 5858, 7726, 8795, 8951, 15167, 15527), 
+                       labels =c("Pro","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           plot.subtitle = element_text(hjust = 0.5),
           text = element_text(size = 40),
           panel.border = element_rect(color = "black", fill = NA, linewidth = 1),  # <-- the rectangle
           panel.background = element_rect(fill = "white", color = NA),
           plot.background  = element_rect(fill = "white", color = NA),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30), # Center Y-axis title
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 40), # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
           axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-          axis.text.y = element_text(color = "black"))
+          axis.text.y = element_text(color = "black", size = 40))
   
   ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_", i, "bp.png"), 
-         plot = sliding_graph, width=18, height = 10, dpi = 300)
+         plot = sliding_graph, width=18, height = 10, dpi = 600)
   
   
   #sliding<- paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv")
@@ -281,15 +278,15 @@ for ( i in bin_size){
   
   sliding_content_graph<- ggplot(sliding_content, aes(x = start, y = gc_content_perc)) +
     geom_line(color = "#E21515") +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-    geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen")+
-    labs(title = "GC Content Across rDNA Sequence KY962518",
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =1.2) +
+    geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen", linewidth =1.2)+
+    labs(title = "GC Content across human rDNA",
          subtitle= paste0(i, " bp sliding window size"),
          x = "Position (bp)",
          y = "GC Content") +
-    scale_y_continuous(limits= c(0,100), breaks=seq(0,100, by=20))+
-    scale_x_continuous(breaks = c(0, 2202, 5859, 7728,8798, 8955, 10122, 15173, 15534), 
-                       labels =c("Promoter","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS", "IGS"))+
+    scale_y_continuous(limits= c(0,100), breaks=seq(0,100, by=25))+
+    scale_x_continuous(breaks = c(0, 2202, 5858, 7726, 8795, 8951, 15167, 15527), 
+                       labels =c("Pro","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
     
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
           plot.subtitle = element_text(hjust = 0.5),
@@ -297,13 +294,13 @@ for ( i in bin_size){
           panel.border = element_rect(color = "black", fill = NA, linewidth = 1),  # <-- the rectangle
           panel.background = element_rect(fill = "white", color = NA),
           plot.background  = element_rect(fill = "white", color = NA),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30), # Center Y-axis title
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 40), # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
           axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-          axis.text.y = element_text(color = "black"))
+          axis.text.y = element_text(color = "black", size = 40))
   
   ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_", i, "bp.png"), 
-         plot =  sliding_content_graph, width=18, height = 10, dpi = 300)
+         plot =  sliding_content_graph, width=18, height = 10, dpi = 600)
   
 } 
 
@@ -428,7 +425,7 @@ fwrite(non_sliding_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_data_
   library(karyoploteR)
   
   #need to plot only from 5'ETS to 3'ETS
-  png("rdna.png", width = 15, height= 10, units= "in", res = 600)
+  png("rdna.png", width = 10, height= 10, units= "in", res = 600)
   
   custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
   kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
