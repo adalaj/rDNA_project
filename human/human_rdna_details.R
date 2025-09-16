@@ -167,7 +167,7 @@ for (nm in names(datasets)) {
     theme(axis.text.x = element_text(angle = 45, size = 30, hjust = 1)) +
     labs(title = "AT vs GC percent in human rDNA",
          x = "rDNA region",
-         y = "Percent (%) of nucleotides", 
+         y = "Percent (%) of Nucleotides", 
          fill = NULL) +
    scale_fill_manual(
      values = c(
