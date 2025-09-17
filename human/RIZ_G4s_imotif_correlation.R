@@ -83,30 +83,30 @@ for (i in bin_size){
     geom_density(data = entire_g4s_rdna,
                  aes(x = pG4CS_start, 
                      y = ..density.. * length(entire_g4s_rdna$pG4CS_start) * bin_width),
-                 color = "#228B22", size = 1, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##B4F609"
+                 color = "#228B22", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##B4F609"
     geom_bar(data = combined_count, 
              aes(x = bin_midpoints, y = RIZ_counts, fill = "RIZ_counts"), 
              stat = "identity", color = "#aa2a85", alpha = 0.7) + 
     geom_density(data = riz,
                  aes(x = RIZ_start, 
                      y = ..density.. * length(riz$RIZ_start) * bin_width),
-                 color = "#aa2a85", size = 1, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ #"#89216B"
+                 color = "#aa2a85", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ #"#89216B"
     geom_bar(data = combined_count, 
              aes(x = bin_midpoints, y = imotif_counts, fill = "imotif_counts"), 
              stat = "identity", color = "#32A0CD", alpha = 0.7) + 
     geom_density(data = imotif,
                  aes(x = beg, 
                      y = ..density.. * length(imotif$beg) * bin_width),
-                 color =   "#32A0CD", size = 1, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##216B89"
+                 color =   "#32A0CD", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##216B89"
     
     
     scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
                        labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
     
-    labs(title= "pG4CS vs RIZ vs imotif frequency distribution in human rDNA", 
-         x= paste0("Human rDNA region (",i, "bins)"), 
+    labs(title= "Non-canonical Structures", 
+         x= paste0("Human rDNA region (",i, " bins)"), 
          y= "Frequency", 
-         fill= "Non-canonical structures")+
+         fill= NULL)+
     #scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
     scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
                       breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
@@ -115,24 +115,24 @@ for (i in bin_size){
     theme(axis.text.x = element_text(angle = 90, hjust=1),
           axis.ticks.x = element_line(color = "black"),
           panel.grid = element_blank(),
-          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5),
           text = element_text(size = 40),
           axis.line = element_line(color = "black"),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin (r=20)),  # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
           legend.key = element_rect(color = NA),
           legend.position = "top")
   
   ggsave(paste("pG4CS_RIZ_imotif_count_entire_human_rdna_in_", i, "bin.png", sep = ""), 
-         plot = g4s_riz_imotif_count, width = 18, height = 10, dpi = 150)
+         plot = g4s_riz_imotif_count, width = 18, height = 10, dpi = 300)
   
   
   
   
   
   
-  combined_count_zoom <- combined_count %>% filter(bin_midpoints >= 2201 & bin_midpoints <= 15534)
+  combined_count_zoom <- combined_count %>% filter(bin_midpoints >= 1299 & bin_midpoints <= 16832)
   
   entire_g4s_rdna_zoom <- entire_g4s_rdna %>% filter(rDNA_region != "IGS")
   riz_zoom<- riz %>% filter(rDNA_region != "IGS")
@@ -145,30 +145,30 @@ for (i in bin_size){
     geom_density(data = entire_g4s_rdna_zoom,
                  aes(x = pG4CS_start, 
                      y = ..density.. * length(entire_g4s_rdna_zoom$pG4CS_start) * bin_width),
-                 color = "#228B22", size = 1, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##B4F609"
+                 color = "#228B22", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##B4F609"
     geom_bar(data = combined_count_zoom, 
              aes(x = bin_midpoints, y = RIZ_counts, fill = "RIZ_counts"), 
              stat = "identity", color = "#aa2a85", alpha = 0.7) + 
     geom_density(data = riz_zoom,
                  aes(x = RIZ_start, 
                      y = ..density.. * length(riz_zoom$RIZ_start) * bin_width),
-                 color = "#aa2a85", size = 1, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ #"#89216B"
+                 color = "#aa2a85", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ #"#89216B"
     geom_bar(data = combined_count_zoom, 
              aes(x = bin_midpoints, y = imotif_counts, fill = "imotif_counts"), 
              stat = "identity", color = "#32A0CD", alpha = 0.7) + 
     geom_density(data = imotif_zoom,
                  aes(x = beg, 
                      y = ..density.. * length(imotif_zoom$beg) * bin_width),
-                 color =   "#32A0CD", size = 1, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##216B89"
+                 color =   "#32A0CD", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##216B89"
     
     
-    scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
+    scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16832, 46137),
                        labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
     
-    labs(title= "pG4CS vs RIZ vs imotif frequency distribution in human rDNA", 
-         x= paste0("Human rDNA region (",i, "bins)"), 
+    labs(title= "Non-canonical Structures",  
+         x= paste0("Human rDNA region (",i, " bins)"), 
          y= "Frequency", 
-         fill= "Non-canonical structures")+
+         fill= NULL)+
     #scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
     scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
                       breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
@@ -177,11 +177,11 @@ for (i in bin_size){
     theme(axis.text.x = element_text(angle = 90, hjust=1),
           axis.ticks.x = element_line(color = "black"),
           panel.grid = element_blank(),
-          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5),
           text = element_text(size = 40),
           axis.line = element_line(color = "black"),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5,margin = margin (r=20)),  # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
           legend.key = element_rect(color = NA),
           legend.position = "top")
@@ -198,43 +198,47 @@ for (i in bin_size){
                  aes(x = pG4CS_start,
                      y = ..density.. * length(entire_g4s_rdna$pG4CS_start) * bin_width,
                      color = "pG4CS"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
+                 size = 2, bw = 2000, kernel = "gaussian") +
     
     geom_density(data = riz,
                  aes(x = RIZ_start,
                      y = ..density.. * length(riz$RIZ_start) * bin_width,
                      color = "RIZ"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
+                 size = 2, bw = 2000, kernel = "gaussian") +
     
     geom_density(data = imotif,
                  aes(x = beg,
                      y = ..density.. * length(imotif$beg) * bin_width,
                      color = "imotif"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
+                 size = 2, bw = 2000, kernel = "gaussian") +
     
     scale_color_manual(
-      name = "Non-canonical structures",
+      name = NULL,
       values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
       breaks = c("RIZ", "pG4CS", "imotif"),
-      labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS"))+
+      labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS"),guide = guide_legend(
+        override.aes = list(fill = c("#aa2a85", "#228B22", "#32A0CD"), 
+                            linetype = 0)  # removes line in legend
+      )
+    )+
     
     scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
                        labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
     
-    labs(title= "pG4CS vs RIZ vs imotif frequency distribution in human rDNA", 
-         x= paste0("Human rDNA region (",i, "bins)"), 
+    labs(title= "Non-canonical Structures", 
+         x= paste0("Human rDNA region (",i, " bins)"), 
          y= "Bin Density (Smooth)", 
-         fill= "Non-canonical structures") +
+         fill= NULL) +
     
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust=1),
           axis.ticks.x = element_line(color = "black"),
           panel.grid = element_blank(),
-          plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5),
           text = element_text(size = 40),
           axis.line = element_line(color = "black"),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5,margin = margin (r=20)),  # Center Y-axis title
           axis.ticks.y = element_line(color = "black"),
           legend.key = element_rect(color = NA),
           legend.position = "top")
@@ -246,102 +250,7 @@ for (i in bin_size){
          plot = g4s_riz_imotif_density, width = 15, height = 10, dpi = 300)
   
   
-  g4s_riz_imotif_scale_density <- ggplot() +
-    geom_density(data = entire_g4s_rdna,
-                 aes(x = pG4CS_start, y = after_stat(scaled), color = "pG4CS"),#after_stat(scaled) (formerly ..scaled..) gives a curve whose maximum is 1 for each group; perfect for visual shape comparison
-                 size = 1, bw = 2000, kernel = "gaussian") +
-    geom_density(data = riz,
-                 aes(x = RIZ_start, y = after_stat(scaled), color = "RIZ"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
-    geom_density(data = imotif,
-                 aes(x = beg, y = after_stat(scaled), color = "imotif"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
-    scale_color_manual(
-      name = "Non-canonical structures",
-      values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
-      breaks = c("RIZ", "pG4CS", "imotif"),
-      labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS")
-    ) +
-    scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
-                       labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
-    
-    labs(
-      title = "pG4CS vs RIZ vs imotif (scaled density, 0–1)",
-      x = paste0("Human rDNA region (", i, " bins)"),
-      y = "Scaled density (0–1)"
-    ) +
-    theme_minimal() +
-    theme(
-      axis.text.x = element_text(angle = 90, hjust = 1),
-      axis.ticks.x = element_line(color = "black"),
-      panel.grid = element_blank(),
-      plot.title = element_text(hjust = 0.5, face = "bold"),
-      plot.subtitle = element_text(hjust = 0.5),
-      text = element_text(size = 40),
-      axis.line = element_line(color = "black"),
-      axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),
-      axis.ticks.y = element_line(color = "black"),
-      legend.key = element_rect(color = NA),
-      legend.position = "top"
-    )
   
-  ggsave(paste("pG4CS_RIZ_imotif_scaled_density_entire_human_rdna_in_", i, "bin.png", sep = ""), 
-         plot = g4s_riz_imotif_density, width = 15, height = 10, dpi = 300)
-  
-  
-  g4s_riz_imotif_density_zoom<- ggplot() +
-    geom_density(data = entire_g4s_rdna_zoom,
-                 aes(x = pG4CS_start,
-                     y = ..density.. * length(entire_g4s_rdna_zoom$pG4CS_start) * bin_width,
-                     color = "pG4CS"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
-    
-    geom_density(data = riz_zoom,
-                 aes(x = RIZ_start,
-                     y = ..density.. * length(riz_zoom$RIZ_start) * bin_width,
-                     color = "RIZ"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
-    
-    geom_density(data = imotif_zoom,
-                 aes(x = beg,
-                     y = ..density.. * length(imotif_zoom$beg) * bin_width,
-                     color = "imotif"),
-                 size = 1, bw = 2000, kernel = "gaussian") +
-    
-    scale_color_manual(
-      name = "Non-canonical structures",
-      values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
-      breaks = c("RIZ", "pG4CS", "imotif"),
-      labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS"))+
-    
-    scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
-                       labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
-    
-    labs(title= "pG4CS vs RIZ vs imotif frequency distribution in human rDNA", 
-         x= paste0("Human rDNA region (",i, "bins)"), 
-         y= "Bin Density (Smooth)", 
-         fill= "Non-canonical structures") +
-    
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust=1),
-          axis.ticks.x = element_line(color = "black"),
-          panel.grid = element_blank(),
-          plot.title = element_text(hjust = 0.5, face = "bold"),
-          plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 40),
-          axis.line = element_line(color = "black"),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
-          axis.ticks.y = element_line(color = "black"),
-          legend.key = element_rect(color = NA),
-          legend.position = "top")
-  
-  
-  
-  
-  ggsave(paste("pG4CS_RIZ_imotif_density_entire_human_rdna_in_", i, "bin_zoom.png", sep = ""), 
-         plot = g4s_riz_imotif_density_zoom, width = 15, height = 10, dpi = 300)
-  
-}
 
 png("rdna_zoom_black_and_white.png", width = 15, height= 10, units= "in", res = 600)
 custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1299, end=46137))
@@ -370,7 +279,7 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "bl
 kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 3'ETS
 #16472+(361-1) = 16832
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 47040, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks IGS
+kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 46137, y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks IGS
 dev.off()
 
 png("rdna_zoom_black_and_white_zoom.png", width = 15, height= 10, units= "in", res = 600)
@@ -408,8 +317,9 @@ cor_matrix <- cor(combined_count[, c("RIZ_counts", "pG4CS_counts","imotif_counts
 new_labels <- c("RIZ","pG4CS", "iMFS")
 dimnames(cor_matrix) <- list(new_labels, new_labels)  # row + col names
 fwrite(cor_matrix, "RIZ_g4s_imfs_correlation_plot_graph_input.csv")
-png("RIZ_g4s_imfs_correlation_plot.png", width = 15, height = 10, units = "in", res = 300)
 
+
+png("RIZ_g4s_imfs_correlation_plot.png", width = 11, height = 10, units = "in", res = 300)
 
 
 
@@ -421,7 +331,10 @@ corrplot(
   tl.cex = 3.5,          # Text label size
   col = colorRampPalette(c("white", "red"))(200),  # Red gradient
   addCoef.col = "black", # Optional: adds correlation coefficients
-  number.cex = 3.5       # Size of numbers (if added)
+  number.cex = 3.5,       # Size of numbers (if added)
+  cl.cex = 2.0,         # Increase scale (legend) text size
+  cl.ratio = 0.3,        # Increase thickness of the color bar
+  cl.align.text = "l", # c=center, r=right, l= left align text to ticks
 )
 
 dev.off()
@@ -457,6 +370,91 @@ dev.off()
 
 #If you're interested in finer, localized overlaps, and can handle noise, use 100 bins or more.
 
+
+
+
+
+###Venn diagram:
+#Convert each count column into presence/absence (1 if count > 0, 0 if count = 0).
+combined_count$RIZ_bin    <- as.integer(combined_count$RIZ_counts > 0)
+combined_count$pG4CS_bin     <- as.integer(combined_count$pG4CS_counts > 0)
+combined_count$iMFS_bin   <- as.integer(combined_count$imotif_counts > 0)
+fwrite(combined_count, "graph_input_pG4CS_RIZ_imotif_count_bar_graph_100bin.csv")
+
+
+png("RIZ_g4s_imfs_venn_plot.png", width = 11, height = 10, units = "in", res = 300)
+
+venn.plot <- venn.diagram(
+  x = list(
+    RIZ   = which(combined_count$RIZ_bin == 1),
+    pG4CS   = which(combined_count$G4_bin == 1),    
+    iMFS  = which(combined_count$iMFS_bin == 1)
+    
+  ),
+  filename = NULL,
+  fill = c("#aa2a85",  "#228B22","#32A0CD"),
+  alpha = 0.6,#the greater the number the higher is transparency
+  cex = 4,
+  cat.cex = 5,
+  cat.col = c("#aa2a85", "#228B22", "#32A0CD") #will give name of structures in this color order
+  #cat.pos = c(-20, 90, 20),   # angle of labels relative to circles, this didnt work
+  #cat.dist = c(0.08, 0.08, 0.06)  # distance from the border# category label colors
+)
+
+grid.draw(venn.plot)
+
+dev.off()
+
+
+
+png("RIZ_g4s_imfs_venn_plot2.png", width = 11, height = 10, units = "in", res = 300)
+
+venn.plot <- venn.diagram(
+  x = list(
+    RIZ   = which(combined_count$RIZ_bin == 1),
+    pG4CS = which(combined_count$G4_bin == 1),
+    iMFS  = which(combined_count$iMFS_bin == 1)
+  ),
+  filename = NULL,
+  fill = NA,   # no fill inside the circles
+  col = c("#aa2a85", "#228B22", "#32A0CD"),  # outline colors
+  lwd = 3,     # line width of circles
+  alpha = 1,   # keep outline solid
+  cex = 5,     # numbers inside
+  cat.cex = 0  # suppress category labels
+)
+
+grid.draw(venn.plot)
+
+dev.off()
+
+
+
+png("RIZ_g4s_imfs_venn_plot3.png", width = 11, height = 10, units = "in", res = 300)
+
+venn.plot <- venn.diagram(
+  x = list(
+    RIZ   = which(combined_count$RIZ_bin == 1),
+    pG4CS   = which(combined_count$G4_bin == 1),    
+    iMFS  = which(combined_count$iMFS_bin == 1)
+    
+  ),
+  filename = NULL,
+  fill = c("#aa2a85",  "#228B22","#32A0CD"),
+  col=NA, #if you want black border then remove this piece of code
+  alpha = 0.6,#the greater the number the higher is transparency
+  cex = 4,
+  cat.cex = 5,
+  category.names = c("","", "") 
+  #cat.col = c("#aa2a85", "#228B22", "#32A0CD") will give name of structures in this color order
+  #cat.pos = c(-20, 90, 20),   # angle of labels relative to circles, this didnt work
+  #cat.dist = c(0.08, 0.08, 0.06)  # distance from the border# category label colors
+)
+
+
+grid.draw(venn.plot)
+
+dev.off()
 
 
 
@@ -703,6 +701,102 @@ rho
   
 }
 
+{g4s_riz_imotif_scale_density <- ggplot() +
+  geom_density(data = entire_g4s_rdna,
+               aes(x = pG4CS_start, y = after_stat(scaled), color = "pG4CS"),#after_stat(scaled) (formerly ..scaled..) gives a curve whose maximum is 1 for each group; perfect for visual shape comparison
+               size = 1, bw = 2000, kernel = "gaussian") +
+  geom_density(data = riz,
+               aes(x = RIZ_start, y = after_stat(scaled), color = "RIZ"),
+               size = 1, bw = 2000, kernel = "gaussian") +
+  geom_density(data = imotif,
+               aes(x = beg, y = after_stat(scaled), color = "imotif"),
+               size = 1, bw = 2000, kernel = "gaussian") +
+  scale_color_manual(
+    name = "Non-canonical structures",
+    values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
+    breaks = c("RIZ", "pG4CS", "imotif"),
+    labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS")
+  ) +
+  scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
+                     labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
+  
+  labs(
+    title = "pG4CS vs RIZ vs imotif (scaled density, 0–1)",
+    x = paste0("Human rDNA region (", i, " bins)"),
+    y = "Scaled density (0–1)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    axis.ticks.x = element_line(color = "black"),
+    panel.grid = element_blank(),
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5),
+    text = element_text(size = 40),
+    axis.line = element_line(color = "black"),
+    axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),
+    axis.ticks.y = element_line(color = "black"),
+    legend.key = element_rect(color = NA),
+    legend.position = "top"
+  )
+
+ggsave(paste("pG4CS_RIZ_imotif_scaled_density_entire_human_rdna_in_", i, "bin.png", sep = ""), 
+       plot = g4s_riz_imotif_density, width = 15, height = 10, dpi = 300)
+
+
+g4s_riz_imotif_density_zoom<- ggplot() +
+  geom_density(data = entire_g4s_rdna_zoom,
+               aes(x = pG4CS_start,
+                   y = ..density.. * length(entire_g4s_rdna_zoom$pG4CS_start) * bin_width,
+                   color = "pG4CS"),
+               size = 1, bw = 2000, kernel = "gaussian") +
+  
+  geom_density(data = riz_zoom,
+               aes(x = RIZ_start,
+                   y = ..density.. * length(riz_zoom$RIZ_start) * bin_width,
+                   color = "RIZ"),
+               size = 1, bw = 2000, kernel = "gaussian") +
+  
+  geom_density(data = imotif_zoom,
+               aes(x = beg,
+                   y = ..density.. * length(imotif_zoom$beg) * bin_width,
+                   color = "imotif"),
+               size = 1, bw = 2000, kernel = "gaussian") +
+  
+  scale_color_manual(
+    name = "Non-canonical structures",
+    values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
+    breaks = c("RIZ", "pG4CS", "imotif"),
+    labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS"))+
+  
+  scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
+                     labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
+  
+  labs(title= "pG4CS vs RIZ vs imotif frequency distribution in human rDNA", 
+       x= paste0("Human rDNA region (",i, "bins)"), 
+       y= "Bin Density (Smooth)", 
+       fill= "Non-canonical structures") +
+  
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust=1),
+        axis.ticks.x = element_line(color = "black"),
+        panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 40),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
+        axis.ticks.y = element_line(color = "black"),
+        legend.key = element_rect(color = NA),
+        legend.position = "top")
+
+
+
+
+ggsave(paste("pG4CS_RIZ_imotif_density_entire_human_rdna_in_", i, "bin_zoom.png", sep = ""), 
+       plot = g4s_riz_imotif_density_zoom, width = 15, height = 10, dpi = 300)
+
+}
 
 
 
