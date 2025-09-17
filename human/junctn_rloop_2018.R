@@ -212,7 +212,7 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
        x= "Human rDNA region", 
        y= "RLFS density", 
        fill = "rDNA")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value),expand = expansion(mult = c(0, 0.03)))+
   geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
@@ -228,12 +228,12 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
         axis.text.x  = element_text(color = "black"),
-        axis.text.y  = element_text(color = "black"))+
+        axis.text.y  = element_text(color = "black"), 
+        legend.position = "top")+
   coord_flip()
 
 ggsave("Normalized_RLFS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
         plot = RLFS_norm_3500igs_nojuntn, width=18,height=10, dpi=300)
-
 
 
 
@@ -246,7 +246,7 @@ RLFS_prop_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
        x= "Human rDNA region", 
        y= "RLFS proportion (%)", 
        fill = "rDNA")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.05)))+
   geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
@@ -262,7 +262,8 @@ RLFS_prop_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
         axis.ticks.y = element_line(color = "black"),
         axis.text.x  = element_text(color = "black"),
-        axis.text.y  = element_text(color = "black"))+
+        axis.text.y  = element_text(color = "black"), 
+        legend.position = "top")+
   coord_flip()
 
 ggsave("RLFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
@@ -331,15 +332,15 @@ rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y 
   labs(title= "Normalized RLFS strandwise distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "RLFS density", 
-       fill= "RLFS strand")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.004), limits =c(0,max_value))+
+       fill= NULL)+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.004), limits =c(0,max_value), expand = expansion(mult = c(0, 0.02)))+
   geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), #changed the non template and template colors
-                    labels = c("+" = "Non-template", "-" = "Template"),
+                    labels = c("+" = "Non-template strand", "-" = "Template strand"),
                     breaks = c("+", "-"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = -0.5, hjust = 0.5),
+  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
         axis.ticks.x = element_line(color = "black"), 
         panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -351,8 +352,7 @@ rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y 
         axis.text.x  = element_text(color = "black"),
         axis.text.y  = element_text(color = "black"),
         legend.position = "top", 
-        legend.title = element_text(size=30), 
-        legend.text = element_text(size=30))+
+        legend.text = element_text(size=40))+
   coord_flip()
 
 

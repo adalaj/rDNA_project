@@ -238,7 +238,7 @@ kpPlotRegions(kp, data=rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1
  
 
  #need to plot only from 5'ETS to 3'ETS
- png("rdna_nontemplate_rlfs_coverage.png", width = 15, height= 10, units= "in", res = 600)
+ png("rdna_nontemplate_rlfs_coverage.png", width = 10, height= 10, units= "in", res = 600)
  
  custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
  kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
