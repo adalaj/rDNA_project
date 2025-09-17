@@ -221,12 +221,15 @@ fwrite(data_of_interest[[i]], paste0(i, "_non_canonical_with_Chip_UBF_POLR1A_gra
 
 
 #####read again
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/human/IGV_files/bedfiles")
+
 zoom_start <- 7000
 zoom_end <- 23000
 
 Entire<- fread("Entire_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
 Nontemplate<- fread("Nontemplate_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
 Template<- fread("Template_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv", sep = ",", header = TRUE)
+
 Entire_zoom <- Entire %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
 Nontemplate_zoom <- Nontemplate %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
 Template_zoom <- Template %>% filter(bin_midpoints >= zoom_start & bin_midpoints <= zoom_end)
@@ -234,63 +237,83 @@ Template_zoom <- Template %>% filter(bin_midpoints >= zoom_start & bin_midpoints
 
 
 region_marks <- c(1, 7137, 9339, 12996, 14865, 15935, 16092, 17259, 22310,22671, 44838)
-region_labels <- c("","Pro", "5′ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ETS","", "")
+region_labels <- c("","Pro", "5′ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3′ET","", "")
 
 
 data_of_interest<- list(
-  Entire = Entire,
-  Entire_zoom = Entire_zoom,
-  Nontemplate = Nontemplate,
+  #Entire = Entire,
+  #Entire_zoom = Entire_zoom,
+  #Nontemplate = Nontemplate,
   Nontemplate_zoom = Nontemplate_zoom,
-  Template = Template,
+  #Template = Template,
   Template_zoom = Template_zoom
 )
 
 
 for (i in names(data_of_interest)){
+  cols <- c("RLFS" = "#aa2a85", "POLR1A" = "#D2691E")
+  
+  # legend-only data (NA coordinates => nothing is drawn on the panel)
+  legend_df <- data.frame(
+    bin_midpoints = NA_real_,
+    y = NA_real_,
+    grp = factor(c("POLR1A","RLFS"), levels = c("POLR1A","RLFS"))
+  )
+  
+  
   ##plot the RLFS with POLR1A
   plot_rlfs_polr1a <-
     ggplot() +
-    #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 1.2) +
+    #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 2.0) +
+    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 3.0,show.legend = FALSE) +
     
     geom_line(data = data_of_interest[[i]],
-              aes(x = bin_midpoints, y = norm_RLFS_counts, color = "RLFS"), size = 1.2) +
+              aes(x = bin_midpoints, y = norm_RLFS_counts, color = "RLFS"), size = 3.0, show.legend = FALSE) +
     #geom_point(data = chip_with_nontemplate,
     #aes(x = bin_midpoints, y = norm_RLFS_counts, shape = "RLFS", color = "RLFS"), size = 3) +
     
+    # legend-only filled squares
+    geom_point(data = legend_df,
+               aes(x = bin_midpoints, y = y, color = grp),
+               shape = 15, size = 10, inherit.aes = FALSE, na.rm = TRUE) +
+    
     scale_color_manual(name = NULL, 
-                       values = c("RLFS" = "#aa2a85","POLR1A" = "#E68532"),
-                       labels = c(
-                         "RLFS"   = "<span style='color:#aa2a85;'>RLFS</span>",
-                         "POLR1A" = "<span style='color:#E68532;'>POLR1A</span>"
-                       )) +#"UBF" = "#f609b4" #CD32A0, #9e277b
+                       values = cols)+
+    #labels = c(
+    #"RLFS"   = "<span style='color:#aa2a85;'>RLFS</span>",
+    #"POLR1A" = "<span style='color:#D2691E;'>POLR1A</span>" #"UBF" = "#f609b4" #CD32A0, #9e277b
+    #),
+    
+    guides(color = guide_legend(override.aes = list(shape = 15, size = 10, linetype = NA))) +
+    
     #scale_shape_manual(name = "Non-canonical structure", values = c("RLFS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
-      name = "Normalized POLR1A ChIP-seq signal(0-1)",
+      name = "POLR1A ChIP-seq signal",
       limits = c(0,1),
       breaks = seq(0, 1, 0.2),
       sec.axis = sec_axis(~., breaks = seq(0, 1, 0.2),
-                          name = "Normalized RLFS counts(0-1)")
+                          name = "RLFS counts")
     ) +
     labs(
       title = paste0(i," RLFS and POLR1A"),
       x = "Human rDNA region (100 bins)"
     ) +
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          text = element_text(size = 40),
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size=20),
+          text = element_text(size = 50),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black"),
-          axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
-          axis.title.y.right = element_text(color = "#aa2a85"),  # right axis purple
-          axis.text.y.left   = element_text(color = "#E68532"),
-          axis.text.y.right  = element_text(color = "#aa2a85"),
-          legend.position = "top", 
-          legend.title = element_text(size=40), 
-          legend.text = ggtext::element_markdown(size=40))
+          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black", margin = margin(b=20)),
+          axis.title.y.left  = element_text(color = "#D2691E", margin = margin (r=20), size = 50),  # left axis orange
+          axis.title.y.right = element_text(color = "#aa2a85", margin = margin (l=20), size = 50),  # right axis purple
+          axis.text.y.left   = element_text(color = "#D2691E", size = 50),
+          axis.text.y.right  = element_text(color = "#aa2a85", size = 50),
+          legend.position = c(0.05,0.98),
+          legend.justification = c("left", "top"),
+          legend.key = element_blank(),
+          legend.title = element_text(size=50), 
+          legend.text = ggtext::element_markdown(size=50))
   
   ggsave(paste0(i, "_RLFS_with_POLR1A.png"), plot_rlfs_polr1a, width = 20, height = 14, dpi = 300)
   
@@ -312,74 +335,90 @@ for (i in names(data_of_interest)){
     geom_smooth(method = "lm", color = "black", se = TRUE) +
     annotate("text", 
              x = 0.1, y = 0.9, hjust = 0,
-             label = paste0("Pearson r = ", r_val," ", 
-                            "\n P = ", p_val),
-             size = 12) +   # text size scales differently than theme text
+             label = paste0("Pearson r = ", r_val," ", "P = ", p_val),
+             size = 20) +   # text size scales differently than theme text
     labs(title = paste0(i, "Correlation between POLR1A and RLFS"),
-         x = "Normalized POLR1A ChIP-seq signal(0-1)",
-         y = "Normalized RLFS counts(0-1)") +
+         x = "POLR1A ChIP-seq signal",
+         y = "RLFS counts") +
     scale_x_continuous(limits = c(0,1), breaks = seq(0,1,0.2)) +
     scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          text = element_text(size = 40, color = "black"),
-          axis.title.x = element_text(color = "#E68532"),
-          axis.title.y = element_text(color = "#aa2a85"),
-          axis.text.x = element_text(color = "#E68532"),
-          axis.text.y = element_text(color = "#aa2a85"),
-          axis.line = element_line(color = "black"),
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 20),
+          text = element_text(size = 50, color = "black"),
+          axis.title.x = element_text(color = "#D2691E", margin = margin (t=20), size = 50),
+          axis.title.y = element_text(color = "#aa2a85", hjust= 0.7, margin = margin (r=20), size = 50),
+          axis.text.x = element_text(color = "#D2691E", hjust = 0.5, size = 50),
+          axis.text.y = element_text(color = "#aa2a85", hjust = 0.5, size = 50),
           panel.grid = element_blank(),
-          panel.background = element_rect(fill = "white", color = "black"),
-          legend.position = "top", 
-          legend.title = element_text(size = 40), 
-          legend.text = element_text(size = 40))
+          panel.background = element_blank(),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+          axis.line = element_blank())
   
   ggsave(paste0(i, "_RLFS_with_POLR1A_pearson.png"), pearson_rlfs_polr1a, width = 15, height = 14, dpi = 300)
 
   
   
   ############ plot pG4CS
-  plot_g4s_polr1a <-
-    ggplot() +
+  
+  cols <- c("pG4CS" = "#228B22", "POLR1A" = "#D2691E")
+  
+  # legend-only data (NA coordinates => nothing is drawn on the panel)
+  legend_df <- data.frame(
+    bin_midpoints = NA_real_,
+    y = NA_real_,
+    grp = factor(c("POLR1A","pG4CS"), levels = c("POLR1A","pG4CS"))
+  )
+  
+  plot_g4s_polr1a <-ggplot() +
     #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 1.2) +
+    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 3.0,show.legend = FALSE) +
     
     geom_line(data = data_of_interest[[i]],
-              aes(x = bin_midpoints, y = norm_pG4CS_counts, color = "pG4CS"), size = 1.2) +
+              aes(x = bin_midpoints, y = norm_pG4CS_counts, color = "pG4CS"), size = 3.0, show.legend = FALSE) +
     #geom_point(data = chip_with_nontemplate,
     #aes(x = bin_midpoints, y = norm_pG4CS_counts, shape = "pG4CS", color = "pG4CS"), size = 3) +
     
+    # legend-only filled squares
+    geom_point(data = legend_df,
+               aes(x = bin_midpoints, y = y, color = grp),
+               shape = 15, size = 10, inherit.aes = FALSE, na.rm = TRUE) +
+    
     scale_color_manual(name = NULL, 
-                       values = c("pG4CS" = "#228B22","POLR1A" = "#E68532"),
-                       labels = c(
-                         "pG4CS"   = "<span style='color:#228B22;'>pG4CS</span>",
-                         "POLR1A" = "<span style='color:#E68532;'>POLR1A</span>"
-                       )) +#"UBF" = "#f609b4"
+                       values = cols)+
+    #labels = c(
+    #"pG4CS"   = "<span style='color:#228B22;'>pG4CS</span>",
+    #"POLR1A" = "<span style='color:#D2691E;'>POLR1A</span>" #"UBF" = "#f609b4" #CD32A0, #9e277b
+    #),
+    
+    guides(color = guide_legend(override.aes = list(shape = 15, size = 10, linetype = NA))) +
+    
     #scale_shape_manual(name = "Non-canonical structure", values = c("pG4CS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
-      name = "POLR1A Signal Intensity",
+      name = "POLR1A ChIP-seq signal",
       limits = c(0,1),
       breaks = seq(0, 1, 0.2),
       sec.axis = sec_axis(~., breaks = seq(0, 1, 0.2),
-                          name = "pG4CS structure Count")
+                          name = "pG4CS counts")
     ) +
     labs(
       title = paste0(i," pG4CS and POLR1A"),
       x = "Human rDNA region (100 bins)"
     ) +
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          text = element_text(size = 40),
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size=20),
+          text = element_text(size = 50),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black"),
-          axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
-          axis.title.y.right = element_text(color = "#228B22"),  # right axis purple
-          axis.text.y.left   = element_text(color = "#E68532"),
-          axis.text.y.right  = element_text(color = "#228B22"),
-          legend.position = "top", 
-          legend.title = element_text(size=40), 
-          legend.text = ggtext::element_markdown(size=40))
+          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black", margin = margin(b=20)),
+          axis.title.y.left  = element_text(color = "#D2691E", margin = margin (r=20), size = 50),  # left axis orange
+          axis.title.y.right = element_text(color = "#228B22", margin = margin (l=20), size = 50),  # right axis purple
+          axis.text.y.left   = element_text(color = "#D2691E", size = 50),
+          axis.text.y.right  = element_text(color = "#228B22", size = 50),
+          legend.position = c(0.05,0.98),
+          legend.justification = c("left", "top"),
+          legend.key = element_blank(),
+          legend.title = element_text(size=50), 
+          legend.text = ggtext::element_markdown(size=50))
 
 
   ggsave(paste0(i, "_pG4CS_with_POLR1A.png"), plot_g4s_polr1a, width = 20, height = 14, dpi = 300)
@@ -406,73 +445,88 @@ for (i in names(data_of_interest)){
     geom_smooth(method = "lm", color = "black", se = TRUE) +
     annotate("text", 
              x = 0.1, y = 0.9, hjust = 0,
-             label = paste0("Pearson r = ", r_val," ", 
-                            "\n P = ", p_val),
-             size = 12) +   # text size scales differently than theme text
+             label = paste0("Pearson r = ", r_val," ", "P = ", p_val),
+             size = 20) +   # text size scales differently than theme text
     labs(title = paste0(i, "Correlation between POLR1A and pG4CS"),
-         x = "Normalized POLR1A ChIP-seq signal(0-1)",
-         y = "Normalized pG4CS counts(0-1)") +
+         x = "POLR1A ChIP-seq signal",
+         y = "pG4CS counts") +
     scale_x_continuous(limits = c(0,1), breaks = seq(0,1,0.2)) +
     scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          text = element_text(size = 40, color = "black"),
-          axis.title.x = element_text(color = "#E68532"),
-          axis.title.y = element_text(color = "#228B22"),
-          axis.text.x = element_text(color = "#E68532"),
-          axis.text.y = element_text(color = "#228B22"),
-          axis.line = element_line(color = "black"),
+          text = element_text(size = 50, color = "black"),
+          axis.title.x = element_text(color = "#D2691E", margin = margin (t=20), size = 50),
+          axis.title.y = element_text(color = "#228B22", hjust= 0.7, margin = margin (r=20), size = 50),
+          axis.text.x = element_text(color = "#D2691E", hjust = 0.5, size = 50),
+          axis.text.y = element_text(color = "#228B22", hjust = 0.5, size = 50),
           panel.grid = element_blank(),
-          panel.background = element_rect(fill = "white", color = "black"),
-          legend.position = "top", 
-          legend.title = element_text(size = 40), 
-          legend.text = element_text(size = 40))
+          panel.background = element_blank(),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+          axis.line = element_blank())
   
   ggsave(paste0(i, "_pG4CS_with_POLR1A_pearson.png"), pearson_g4s_polr1a, width = 15, height = 14, dpi = 300)
   
   
   ###############plot imotif
+  cols <- c("iMFS" = "#32A0CD", "POLR1A" = "#D2691E")
+  
+  # legend-only data (NA coordinates => nothing is drawn on the panel)
+  legend_df <- data.frame(
+    bin_midpoints = NA_real_,
+    y = NA_real_,
+    grp = factor(c("POLR1A","iMFS"), levels = c("POLR1A","iMFS"))
+  )
+  
   plot_imfs_polr1a <-
     ggplot() +
-    #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 1.2) +
-    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 1.2) +
+    #geom_line(data = data, aes(x = bin_midpoints, y = UBF, color = "UBF"), size = 2.0) +
+    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 3.0, show.legend = FALSE) +
     
-    geom_line(data = data_of_interest[[i]],
-              aes(x = bin_midpoints, y = norm_iMFS_counts, color = "iMFS"), size = 1.2) +
+    geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_iMFS_counts, color = "iMFS"), size = 3.0,show.legend = FALSE) +
     #geom_point(data = chip_with_nontemplate,
     #aes(x = bin_midpoints, y = norm_iMFS_counts, shape = "iMFS", color = "iMFS"), size = 3) +
     
-    scale_color_manual(name = NULL, 
-                       values = c("iMFS" = "#32A0CD","POLR1A" = "#E68532"),
-                       labels = c(
-                         "iMFS"   = "<span style='color:#32A0CD;'>iMFS</span>",
-                         "POLR1A" = "<span style='color:#E68532;'>POLR1A</span>"
-                       )) +#"UBF" = "#f609b4"
-    #scale_shape_manual(name = "Non-canonical structure", values = c("iMFS" = 16)) +
+    # legend-only filled squares
+    geom_point(data = legend_df,
+               aes(x = bin_midpoints, y = y, color = grp),
+               shape = 15, size = 10, inherit.aes = FALSE, na.rm = TRUE) +
+    
+    scale_color_manual(name = NULL,
+                       values = cols)+
+                       #values = c("iMFS" = "#32A0CD","POLR1A" = "#D2691E"),
+                       #labels = c(
+                         #"iMFS"   = "<span style='color:#32A0CD;'>iMFS</span>",
+                         #"POLR1A" = "<span style='color:#D2691E;'>POLR1A</span>"
+                       #)) +#"UBF" = "#f609b4"
+    guides(color = guide_legend(override.aes = list(shape = 15, size = 10, linetype = NA))) +
+  
+      #scale_shape_manual(name = "Non-canonical structure", values = c("iMFS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
-      name = "POLR1A Signal Intensity",
+      name = "POLR1A ChIP-seq signal",
       limits = c(0,1),
       breaks = seq(0, 1, 0.2),
       sec.axis = sec_axis(~., breaks = seq(0, 1, 0.2),
-                          name = "iMFS structure Count")
+                          name = "iMFS counts")
     ) +
     labs(
       title = paste0(i," iMFS and POLR1A"),
       x = "Human rDNA region (100 bins)"
     ) +
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          text = element_text(size = 40),
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 20),
+          text = element_text(size = 50),
           axis.line = element_line(color = "black"),
           panel.grid = element_blank(),
           panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black"),
-          axis.title.y.left  = element_text(color = "#E68532"),  # left axis orange
-          axis.title.y.right = element_text(color = "#32A0CD"),  # right axis purple
-          axis.text.y.left   = element_text(color = "#E68532"),
-          axis.text.y.right  = element_text(color = "#32A0CD"),
-          legend.position = "top", 
-          legend.title = element_text(size=40), 
-          legend.text = ggtext::element_markdown(size=40))
+          axis.text.x = element_text(angle = 90, hjust = 1, size=20, color = "black", margin = margin(b=20)),
+          axis.title.y.left  = element_text(color = "#D2691E", margin = margin (r=20), size = 50),  # left axis orange
+          axis.title.y.right = element_text(color = "#32A0CD", margin = margin (l=20), size = 50),  # right axis purple
+          axis.text.y.left   = element_text(color = "#D2691E", size = 50),
+          axis.text.y.right  = element_text(color = "#32A0CD", size = 50),
+          legend.position = c(0.05,0.98),
+          legend.justification = c("left", "top"),
+          legend.key = element_blank(),
+          legend.title = element_text(size=50), 
+          legend.text = ggtext::element_markdown(size=50))
   
   
   ggsave(paste0(i, "_iMFS_with_POLR1A.png"), plot_imfs_polr1a, width = 20, height = 14, dpi = 300)
@@ -499,27 +553,26 @@ for (i in names(data_of_interest)){
     geom_smooth(method = "lm", color = "black", se = TRUE) +
     annotate("text", 
              x = 0.1, y = 0.9, hjust = 0,
-             label = paste0("Pearson r = ", r_val," ", 
-                            "\n P = ", p_val),
-             size = 12) +   # text size scales differently than theme text
+             label = paste0("Pearson r = ", r_val," ", "P = ", p_val),
+             size = 20) +   # text size scales differently than theme text
     labs(title = paste0(i, "Correlation between POLR1A and iMFS"),
-         x = "Normalized POLR1A ChIP-seq signal(0-1)",
-         y = "Normalized iMFS counts(0-1)") +
+         x = "POLR1A ChIP-seq signal",
+         y = "iMFS counts") +
     scale_x_continuous(limits = c(0,1), breaks = seq(0,1,0.2)) +
     scale_y_continuous(limits = c(-0.25,1), breaks = seq(0,1,0.2)) +
     theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          text = element_text(size = 40, color = "black"),
-          axis.title.x = element_text(color = "#E68532"),
-          axis.title.y = element_text(color = "#32A0CD"),
-          axis.text.x = element_text(color = "#E68532"),
-          axis.text.y = element_text(color = "#32A0CD"),
-          axis.line = element_line(color = "black"),
+          text = element_text(size = 50, color = "black"),
+          axis.title.x = element_text(color = "#D2691E", margin = margin (t=20), size = 50),
+          axis.title.y = element_text(color = "#32A0CD", hjust= 0.7, margin = margin (r=20), size = 50),
+          axis.text.x = element_text(color = "#D2691E", hjust = 0.5, size = 50),
+          axis.text.y = element_text(color = "#32A0CD", hjust = 0.5, size = 50),
           panel.grid = element_blank(),
-          panel.background = element_rect(fill = "white", color = "black"),
-          legend.position = "top", 
-          legend.title = element_text(size = 40), 
-          legend.text = element_text(size = 40))
-  
+          panel.background = element_blank(),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+          axis.line = element_blank()
+  )
+    
+   
   ggsave(paste0(i, "_iMFS_with_POLR1A_pearson.png"), pearson_imfs_polr1a, width = 15, height = 14, dpi = 300)
   
 }
@@ -647,7 +700,7 @@ kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
 
 kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =9339 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #IGS plus promoter
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 9340, x1 = 12996 , y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+kpRect(kp, chr = 'rDNA_locus', x0 = 9350, x1 = 12996 , y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
 #3501+(3657-1) = 7157
 
 kpRect(kp, chr = 'rDNA_locus', x0 = 12997, x1 = 14865, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 18S
@@ -681,7 +734,7 @@ kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
 
 kpRect(kp, chr = 'rDNA_locus', x0 = 7137, x1 =9339 , y0 = 0, y1 = 1, col = "#A4A2A8", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
 
-kpRect(kp, chr = 'rDNA_locus', x0 = 9340, x1 = 12996 , y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
+kpRect(kp, chr = 'rDNA_locus', x0 = 9350, x1 = 12996 , y0 = 0, y1 = 1, col = "#EAEAEA", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
 #3501+(3657-1) = 7157
 
 kpRect(kp, chr = 'rDNA_locus', x0 = 12997, x1 = 14865, y0 = 0, y1 = 1, col = "black", data.panel = "ideogram", borders= NA) #marks 18S
