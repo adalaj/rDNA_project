@@ -203,71 +203,73 @@ RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region,
 
 #To reverse the order so that "Promoter" appears at the top when flipped, modify the levels of the factor like this
 
-max_value<- round(max(RLFSs_rdna_summary$RLFS_density, na.rm = TRUE),2)
+max_value<- max(RLFSs_rdna_summary$RLFS_density, na.rm = TRUE)
 
 
 RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = RLFS_density, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized RLFS distribution in the Human rDNA locus", 
+  labs(#title= "Normalized RLFS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "RLFS density", 
        fill = "rDNA")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value),expand = expansion(mult = c(0, 0.03)))+
-  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value),expand = expansion(mult = c(0, 0.05)))+
+  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, colour = "black"),
-        axis.ticks.x = element_line(color = "black"), 
+  theme(axis.ticks = element_line(color = "black", linewidth = 4),
+        axis.ticks.length = unit(50, "pt"),
         panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.title = element_text(hjust = 0.5), #face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 40),
-        axis.line = element_line(color = "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
+        text = element_text(size = 100),
+        axis.line = element_line(color = "black", linewidth = 4),
+        axis.title.x = element_text(vjust = 0.7, hjust = 0.5, colour = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)),   # Center Y-axis title
         axis.text.x  = element_text(color = "black"),
         axis.text.y  = element_text(color = "black"), 
-        legend.position = "top")+
+        legend.position = "none")+
   coord_flip()
 
+
+
 ggsave("Normalized_RLFS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = RLFS_norm_3500igs_nojuntn, width=18,height=10, dpi=300)
+        plot = RLFS_norm_3500igs_nojuntn, width=30,height=18, dpi=300)
 
 
 
-max_value<- round(max(RLFSs_rdna_summary$RLFS_proportion_perc, na.rm = TRUE),2)
+max_value<- max(RLFSs_rdna_summary$RLFS_proportion_perc, na.rm = TRUE)
 
 
 RLFS_prop_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = RLFS_proportion_perc, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized RLFS distribution in the Human rDNA locus", 
+  labs(#title= "Normalized RLFS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "RLFS proportion (%)", 
        fill = "rDNA")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.05)))+
-  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
+  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.09)))+
+  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, colour = "black"),
-        axis.ticks.x = element_line(color = "black"), 
+  theme(axis.ticks = element_line(color = "black", linewidth = 4), 
+        axis.ticks.length = unit(50, "pt"),
         panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.title = element_text(hjust = 0.5), #face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 40),
-        axis.line = element_line(color = "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
+        text = element_text(size = 100),
+        axis.line = element_line(color = "black", linewidth = 4),
+        axis.title.x = element_text(vjust = 0.7, hjust = 0.5, colour = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5,margin = margin (r=20)),   # Center Y-axis title
         axis.text.x  = element_text(color = "black"),
         axis.text.y  = element_text(color = "black"), 
-        legend.position = "top")+
+        legend.position = "none")+
   coord_flip()
 
 ggsave("RLFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-       plot = RLFS_prop_3500igs_nojuntn, width=18,height=10, dpi=300)
+       plot = RLFS_prop_3500igs_nojuntn, width=30,height=18, dpi=300)
 
 
 
@@ -323,41 +325,41 @@ entire_RLFSs_rdna_summary2$strand <- factor(
   levels = rev(c("+", "-"))  # "+" = Non-template first, "-" = Template second
 )
 
-max_value<- round(max(entire_RLFSs_rdna_summary2$RLFS_density, na.rm = TRUE),4)
+max_value<- max(entire_RLFSs_rdna_summary2$RLFS_density, na.rm = TRUE)
 
 
 
 rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y = RLFS_density, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized RLFS strandwise distribution in the Human rDNA locus", 
+  labs(#title= "Normalized RLFS strandwise distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "RLFS density", 
        fill= NULL)+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.004), limits =c(0,max_value), expand = expansion(mult = c(0, 0.02)))+
-  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 12, position = position_dodge(width = 0.9))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.004), limits =c(0,max_value), expand = expansion(mult = c(0, 0.03)))+
+  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 20, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), #changed the non template and template colors
                     labels = c("+" = "Non-template strand", "-" = "Template strand"),
                     breaks = c("+", "-"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
-        axis.ticks.x = element_line(color = "black"), 
+  theme(axis.ticks = element_line(color = "black", linewidth = 4), 
+        axis.ticks.length = unit(50, "pt"),
         panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.title = element_text(hjust = 0.5), #face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 40),
-        axis.line = element_line(color = "black"),
+        text = element_text(size = 100),
+        axis.line = element_line(color = "black", linewidth = 4),
+        axis.title.x = element_text(vjust = 0.6, hjust = 0.5, colour = "black"),
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
         axis.text.x  = element_text(color = "black"),
         axis.text.y  = element_text(color = "black"),
         legend.position = "top", 
-        legend.text = element_text(size=40))+
+        legend.text = element_text(size=80),
+        legend.key.size = unit(3, "cm"))+
   coord_flip()
 
-
 ggsave( "Normalized_strandwise_RLFS_flipped_distribution_in_human_rDNA_subcomponents_AR.tiff", 
-        plot = rlfs_strandwise_flip, width=18,height=10, dpi=300)
+        plot = rlfs_strandwise_flip, width=30,height=18, dpi=300)
 
 
 

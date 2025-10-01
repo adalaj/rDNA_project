@@ -123,13 +123,14 @@ rdna_human<- fread("rdna_hg38_chr21_2018_dataset_details_v3.csv", sep = ",", hea
 rdna_2018<-rdna_human[c(1:9), c("Name", "A%", "G%", "C%", "T%", "GC_perc", "AT_perc")]
 rdna_2018_no_igs<- rdna_human[c(1:8), c("Name", "A%", "G%", "C%", "T%", "GC_perc", "AT_perc")]
 
-datasets<- list("rdna_2018"= rdna_2018,
+datasets<- list(#"rdna_2018"= rdna_2018,
                 "rdna_2018_no_igs" = rdna_2018_no_igs)
 
 
 for (nm in names(datasets)) {
   
-  i <- datasets[[nm]]   # get the dataset by name
+  i <- datasets[[nm]]   # get the dataset by name 
+  #nucleotide_new <- separate(datasets[["rdna_2018_no_igs"]], Name, "Name", sep = "_")
   
   nucleotide_new <- separate(i, Name, "Name", sep = "_")
   
@@ -138,8 +139,8 @@ for (nm in names(datasets)) {
                                      values_to = "Percent")
   
   # save with the dataset name in the filename
-  fwrite(nucleotide_reshape,
-         file = paste0("nucleotide_", nm, "_graph_input2.csv"))
+  #fwrite(nucleotide_reshape,
+         #file = paste0("nucleotide_", nm, "_graph_input2.csv"))
   
   nucleotide_reshape$Name <- factor(
     nucleotide_reshape$Name,
@@ -161,13 +162,12 @@ for (nm in names(datasets)) {
     dplyr::mutate(Nucleotide = factor(Nucleotide, levels = c("AT_perc", "GC_perc")))
   
   
-  
+  #fig 3
  p_atgc<- ggplot(atgc, aes(x = Name, y = Percent, fill = Nucleotide)) + 
     geom_bar(stat = 'identity', color = "black") +
-    theme(axis.text.x = element_text(angle = 45, size = 30, hjust = 1)) +
-    labs(title = "AT vs GC percent in human rDNA",
-         x = "rDNA region",
-         y = "Percent (%) of Nucleotides", 
+    labs(#title = "AT vs GC percent comparison",
+         x = "Human rDNA region",
+         y = "AT and GC Content (%)", 
          fill = NULL) +
    scale_fill_manual(
      values = c(
@@ -177,22 +177,23 @@ for (nm in names(datasets)) {
      breaks = c("AT_perc", "GC_perc"),
      labels = c("AT%", "GC%")
    ) +
-    geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 11) + #this will increase the font of the text inside the bar
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 30),
-          axis.line = element_line(color = "black"),
+    geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 18)+ #fontface ="bold") + #this will increase the font of the text inside the bar
+    theme(plot.title = element_text(hjust = 0.5), #face = "bold", size = 20),
+          #plot.subtitle = element_text(hjust = 0.5),
+          text = element_text(size = 80),#face = "bold"),
+          axis.line = element_line(color = "black", linewidth = 4),
           panel.grid = element_blank(),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30),
-          axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size = 30, color = "black"),
-          axis.text.y  = element_text(color = "black", size = 30),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin (r=20)),
+          axis.ticks = element_line(color = "black", linewidth = 4),
+          axis.ticks.length = unit(30, "pt"),
+          axis.text.x = element_text(angle = 45, hjust = 1.0, color = "black"),
+          axis.text.y  = element_text(color = "black"),
           panel.background = element_blank(),   # removes grey background
           plot.background  = element_blank(), 
           legend.position = "top") 
  
-  ggsave(paste0(nm, "_AT_vs_GC_sequences_nucleotide_distribution.tiff"),
-         plot = p_atgc, width = 15, height = 10, dpi = 600)
+  ggsave("rdna_2018_no_igs_AT_vs_GC_sequences_nucleotide_distribution.tiff",
+         plot = p_atgc, width = 20, height = 15.5, dpi = 600)
   
   
   
@@ -201,12 +202,13 @@ for (nm in names(datasets)) {
     dplyr::mutate(Nucleotide = factor(Nucleotide, levels = c("A%", "T%", "G%", "C%")))
   
   
+  #fig 4
   p_atgc_only<- ggplot(atgc_only, aes(x = Name, y = Percent, fill = Nucleotide)) + 
     geom_bar(stat = 'identity', color = "black") +
-    theme(axis.text.x = element_text(angle = 45, size = 30, hjust = 1)) +
-    labs(title = "Nucleotide percent in human rDNA",
-         x = "rDNA region",
-         y = "Percent (%) of Nucleotides ",
+    #theme(axis.text.x = element_text(angle = 45, size = 30, hjust = 1)) +
+    labs(#title = "Nucleotide distribution in human rDNA",
+         x = "Human rDNA region",
+         y = "Nucleotide Percent (%)",
          fill = NULL) +
     scale_fill_manual(
       values = c(
@@ -219,23 +221,118 @@ for (nm in names(datasets)) {
       breaks = c("A%", "T%", "G%", "C%"),
       labels = c("A%", "T%", "G%", "C%")
     ) +
-    geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 11) +
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+    geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 18)+# fontface = "bold") +
+    theme(plot.title = element_text(hjust = 0.5), #face = "bold", size=20),
           plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 30),
-          axis.line = element_line(color = "black"),
+          text = element_text(size = 80), #face = "bold"),
+          axis.line = element_line(color = "black", linewidth = 4),
           panel.grid = element_blank(),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 30),
-          axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size = 30, color = "black"),
-          axis.text.y  = element_text(color = "black", size = 30),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)),
+          axis.ticks = element_line(color = "black", linewidth = 4),
+          axis.ticks.length = unit(30, "pt"),
+          axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
+          axis.text.y  = element_text(color = "black"),
           panel.background = element_blank(),   # removes grey background
           plot.background  = element_blank(),
           legend.position = "top") 
   
-  ggsave(paste0(nm, "_ATGC_only_sequences_nucleotide_distribution.tiff"),
-         plot = p_atgc_only, width = 15, height = 10, dpi = 600)
+  ggsave( "rdna_2018_no_igs_ATGC_only_sequences_nucleotide_distribution.tiff",
+         plot = p_atgc_only, width = 20, height = 16, dpi = 600)
+  
+  
+  ###Fig 2 
+  
+  # dataset 1: individual bases
+  df1 <- data.frame(
+    Name = "Bases",
+    Nucleotide = c("A%", "T%", "G%", "C%"),
+    Percent = c(12.01, 15.55, 36.88, 35.56)
+  )
+  
+  df1$Nucleotide <- factor(
+    df1$Nucleotide,
+    levels = c("A%", "T%", "G%", "C%")  # nucleotides first
+  )
+  
+  
+  # dataset 2: combined groups
+  df2 <- data.frame(
+    Name = "Groups",
+    Nucleotide = c("AT%", "GC%"),
+    Percent = c(27.56, 72.44)
+  )
+  
+  df2$Nucleotide <- factor(
+    df2$Nucleotide,
+    levels = c("AT%", "GC%")  # nucleotides first
+  )
+  
+  
+  # combine both
+  
+  entire_only <- rbind(df1, df2)
+  
+ 
+  
+  
+  # plot
+  entire_rdna<- ggplot(entire_only, aes(x = Name, y = Percent, fill = Nucleotide)) +
+    geom_bar(stat = "identity", color = "black") +
+    labs(
+      #title = "Nucleotide Distribution",
+      x = "Human rDNA",
+      y = "Nucleotide Percent (%)",
+      fill = NULL
+    ) +
+    scale_fill_manual(
+      values = c(
+        "A%" = "#FF9999",   # soft red
+        "T%" = "#E7C318",   # orange
+        "G%" = "#99CCFF",   # blue
+        "C%" = "#66CC66",   # green
+        "AT%" = "#FFCC99",   # purple 
+        "GC%" = "#b194c2"    # dark red
+      ),
+      breaks = c("A%", "T%", "G%", "C%", "AT%", "GC%"),
+      labels = c("A%", "T%", "G%", "C%", "AT%", "GC%")
+      #guide = guide_legend(reverse = TRUE)
+    ) +
+    geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 18)+ #, fontface = "bold") +
+    theme(
+      plot.title    = element_text(hjust = 0.5), #face = "bold", size = 20),
+      plot.subtitle = element_text(hjust = 0.5),
+      text          = element_text(size = 80), #face = "bold"),
+      axis.line     = element_line(color = "black", linewidth = 4),
+      panel.grid    = element_blank(),
+      axis.title.y  = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r = 20)),
+      axis.ticks    = element_line(color = "black", linewidth = 4),
+      axis.ticks.length = unit(30, "pt"),
+      axis.text.x   = element_text(angle = 45, hjust = 1, color = "black"), # keep straight under bars
+      axis.text.y   = element_text(color = "black"),
+      panel.background = element_blank(),
+      plot.background  = element_blank(),
+      legend.position  = "right"
+    )
+  
+  ggsave( "entire_rdna_sequences_nucleotide_distribution.tiff",
+          plot = entire_rdna, width = 12, height = 16, dpi = 600)
+  
+  
   }
 
+geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 18)+# fontface = "bold") +
+  theme(plot.title = element_text(hjust = 0.5), #face = "bold", size=20),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 80), #face = "bold"),
+        axis.line = element_line(color = "black", linewidth = 4),
+        panel.grid = element_blank(),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)),
+        axis.ticks = element_line(color = "black", linewidth = 4),
+        axis.ticks.length = unit(30, "pt"),
+        axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
+        axis.text.y  = element_text(color = "black"),
+        panel.background = element_blank(),   # removes grey background
+        plot.background  = element_blank(),
+        legend.position = "top") 
 
 

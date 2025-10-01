@@ -226,8 +226,8 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 46137, x1 = 48338, y0 = 0, y1 = 1, col = "#B
 #48338-2201
 
 
-kpPlotRegions(kp, data=entire_rdna_template, col="#1414E1", r0= -0.5, r1= -1.9)
-kpPlotRegions(kp, data=entire_rdna_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
+kpPlotRegions(kp, data=entire_rdna_template, col="#1414E1", r0= -0.5, r1= -1.9, lwd =5)
+kpPlotRegions(kp, data=entire_rdna_nontemplate, col="#E21515", r0= -0.5, r1= -1.3, lwd =5) #-1.5 to make blue with more width
 dev.off()
 #use zoom option, took screenshot and edited in powerpoint
 #for checking how many pG4CS are formed after rule count please see junction_rloop_2018.R file
@@ -267,7 +267,7 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 19000, y0 = 0, y1 = 1, col = "#A
 #16472+(361-1) = 16832
 
 kpPlotCoverage(kp, data=entire_rdna_nontemplate, col = "#E21515", lwd =5)
-kpPlotRegions(kp, data=entire_rdna_nontemplate, data.panel=2, col = "#E21515")
+kpPlotRegions(kp, data=entire_rdna_nontemplate, data.panel=2, col = "#E21515",lwd=5)
 dev.off()
 
 
@@ -305,7 +305,7 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 19000, y0 = 0, y1 = 1, col = "#A
 #16472+(361-1) = 16832
 
 kpPlotCoverage(kp, data=entire_rdna_template, col = "#1414E1", lwd =5)
-kpPlotRegions(kp, data=entire_rdna_template, data.panel=2, col = "#1414E1")
+kpPlotRegions(kp, data=entire_rdna_template, data.panel=2, col = "#1414E1", lwd =5)
 dev.off()
 
 

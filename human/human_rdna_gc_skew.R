@@ -248,61 +248,70 @@ for ( i in bin_size){
   sliding_content<- gc_content_data$sliding_window_results
   fwrite(sliding_content, paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv"))
   
-  sliding_graph<- ggplot(sliding_skew, aes(x = start, y = GC_skew_value)) +
-    geom_line(color = "#E21515") +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =1.2) +
-    labs(title = "GC Skew across human rDNA",
-         subtitle= paste0(i, " bp Sliding window size"),
+  
+  #Fig1D
+  sliding_content_graph<- ggplot(sliding_content, aes(x = start, y = gc_content_perc)) +
+    geom_line(color = "#E21515", size = 1.5) +
+    #geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =2.0) +
+    geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen", linewidth =3.0)+
+    labs(#title = "GC Content across human rDNA",
+         #subtitle= paste0("Sliding window of 100 nt"),
          x = "Position (bp)",
+         y = "GC Content (%)") +
+    scale_y_continuous(limits= c(0,100), breaks=seq(0,100, by=25))+
+    
+    scale_x_continuous(breaks = c(0, 2202, 5858, 7726, 8795, 8951, 15167, 15527), 
+                       labels =c("Pro","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
+    
+    theme(plot.title = element_text(hjust = 0.5), #, face = "bold"), #at this font size its giving illusion that its bold when its not.
+          plot.subtitle = element_text(hjust = 0.5),
+          text = element_text(size = 80), #face = "bold"),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 6),  # <-- the rectangle
+          panel.background = element_rect(fill = "white", color = NA),
+          plot.background  = element_rect(fill = "white", color = NA),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)), # Center Y-axis title
+          axis.ticks.y = element_line(color = "black", linewidth = 4),
+          axis.ticks.length = unit(30, "pt"),
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
+  
+  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_", i, "bp.png"), 
+         plot =  sliding_content_graph, width=18, height = 10, dpi = 600)
+  
+  
+  #Fig1E
+  sliding_skew_graph<- ggplot(sliding_skew, aes(x = start, y = GC_skew_value)) +
+    geom_line(color = "#E21515", size = 1.5) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =3.0) +
+    labs(#title = "GC Skew across human rDNA",
+         #subtitle= paste0("Sliding window of 100 nt"),
+         x = "Position (bp)", #ggplot bydefault need x and y axis label
         y = "GC Skew") +
     scale_x_continuous(breaks = c(0, 2202, 5858, 7726, 8795, 8951, 15167, 15527), 
                        labels =c("Pro","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+    theme(plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 40),
-          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),  # <-- the rectangle
+          text = element_text(size = 80), #face = "bold"),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 6),  # <-- the rectangle
           panel.background = element_rect(fill = "white", color = NA),
           plot.background  = element_rect(fill = "white", color = NA),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 40), # Center Y-axis title
-          axis.ticks.y = element_line(color = "black"),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.7, margin = margin(r=20)), # Center Y-axis title
+          axis.ticks.y = element_line(color = "black", linewidth = 4),
+          axis.ticks.length = unit(30, "pt"),
           axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-          axis.text.y = element_text(color = "black", size = 40))
+          axis.text.y = element_text(color = "black"))
   
   ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_", i, "bp.png"), 
-         plot = sliding_graph, width=18, height = 10, dpi = 600)
+         plot = sliding_skew_graph, width=18, height = 10, dpi = 600)
   
   
   #sliding<- paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv")
   #sliding_content<- fread(sliding, sep = ",", header = TRUE)
   
-  
-  sliding_content_graph<- ggplot(sliding_content, aes(x = start, y = gc_content_perc)) +
-    geom_line(color = "#E21515") +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =1.2) +
-    geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen", linewidth =1.2)+
-    labs(title = "GC Content across human rDNA",
-         subtitle= paste0(i, " bp sliding window size"),
-         x = "Position (bp)",
-         y = "GC Content") +
-    scale_y_continuous(limits= c(0,100), breaks=seq(0,100, by=25))+
-    scale_x_continuous(breaks = c(0, 2202, 5858, 7726, 8795, 8951, 15167, 15527), 
-                       labels =c("Pro","5'ETS", "18S","ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
-    
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-          plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 40),
-          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),  # <-- the rectangle
-          panel.background = element_rect(fill = "white", color = NA),
-          plot.background  = element_rect(fill = "white", color = NA),
-          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 40), # Center Y-axis title
-          axis.ticks.y = element_line(color = "black"),
-          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-          axis.text.y = element_text(color = "black", size = 40))
-  
-  ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_", i, "bp.png"), 
-         plot =  sliding_content_graph, width=18, height = 10, dpi = 600)
+ 
   
 } 
+
 
 
 

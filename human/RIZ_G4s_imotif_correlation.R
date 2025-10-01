@@ -6,6 +6,7 @@ library(tidyverse)
 library(data.table)
 library(karyoploteR)
 library(corrplot)
+library(VennDiagram)
 
 #read the files
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
@@ -99,35 +100,40 @@ for (i in bin_size){
                      y = ..density.. * length(imotif$beg) * bin_width),
                  color =   "#32A0CD", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##216B89"
     
-    
     scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
                        labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
     
-    labs(title= "Non-canonical Structures", 
-         x= paste0("Human rDNA region (",i, " bins)"), 
+    labs(#title= "Non-canonical Structures", 
+         x= "Human rDNA region", 
          y= "Frequency", 
          fill= NULL)+
-    #scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
+    scale_y_continuous(breaks= seq(0, 20, by = 10), limits =c(0,30))+
     scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
                       breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
-                      labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "pG4CS", "imotif_counts" = "iMFS"))+
+                      labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
     theme_minimal()+
-    theme(axis.text.x = element_text(angle = 90, hjust=1),
-          axis.ticks.x = element_line(color = "black"),
+    theme(axis.ticks = element_line(color = "black", linewidth = 4),
+          axis.ticks.length = unit(50, "pt"),
           panel.grid = element_blank(),
           plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 40),
-          axis.line = element_line(color = "black"),
+          text = element_text(size = 100),
+          axis.line = element_line(color = "black", linewidth = 4),
+          axis.title.x = element_text(vjust = 0.9, hjust = 0.6, color = "black", margin = margin (t=20)),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin (r=20)),  # Center Y-axis title
-          axis.ticks.y = element_line(color = "black"),
+          axis.ticks.length.x = unit(20,"pt"),
+          axis.text.x  = element_text(color = "black", size = 40),
+          axis.text.y  = element_text(color = "black"),
           legend.key = element_rect(color = NA),
+          legend.text = element_text(size=60),
+          legend.key.size = unit(3, "cm"),
           legend.position = "top")
   
   ggsave(paste("pG4CS_RIZ_imotif_count_entire_human_rdna_in_", i, "bin.png", sep = ""), 
-         plot = g4s_riz_imotif_count, width = 18, height = 10, dpi = 300)
+         plot = g4s_riz_imotif_count, width = 18, height = 15, dpi = 300)
   
   
+
   
   
   
@@ -165,29 +171,34 @@ for (i in bin_size){
     scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16832, 46137),
                        labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
     
-    labs(title= "Non-canonical Structures",  
-         x= paste0("Human rDNA region (",i, " bins)"), 
+    labs(#title= "Non-canonical Structures",  
+         x= "Human rDNA region", 
          y= "Frequency", 
          fill= NULL)+
-    #scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
+    scale_y_continuous(breaks= seq(0, 20, by = 10), limits =c(0,30))+
     scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
                       breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
-                      labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "pG4CS", "imotif_counts" = "iMFS"))+
+                      labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
     theme_minimal()+
-    theme(axis.text.x = element_text(angle = 90, hjust=1),
-          axis.ticks.x = element_line(color = "black"),
+    theme(axis.ticks = element_line(color = "black", linewidth = 4),
+          axis.ticks.length = unit(50, "pt"),
           panel.grid = element_blank(),
           plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 40),
-          axis.line = element_line(color = "black"),
+          text = element_text(size = 100),
+          axis.line = element_line(color = "black", linewidth = 4),
+          axis.title.x = element_text(vjust = 0.9, hjust = 0.6, color = "black", margin = margin (t=20)),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5,margin = margin (r=20)),  # Center Y-axis title
-          axis.ticks.y = element_line(color = "black"),
+          axis.ticks.length.x = unit(20,"pt"),
+          axis.text.x = element_text(angle = 90, hjust=1, size = 40, colour = "black"),
+          axis.text.y  = element_text(color = "black"),
           legend.key = element_rect(color = NA),
+          legend.text = element_text(size=60),
+          legend.key.size = unit(3, "cm"),
           legend.position = "top")
   
   ggsave(paste("pG4CS_RIZ_imotif_count_entire_human_rdna_in_", i, "bin_zoom.png", sep = ""), 
-         plot = g4s_riz_imotif_count_zoom, width = 15, height = 10, dpi = 300)
+         plot = g4s_riz_imotif_count_zoom, width = 18, height = 15, dpi = 300)
   
   
   
@@ -216,7 +227,7 @@ for (i in bin_size){
       name = NULL,
       values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
       breaks = c("RIZ", "pG4CS", "imotif"),
-      labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS"),guide = guide_legend(
+      labels = c(RIZ="RIZ", pG4CS="G4FS", imotif="iMFS"),guide = guide_legend(
         override.aes = list(fill = c("#aa2a85", "#228B22", "#32A0CD"), 
                             linetype = 0)  # removes line in legend
       )
@@ -225,29 +236,33 @@ for (i in bin_size){
     scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
                        labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
     
-    labs(title= "Non-canonical Structures", 
-         x= paste0("Human rDNA region (",i, " bins)"), 
+    labs(#title= "Non-canonical Structures", 
+         x= "Human rDNA region", 
          y= "Bin Density (Smooth)", 
          fill= NULL) +
     
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust=1),
-          axis.ticks.x = element_line(color = "black"),
+    theme(axis.ticks = element_line(color = "black", linewidth = 4),
+          axis.ticks.length = unit(50, "pt"),
           panel.grid = element_blank(),
           plot.title = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5),
-          text = element_text(size = 40),
-          axis.line = element_line(color = "black"),
+          text = element_text(size = 100),
+          axis.line = element_line(color = "black", linewidth = 4),
+          axis.title.x = element_text(vjust = 0.9, hjust = 0.6, color = "black", margin = margin (t=20)),
           axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5,margin = margin (r=20)),  # Center Y-axis title
-          axis.ticks.y = element_line(color = "black"),
+          axis.ticks.length.x = unit(20,"pt"),
+          axis.text.x = element_text(angle = 90, hjust=1, size = 40, colour = "black"),
+          axis.text.y  = element_text(color = "black"),
           legend.key = element_rect(color = NA),
+          legend.text = element_text(size=60),
+          legend.key.size = unit(3, "cm"),
           legend.position = "top")
   
   
-  
-  
+
   ggsave(paste("pG4CS_RIZ_imotif_density_entire_human_rdna_in_", i, "bin.png", sep = ""), 
-         plot = g4s_riz_imotif_density, width = 15, height = 10, dpi = 300)
+         plot = g4s_riz_imotif_density, width = 18, height = 15, dpi = 300)
   
   
   
@@ -314,12 +329,12 @@ dev.off()
 
 cor_matrix <- cor(combined_count[, c("RIZ_counts", "pG4CS_counts","imotif_counts")],
                   method = "pearson")  # or method = "spearman" for rank correlation or skewed distrubution
-new_labels <- c("RIZ","pG4CS", "iMFS")
+new_labels <- c("RIZ","G4FS", "iMFS")
 dimnames(cor_matrix) <- list(new_labels, new_labels)  # row + col names
 fwrite(cor_matrix, "RIZ_g4s_imfs_correlation_plot_graph_input.csv")
 
 
-png("RIZ_g4s_imfs_correlation_plot.png", width = 11, height = 10, units = "in", res = 300)
+png("RIZ_g4s_imfs_correlation_plot.png", width = 14, height = 10, units = "in", res = 300)
 
 
 
@@ -332,7 +347,7 @@ corrplot(
   col = colorRampPalette(c("white", "red"))(200),  # Red gradient
   addCoef.col = "black", # Optional: adds correlation coefficients
   number.cex = 3.5,       # Size of numbers (if added)
-  cl.cex = 2.0,         # Increase scale (legend) text size
+  cl.cex = 4.0,         # Increase scale (legend) text size
   cl.ratio = 0.3,        # Increase thickness of the color bar
   cl.align.text = "l", # c=center, r=right, l= left align text to ticks
 )
@@ -387,14 +402,14 @@ png("RIZ_g4s_imfs_venn_plot.png", width = 11, height = 10, units = "in", res = 3
 venn.plot <- venn.diagram(
   x = list(
     RIZ   = which(combined_count$RIZ_bin == 1),
-    pG4CS   = which(combined_count$G4_bin == 1),    
+    pG4CS   = which(combined_count$pG4CS_bin == 1),    
     iMFS  = which(combined_count$iMFS_bin == 1)
     
   ),
   filename = NULL,
   fill = c("#aa2a85",  "#228B22","#32A0CD"),
   alpha = 0.6,#the greater the number the higher is transparency
-  cex = 4,
+  cex = 6,
   cat.cex = 5,
   cat.col = c("#aa2a85", "#228B22", "#32A0CD") #will give name of structures in this color order
   #cat.pos = c(-20, 90, 20),   # angle of labels relative to circles, this didnt work
@@ -412,7 +427,7 @@ png("RIZ_g4s_imfs_venn_plot2.png", width = 11, height = 10, units = "in", res = 
 venn.plot <- venn.diagram(
   x = list(
     RIZ   = which(combined_count$RIZ_bin == 1),
-    pG4CS = which(combined_count$G4_bin == 1),
+    pG4CS = which(combined_count$pG4CS_bin == 1),
     iMFS  = which(combined_count$iMFS_bin == 1)
   ),
   filename = NULL,
@@ -429,13 +444,13 @@ grid.draw(venn.plot)
 dev.off()
 
 
-
+#final
 png("RIZ_g4s_imfs_venn_plot3.png", width = 11, height = 10, units = "in", res = 300)
 
 venn.plot <- venn.diagram(
   x = list(
     RIZ   = which(combined_count$RIZ_bin == 1),
-    pG4CS   = which(combined_count$G4_bin == 1),    
+    pG4CS   = which(combined_count$pG4CS_bin == 1),    
     iMFS  = which(combined_count$iMFS_bin == 1)
     
   ),
@@ -443,7 +458,7 @@ venn.plot <- venn.diagram(
   fill = c("#aa2a85",  "#228B22","#32A0CD"),
   col=NA, #if you want black border then remove this piece of code
   alpha = 0.6,#the greater the number the higher is transparency
-  cex = 4,
+  cex = 6,
   cat.cex = 5,
   category.names = c("","", "") 
   #cat.col = c("#aa2a85", "#228B22", "#32A0CD") will give name of structures in this color order

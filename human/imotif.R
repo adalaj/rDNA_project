@@ -115,8 +115,8 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 48338, y0 = 0, y1 = 1, col = "#A
 kpRect(kp, chr = 'rDNA_locus', x0 = 46137, x1 = 48338, y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 2202bp of promoter
 #48338-2201
 
-kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -0.6)
-kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -0.6) #-1.5 to make blue with more width
+kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -0.6,lwd=5)
+kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -0.6,lwd =5 ) #-1.5 to make blue with more width
 dev.off()
 
 #use zoom option, took screenshot and edited in powerpoint
@@ -401,63 +401,66 @@ max_value<- round(max(entire_imotif_rdna_summary$iMFS_density, na.rm = TRUE),4)
 
 imotif_norm_3500igs_nojuntn<- ggplot(imotif_rdna_summary, aes(x= rDNA_region, y = iMFS_density, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized imotif distribution in the human rDNA locus", 
+  labs(#title= "Normalized imotif distribution in the human rDNA locus", 
        x= "Human rDNA region", 
        y= "iMFS density", 
        fill = "rDNA")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.001), limits =c(0,max_value), expand = expansion(mult = c(0, 0.03)))+
-  geom_text(aes(label= iMFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.001), limits =c(0,max_value), expand = expansion(mult = c(0, 0.05)))+
+  geom_text(aes(label= iMFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, color = "black"), 
-        axis.ticks.x = element_line(color = "black"),
+  theme(axis.ticks = element_line(color = "black", linewidth = 4),
+        axis.ticks.length = unit(50, "pt"),
         panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.title = element_text(hjust = 0.5), #face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 40),
-        axis.line = element_line(color = "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
+        text = element_text(size = 100),
+        axis.line = element_line(color = "black", linewidth = 4),
+        axis.title.x = element_text(vjust = 0.5, hjust = 0.5, color = "black"), 
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)),  # Center Y-axis title
         axis.text.x  = element_text(color = "black"),
         axis.text.y  = element_text(color = "black"),
-        legend.position = "top")+
+        legend.position = "none")+
   coord_flip()
+
 ggsave("Normalized_imotif_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-       plot = imotif_norm_3500igs_nojuntn, width=18,height=10, dpi=300)
+       plot = imotif_norm_3500igs_nojuntn, width=30,height=18, dpi=300)
 
 
-max_value<- round(max(entire_imotif_rdna_summary$iMFS_proportion_perc, na.rm = TRUE)+1,2)
+
+max_value<- max(entire_imotif_rdna_summary$iMFS_proportion_perc, na.rm = TRUE)
 
 iMFS_prop_3500igs_nojuntn<- ggplot(imotif_rdna_summary, aes(x= rDNA_region, y = iMFS_proportion_perc, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized iMFS distribution in the Human rDNA locus", 
+  labs(#title= "Normalized iMFS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "iMFS proportion (%)", 
        fill = "rDNA")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.03)))+
-  geom_text(aes(label= iMFS_count, hjust= -0.2, vjust= 0.5), size= 12)+
+  scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.08)))+
+  geom_text(aes(label= iMFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5, colour = "black"),
-        axis.ticks.x = element_line(color = "black"), 
+  theme(axis.ticks = element_line(color = "black", linewidth = 4), 
+        axis.ticks.length = unit(50, "pt"),
         panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.title = element_text(hjust = 0.5), #face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 40),
-        axis.line = element_line(color = "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
+        text = element_text(size = 100),
+        axis.line = element_line(color = "black", linewidth = 4),
+        axis.title.x = element_text(vjust = 0.6, hjust = 0.5, colour = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)),   # Center Y-axis title
         axis.text.x  = element_text(color = "black"),
         axis.text.y  = element_text(color = "black"),
-        legend.position = "top")+
+        legend.position = "none")+
   coord_flip()
 
 ggsave("iMFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-       plot = iMFS_prop_3500igs_nojuntn, width=18,height=10, dpi=300)
+       plot = iMFS_prop_3500igs_nojuntn, width=30,height=18, dpi=300)
+
 
 
 
@@ -503,7 +506,7 @@ fwrite(entire_imotif_rdna_summary2, "imotif_KY962518_added_3500nt_IGS_upstream_n
 entire_imotif_rdna_summary2<- fread("imotif_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_AR_graphinput.csv", sep = ",", header = TRUE)
 
 
-max_value<- round(max(entire_imotif_rdna_summary2$iMFS_density, na.rm = TRUE)+0.001,4)
+max_value<- max(entire_imotif_rdna_summary2$iMFS_density, na.rm = TRUE)
 
 entire_imotif_rdna_summary2$rDNA_region <- factor(entire_imotif_rdna_summary2$rDNA_region, 
                                                levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
@@ -517,38 +520,35 @@ entire_imotif_rdna_summary2$strand <- factor(
 
 imotif_strandwise<- ggplot(entire_imotif_rdna_summary2, aes(x= rDNA_region, y = iMFS_density, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized imotif strandwise distribution in the human rDNA locus", 
+  labs(#title= "Normalized imotif strandwise distribution in the human rDNA locus", 
        x= "Human rDNA region", 
        y= "iMFS density", 
        fill= NULL)+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.001), limits =c(0,max_value), expand = expansion(mult = c(0, 0.02)))+
-  geom_text(aes(label= iMFS_count, hjust=-0.2, vjust=0.5), size=12, position = position_dodge(width = 0.9))+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.001), limits =c(0,max_value), expand = expansion(mult = c(0, 0.08)))+
+  geom_text(aes(label= iMFS_count, hjust=-0.2, vjust=0.5), size=20, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template strand", "-" = "Template strand"),
                     breaks = c("+", "-"))+
   #scale_fill_manual(values = combined_colors)+
   theme_minimal()+
-  theme(axis.title.x = element_text(vjust = 0.5, hjust = 0.5),
-        axis.ticks.x = element_line(color = "black"), 
+  theme(axis.ticks = element_line(color = "black", linewidth = 4), 
+        axis.ticks.length = unit(50, "pt"),
         panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.title = element_text(hjust = 0.5), #face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 40),
-        axis.line = element_line(color = "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),   # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
+        text = element_text(size = 100),
+        axis.line = element_line(color = "black", linewidth = 4),
+        axis.title.x = element_text(vjust = 0.6, hjust = 0.5, color = "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)),   # Center Y-axis title
         axis.text.x  = element_text(color = "black"),
         axis.text.y  = element_text(color = "black"),
         legend.position = "top", 
-        legend.text = element_text(size=40))+
+        legend.text = element_text(size=80),
+        legend.key.size = unit(3, "cm"))+
   coord_flip()
 
-
 ggsave( "Normalized_strandwise_imotif_distribution_in_human_rDNA_subcomponents_AR.tiff", 
-        plot = imotif_strandwise, width=18,height=10, dpi=300)
-
-
-
+        plot = imotif_strandwise, width=30,height=18, dpi=300)
 
 nontemplate<- entire_imotif_rdna_summary2 %>% filter(strand == "+")
 nontemplate$rDNA_region <- factor(nontemplate$rDNA_region, 
