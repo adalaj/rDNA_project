@@ -107,7 +107,7 @@ for (i in bin_size){
          x= "Human rDNA region", 
          y= "Frequency", 
          fill= NULL)+
-    scale_y_continuous(breaks= seq(0, 20, by = 10), limits =c(0,30))+
+    scale_y_continuous(breaks= seq(5, 25, by = 10), limits =c(0,25))+
     scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
                       breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
                       labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
@@ -175,7 +175,7 @@ for (i in bin_size){
          x= "Human rDNA region", 
          y= "Frequency", 
          fill= NULL)+
-    scale_y_continuous(breaks= seq(0, 20, by = 10), limits =c(0,30))+
+    scale_y_continuous(breaks= seq(5, 25, by = 10), limits =c(0,25))+
     scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
                       breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
                       labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
@@ -232,7 +232,7 @@ for (i in bin_size){
                             linetype = 0)  # removes line in legend
       )
     )+
-    
+    scale_y_continuous(breaks= seq(2, 8, by = 2), limits =c(0,8))+
     scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
                        labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
     
