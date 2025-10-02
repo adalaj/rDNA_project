@@ -228,7 +228,7 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG
        y= "G4FS density", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.005), limits =c(0,max_value), expand = expansion(mult = c(0, 0.08)))+
-  geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 30)+
+  #geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
@@ -261,7 +261,7 @@ pG4CS_prop_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG
        y= "G4FS proportion (%)", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.08)))+
-  geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 30)+
+  #geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
@@ -342,7 +342,7 @@ pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y =
        y= "G4FS density", 
        fill= NULL)+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.003), limits =c(0,max_value),expand = expansion(mult = c(0, 0.05)))+
-  geom_text(aes(label= pG4CS_count, hjust=-0.2, vjust=0.5), size=20, position = position_dodge(width = 0.9))+
+  #geom_text(aes(label= pG4CS_count, hjust=-0.2, vjust=0.5), size=20, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template strand", "-" = "Template strand"),
                     breaks = c("+", "-"))+

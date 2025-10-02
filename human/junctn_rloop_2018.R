@@ -213,7 +213,7 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
        y= "RLFS density", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.01), limits =c(0,max_value),expand = expansion(mult = c(0, 0.05)))+
-  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
+  #geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
@@ -249,7 +249,7 @@ RLFS_prop_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
        y= "RLFS proportion (%)", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.09)))+
-  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
+  #geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
@@ -336,7 +336,7 @@ rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y 
        y= "RLFS density", 
        fill= NULL)+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.004), limits =c(0,max_value), expand = expansion(mult = c(0, 0.03)))+
-  geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 20, position = position_dodge(width = 0.9))+
+  #geom_text(aes(label= RLFS_count, hjust= -0.2, vjust= 0.5), size= 20, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), #changed the non template and template colors
                     labels = c("+" = "Non-template strand", "-" = "Template strand"),
                     breaks = c("+", "-"))+
