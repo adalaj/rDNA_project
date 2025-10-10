@@ -1,4 +1,5 @@
-## ##plotting imotif in human rDNA locus that has new promoter size of 2200. 
+#Below code used for generation of Fig.4B to G
+##plotting imotif in human rDNA locus
 # go to https://im-seeker.org/
 
 #paper: iM-Seeker: a webserver for DNA i-motifs prediction and scoring via automated machine learning
@@ -58,6 +59,7 @@ fwrite(master, "human_imotif_prediction_end_to_end_prediction_default_setting_ma
 
 
 #plotting begins
+#Fig 4B
 
 #read the imotif that overlapped with rdna locus
 entire_rdna<- fread("human_imotif_prediction_end_to_end_prediction_default_setting_master.csv", sep = ",", header = TRUE) #91
@@ -119,12 +121,11 @@ kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -0.6,
 kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -0.6,lwd =5 ) #-1.5 to make blue with more width
 dev.off()
 
-#use zoom option, took screenshot and edited in powerpoint
 
 
 ##wanted to plot only till 3'ets and nontemplate
 ##plotting begins
-
+#Fig 4F
 png("human_rdna_nontemplate_imotif_coverage.png", width = 10, height= 10, units= "in", res = 1000)
 custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
 kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
@@ -162,7 +163,7 @@ kpPlotCoverage(kp, data=entire_rdna6_nontemplate, data.panel = 2, col = "#E21515
 dev.off()
 
 
-
+#Fig 4G
 png("human_rdna_template_imotif_coverage.png", width = 10, height= 10, units= "in", res = 1000)
 custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
 kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
@@ -210,6 +211,7 @@ library(tidyverse)
 library(data.table)
 
 
+#Fig 4C to 4E
 entire_imotif_rdna<- fread("imotif_prediction_end_to_end_prediction_default_setting_master.csv", sep = ",", header = TRUE) #93
 
 # strand specificity doesnt matter here because we are cropping region of our interest
@@ -337,39 +339,6 @@ entire_imotif_rdna_summary<- entire_imotif_rdna_summary %>% mutate(iMFS_density 
 
 fwrite(entire_imotif_rdna_summary, "imotif_KY962518_added_3500nt_IGS_upstream_at_junctn_graphinput.csv", sep = ",")
 
-entire_imotif_rdna_summary$rDNA_region <- factor(entire_imotif_rdna_summary$rDNA_region, 
-                                              levels = c("Promoter","Promoter and 5'ETS junction", "5'ETS", "5'ETS and 18S junction", 
-                                                         "18S", "18S and ITS1 junction", "ITS1", "ITS1 and 5.8S junction", "5.8S", 
-                                                         "5.8S and ITS2 junction",  "ITS2", "ITS2 and 28S junction","28S", 
-                                                         "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ))
-
-max_value<- round(max(entire_imotif_rdna_summary$iMFS_density, na.rm = TRUE),4)
-
-
-imotif_norm_3500igs<- ggplot(entire_imotif_rdna_summary, aes(x= rDNA_region, y = iMFS_density, fill= rDNA_region)) + 
-  geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized imotif distribution in the human rDNA locus", 
-       x= "human rDNA region", 
-       y= "i-motif density")+
-  scale_y_continuous(breaks= seq(0, max_value, by = 0.001), limits =c(0,max_value))+
-  geom_text(aes(label= iMFS_count, vjust= -0.5, size= 50))+
-  scale_fill_manual(values= c( "#B6FFF4","maroon", "#FDCCE5", "steelblue", "#D0B6FF","darkviolet", "#EF9B20","burlywood2", "#A0322B", 
-                               "pink", "#FFCC17","aquamarine", "#E5FFB6","greenyellow", "#3B8CC4","turquoise2", "#A4A2A8"))+
-  #scale_fill_manual(values = combined_colors)+
-  theme_minimal()+
-  theme(axis.text.x = element_blank())+ 
-  theme(panel.grid = element_blank())+
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-        plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        theme(panel.grid = element_blank()),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +  # Center Y-axis title
-  theme(axis.ticks.y = element_line(color = "black"))
-#coord_flip()
-
-ggsave( "Normalized_imotif_distribution_in_human_rDNA_subcomponents_incld_junctn_AR.tiff", 
-        plot = imotif_norm_3500igs, width=18,height=10, dpi=150)
 
 
 entire_imotif_rdna_summary<- fread("imotif_KY962518_added_3500nt_IGS_upstream_at_junctn_graphinput.csv", sep = ",", header = TRUE)
@@ -381,6 +350,9 @@ entire_imotif_rdna_summary<- entire_imotif_rdna_summary %>% mutate(iMFS_proporti
 #Which region contributes the largest share of iMFS overall.
 #Biased toward longer regions (they naturally accumulate more iMFS simply because they have more bases)
 fwrite(entire_imotif_rdna_summary, "iMFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
+
+
+#Fig 4D
 entire_imotif_rdna_summary<- fread("iMFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep=",", header = TRUE)
 
 imotif_rdna_summary<- entire_imotif_rdna_summary[!grepl("junction", entire_imotif_rdna_summary$rDNA_region),]
@@ -426,18 +398,18 @@ imotif_norm_3500igs_nojuntn<- ggplot(imotif_rdna_summary, aes(x= rDNA_region, y 
   coord_flip()
 
 ggsave("Normalized_imotif_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-       plot = imotif_norm_3500igs_nojuntn, width=30,height=18, dpi=300)
+       plot = imotif_norm_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
-
+#Fig 4C
 max_value<- max(entire_imotif_rdna_summary$iMFS_proportion_perc, na.rm = TRUE)
 
 iMFS_prop_3500igs_nojuntn<- ggplot(imotif_rdna_summary, aes(x= rDNA_region, y = iMFS_proportion_perc, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
   labs(#title= "Normalized iMFS distribution in the Human rDNA locus", 
-       x= "Human rDNA region", 
-       y= "iMFS proportion (%)", 
-       fill = "rDNA")+
+    x= "Human rDNA region", 
+    y= "iMFS proportion (%)", 
+    fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.08)))+
   #geom_text(aes(label= iMFS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
@@ -459,11 +431,11 @@ iMFS_prop_3500igs_nojuntn<- ggplot(imotif_rdna_summary, aes(x= rDNA_region, y = 
   coord_flip()
 
 ggsave("iMFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-       plot = iMFS_prop_3500igs_nojuntn, width=30,height=18, dpi=300)
+       plot = iMFS_prop_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
 
-
+#FIG 4E
 #to make template and non-template
 entire_imotif_rdna_summary2<- entire_imotif_rdna %>% group_by(rDNA_region, rDNA_region_length, strand) %>% count()
 names(entire_imotif_rdna_summary2)[4] <- "iMFS_count"
@@ -548,7 +520,48 @@ imotif_strandwise<- ggplot(entire_imotif_rdna_summary2, aes(x= rDNA_region, y = 
   coord_flip()
 
 ggsave( "Normalized_strandwise_imotif_distribution_in_human_rDNA_subcomponents_AR.tiff", 
-        plot = imotif_strandwise, width=30,height=18, dpi=300)
+        plot = imotif_strandwise, width=30,height=18, dpi=600)
+
+
+
+####################################
+#EXTRA#
+
+entire_imotif_rdna_summary$rDNA_region <- factor(entire_imotif_rdna_summary$rDNA_region, 
+                                                 levels = c("Promoter","Promoter and 5'ETS junction", "5'ETS", "5'ETS and 18S junction", 
+                                                            "18S", "18S and ITS1 junction", "ITS1", "ITS1 and 5.8S junction", "5.8S", 
+                                                            "5.8S and ITS2 junction",  "ITS2", "ITS2 and 28S junction","28S", 
+                                                            "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ))
+
+max_value<- round(max(entire_imotif_rdna_summary$iMFS_density, na.rm = TRUE),4)
+
+
+imotif_norm_3500igs<- ggplot(entire_imotif_rdna_summary, aes(x= rDNA_region, y = iMFS_density, fill= rDNA_region)) + 
+  geom_bar(stat= 'identity', color= "black") +
+  labs(title= "Normalized imotif distribution in the human rDNA locus", 
+       x= "human rDNA region", 
+       y= "i-motif density")+
+  scale_y_continuous(breaks= seq(0, max_value, by = 0.001), limits =c(0,max_value))+
+  geom_text(aes(label= iMFS_count, vjust= -0.5, size= 50))+
+  scale_fill_manual(values= c( "#B6FFF4","maroon", "#FDCCE5", "steelblue", "#D0B6FF","darkviolet", "#EF9B20","burlywood2", "#A0322B", 
+                               "pink", "#FFCC17","aquamarine", "#E5FFB6","greenyellow", "#3B8CC4","turquoise2", "#A4A2A8"))+
+  #scale_fill_manual(values = combined_colors)+
+  theme_minimal()+
+  theme(axis.text.x = element_blank())+ 
+  theme(panel.grid = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        text = element_text(size = 30),
+        axis.line = element_line(color = "black"),
+        theme(panel.grid = element_blank()),
+        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +  # Center Y-axis title
+  theme(axis.ticks.y = element_line(color = "black"))
+#coord_flip()
+
+ggsave( "Normalized_imotif_distribution_in_human_rDNA_subcomponents_incld_junctn_AR.tiff", 
+        plot = imotif_norm_3500igs, width=18,height=10, dpi=150)
+
+
 
 nontemplate<- entire_imotif_rdna_summary2 %>% filter(strand == "+")
 nontemplate$rDNA_region <- factor(nontemplate$rDNA_region, 
