@@ -29,16 +29,16 @@ human<- fread("rdna_hg38_chr21_2018_dataset_details_v3.csv", sep = ",", header =
 #read required files for monkey
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/monkey")
 
-monkey_rdna_KX065350<- readDNAStringSet("nontemplate_monkey_5ets_KX065350_3ets.fasta", format = "fasta", use.names = FALSE)
+monkey_rdna_KX061890<- readDNAStringSet("nontemplate_monkey_5ets_KX061890_3ets.fasta", format = "fasta", use.names = FALSE)
 #default is fastq and use.names= FALSE will drop the header in the fasta file
 
-monkey_coding_rdna_KX065350<- as.character(monkey_rdna_KX065350[[1]])
-nchar(monkey_coding_rdna_KX065350)
+monkey_coding_rdna_KX061890<- as.character(monkey_rdna_KX061890[[1]])
+nchar(monkey_coding_rdna_KX061890)
 #12979
 
 
 
-monkey_rdna_NR146166<- readDNAStringSet("nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.fasta", format = "fasta", use.names = FALSE)
+monkey_rdna_NR146166<- readDNAStringSet("nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta", format = "fasta", use.names = FALSE)
 monkey_coding_rdna_NR146166<- as.character(monkey_rdna_NR146166[[1]])
 nchar(monkey_coding_rdna_NR146166)
 #12980
@@ -46,7 +46,7 @@ nchar(monkey_coding_rdna_NR146166)
 
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/monkey")
 monkey<- fread("rdna_monkey_dataset_details_v1.csv", sep = ",", header = TRUE)
-#this file has all rDNA region wise sequence of KX065350 and NR_146166 and their nucleotide distribution
+#this file has all rDNA region wise sequence of KX061890 and NR_146166 and their nucleotide distribution
 #8 rows
 
 
@@ -57,7 +57,7 @@ human_tmp<- rbind(human_tmp, new_row)
 
 
 monkey_tmp<- monkey[c(1:8), c(1,2)]
-new_row1 <- data.frame(Name = "monkey_coding_rdna_KX065350", Sequences = monkey_coding_rdna_KX065350)
+new_row1 <- data.frame(Name = "monkey_coding_rdna_KX061890", Sequences = monkey_coding_rdna_KX061890)
 new_row2 <- data.frame(Name = "monkey_coding_rdna_NR146166", Sequences = monkey_coding_rdna_NR146166)
 monkey_tmp<- rbind(monkey_tmp, new_row1, new_row2)
 

@@ -7,16 +7,16 @@ library(Biostrings)
 library(data.table)
 library(tidyverse)
 
-monkey_rdna<- readDNAStringSet("KX065350_monkey_entire_rdna_2018_nontemplate.fasta", format = "fasta", use.names = FALSE)
-
-#the header i removed KX065350.1 Macaca mulatta precursor 48S ribosomal RNA gene, external transcribed spacer, 18S ribosomal RNA gene, internal transcribed spacer 1, 5.8S ribosomal RNA gene, internal transcribed spacer 2, 28S ribosomal RNA gene, and external transcribed spacer, complete sequence
+monkey_rdna<- readDNAStringSet("KX061890_monkey_entire_rdna_2018_nontemplate.fasta", format = "fasta", use.names = FALSE)
+#https://www.ncbi.nlm.nih.gov/nuccore/KX061890
+#the header i removed KX061890.1 Macaca mulatta precursor 48S ribosomal RNA gene, external transcribed spacer, 18S ribosomal RNA gene, internal transcribed spacer 1, 5.8S ribosomal RNA gene, internal transcribed spacer 2, 28S ribosomal RNA gene, and external transcribed spacer, complete sequence
 #default is fastq and use.names= FALSE will drop the header in the fasta file
 
 monkey_rdna_seq<- as.character(monkey_rdna[[1]])
 nchar(monkey_rdna_seq)
 #41735
 
-# from the NCBI entry KX065350.1
+# from the NCBI entry KX061890.1
 
 #Now i want to separate the rdna1 into subsections described by the authors
 #1..3640- 5’ external transcribed spacer
@@ -59,8 +59,8 @@ s18_NR_146166.1<- test
 
 
 
-Name<- c("5'ETS_KX065350", "18S_KX065350", "ITS1_KX065350", "5.8S_KX065350", 
-         "ITS2_KX065350", "28S_KX065350", "3'ETS_KX065350", "s18_NR_146166.1")
+Name<- c("5'ETS_KX061890", "18S_KX061890", "ITS1_KX061890", "5.8S_KX061890", 
+         "ITS2_KX061890", "28S_KX061890", "3'ETS_KX061890", "s18_NR_146166.1")
 
 
 Sequences <- c(ets5, s18, its1, s5.8, its2, s28, ets3, s18_NR_146166.1)
@@ -106,21 +106,21 @@ rdna_monkey_dataset_sequences<- rdna_monkey_dataset_details_v1 %>% select(1,2)
 for (j in 1: nrow(rdna_monkey_dataset_sequences)){
   
   write(paste(">",rdna_monkey_dataset_sequences[j,1], sep=''),                                            
-        file = "rDNA_KX065350_monkey_2017_sequence_fasta_format.txt",
+        file = "rDNA_KX061890_monkey_2018_sequence_fasta_format.txt",
         append = TRUE)
   
   write(rdna_monkey_dataset_sequences[j,2],                                            
-        file = "rDNA_KX065350_monkey_2017_sequence_fasta_format.txt",
+        file = "rDNA_KX061890_monkey_2018_sequence_fasta_format.txt",
         append = TRUE)
   
   write("\n",                                            
-        file = "rDNA_KX065350_monkey_2017_sequence_fasta_format.txt",
+        file = "rDNA_KX061890_monkey_2018_sequence_fasta_format.txt",
         append = TRUE)
   
 }
 
 
-#created two fasta format from 5ets to 3'ets one from KX065350 
+#created two fasta format from 5ets to 3'ets one from KX061890 
 ets5_to_ets3<- subseq(monkey_rdna_seq, start = 1, end=12979)
 nchar(ets5_to_ets3)
 #12979
@@ -128,8 +128,8 @@ nchar(ets5_to_ets3)
 
 monkey_nontemplate <- DNAStringSet(ets5_to_ets3)
 
-names(monkey_nontemplate) <- "nontemplate_KX065350"
-writeXStringSet(monkey_nontemplate, "nontemplate_monkey_5ets_KX065350_3ets.fasta")
+names(monkey_nontemplate) <- "nontemplate_KX061890"
+writeXStringSet(monkey_nontemplate, "nontemplate_monkey_5ets_KX061890_3ets.fasta")
 
 
 #another form replacing the existing 18s with new 18s from NR_146166.1
@@ -139,8 +139,8 @@ nchar(monkey_modified)
 
 monkey_modified_nontemplate <- DNAStringSet(monkey_modified)
 
-names(monkey_modified_nontemplate) <- "nontemplate_KX065350_and_NR_146166"
-writeXStringSet(monkey_modified_nontemplate, "nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.fasta")
+names(monkey_modified_nontemplate) <- "nontemplate_KX061890_and_NR_146166"
+writeXStringSet(monkey_modified_nontemplate, "nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta")
 
 
 #going forward i will use both 18s to see if a see a presence of RLFS, G4 or imotif
@@ -180,7 +180,7 @@ rdna_monkey_nuceotide_distribution<- ggplot(nucleotide_reshape, aes(x = Name, y 
   geom_bar(stat= 'identity', color = "black") +
   theme(axis.text.x = element_text(angle = 45, size = 20, hjust=1)) +
   labs(title= " Nucleotide distribution percent in monkey rDNA locus", 
-       subtitle = "KX065350",
+       subtitle = "KX061890",
        x= "rDNA region", 
        y= "Nucleotide distribution percent")+
   geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 6)+ # Adjusted label positioning
@@ -195,6 +195,6 @@ rdna_monkey_nuceotide_distribution<- ggplot(nucleotide_reshape, aes(x = Name, y 
 
 
 
-ggsave( "rdna_KX065350_monkey_nuceotide_distribution.tiff", 
+ggsave( "rdna_KX061890_monkey_nuceotide_distribution.tiff", 
         plot = rdna_monkey_nuceotide_distribution, width=15,height=10, dpi=150)
 
