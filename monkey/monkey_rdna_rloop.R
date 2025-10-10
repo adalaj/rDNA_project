@@ -8,30 +8,30 @@ library(tidyverse)
 
 #open terminal
 #(base) jyotiadala@Jyotis-MacBook-Pro ~ % conda activate python2.7
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.fasta -o nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets_qmrlfs
+#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta -o nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets_qmrlfs
 #QmRLFS-finder.py (version v1.5)
 #run on Wed Jun 11 2025 16:07:03 
-#command line: python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.fasta -o nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets_qmrlfs
+#command line: python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta -o nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets_qmrlfs
 
 #Time used: 0.39 mins
 
 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX065350_3ets.fasta -o nontemplate_monkey_5ets_KX065350_3ets_qmrlfs 
+#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_3ets.fasta -o nontemplate_monkey_5ets_KX061890_3ets_qmrlfs 
 #QmRLFS-finder.py (version v1.5)
 #run on Wed Jun 11 2025 16:14:35 
-#command line: python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX065350_3ets.fasta -o nontemplate_monkey_5ets_KX065350_3ets_qmrlfs
+#command line: python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_3ets.fasta -o nontemplate_monkey_5ets_KX061890_3ets_qmrlfs
 
 #Time used: 0.40 mins
 
-KX065350<- fread("nontemplate_monkey_5ets_KX065350_3ets_qmrlfs.out.bed", sep = "\t", header = FALSE) #131
-KX065350_and_NR_146166<- fread("nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets_qmrlfs.out.bed", sep = "\t", header = FALSE) #131
+KX061890<- fread("nontemplate_monkey_5ets_KX061890_3ets_qmrlfs.out.bed", sep = "\t", header = FALSE) #131
+KX061890_and_NR_146166<- fread("nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets_qmrlfs.out.bed", sep = "\t", header = FALSE) #131
 
 #no difference in RLFS count or annotation
 
 datasets<- list(
-  KX065350 = KX065350,
-  KX065350_and_NR_146166 = KX065350_and_NR_146166
+  KX061890 = KX061890,
+  KX061890_and_NR_146166 = KX061890_and_NR_146166
 )
 
 for (i in names(datasets)){

@@ -2,8 +2,8 @@
 
 #open terminal
 #(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % conda activate python3.11
-#(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.fasta >output_pG4CS_nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.txt  
-#(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX065350_3ets.fasta >output_pG4CS_nontemplate_monkey_5ets_KX065350_3ets.txt      
+#(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta >output_pG4CS_nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.txt  
+#(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX061890_3ets.fasta >output_pG4CS_nontemplate_monkey_5ets_KX061890_3ets.txt      
 
 
 
@@ -11,14 +11,14 @@ setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUnivers
 library(data.table)
 library(tidyverse)
 
-KX065350<- fread("output_pG4CS_nontemplate_monkey_5ets_KX065350_3ets.txt", sep = "\t", header = FALSE) #114
-KX065350_and_NR_146166<- fread("output_pG4CS_nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.txt", sep = "\t", header = FALSE) #114
+KX061890<- fread("output_pG4CS_nontemplate_monkey_5ets_KX061890_3ets.txt", sep = "\t", header = FALSE) #114
+KX061890_and_NR_146166<- fread("output_pG4CS_nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.txt", sep = "\t", header = FALSE) #114
 
 #no difference in pG4CS count or annotation
 
 datasets<- list(
-  KX065350 = KX065350,
-  KX065350_and_NR_146166 = KX065350_and_NR_146166
+  KX061890 = KX061890,
+  KX061890_and_NR_146166 = KX061890_and_NR_146166
 )
 
 for (i in names(datasets)){
@@ -104,7 +104,7 @@ names(entire_g4s_rdna_summary)[2] <- "pG4CS_count"
 entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(norm_pG4CS_count = pG4CS_count/sum(entire_g4s_rdna_summary$pG4CS_count)) %>% 
   mutate(norm_pG4CS_count= round(norm_pG4CS_count, 2))
 
-fwrite(entire_g4s_rdna_summary, "pG4CS_KX065350_monkey_at_junctn_graphinput.csv", sep = ",")
+fwrite(entire_g4s_rdna_summary, "pG4CS_KX061890_monkey_at_junctn_graphinput.csv", sep = ",")
 
 entire_g4s_rdna_summary$rDNA_region <- factor(entire_g4s_rdna_summary$rDNA_region, 
                                               levels = c("5'ETS", "5'ETS and 18S junction", 
@@ -199,7 +199,7 @@ entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_reg
 entire_g4s_rdna_summary2<- entire_g4s_rdna_summary2 %>% mutate(norm_pG4CS_count = pG4CS_count/sum(entire_g4s_rdna_summary2$pG4CS_count)) %>% 
   mutate(norm_pG4CS_count= round(norm_pG4CS_count, 2))
 
-fwrite(entire_g4s_rdna_summary2, "pG4CS_KX065350_monkey_no_junctn_strandwise_AR_graphinput.csv")
+fwrite(entire_g4s_rdna_summary2, "pG4CS_KX061890_monkey_no_junctn_strandwise_AR_graphinput.csv")
 
 
 g4s_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm_pG4CS_count, fill= strand)) + 
@@ -302,7 +302,7 @@ library(karyoploteR)
 
 
 #read the pG4CS that overlapped with rdna locus
-entire_rdna<- fread("output_pG4CS_KX065350_monkey_rDNA_2017.txt", sep = "\t", header = FALSE) #65
+entire_rdna<- fread("output_pG4CS_KX061890_monkey_rDNA_2017.txt", sep = "\t", header = FALSE) #65
 entire_rdna$V1= "rDNA_locus"
 colnames(entire_rdna)<- c("chr", "start", "end", "sequence", "name", "strand")
 

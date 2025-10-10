@@ -11,7 +11,7 @@ library(karyoploteR)
 
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/monkey")
 
-monkey_rDNA<- readDNAStringSet(file = "nontemplate_monkey_5ets_KX065350_3ets.fasta") #belongs to package BIOSTRINGS
+monkey_rDNA<- readDNAStringSet(file = "nontemplate_monkey_5ets_KX061890_3ets.fasta") #belongs to package BIOSTRINGS
 monkey_rDNA_seq<- monkey_rDNA[[1]]
 nchar(monkey_rDNA_seq)
 #12979
@@ -22,11 +22,11 @@ nchar(template_monkey_rdna)
 
 template_monkey_rdna_set <- DNAStringSet(template_monkey_rdna)
 
-names(template_monkey_rdna_set) <- "template_KX065350"
-writeXStringSet(template_monkey_rdna_set, "template_monkey_5ets_KX065350_3ets.fasta")
+names(template_monkey_rdna_set) <- "template_KX061890"
+writeXStringSet(template_monkey_rdna_set, "template_monkey_5ets_KX061890_3ets.fasta")
 
 
-monkey_modified_rDNA<- readDNAStringSet(file = "nontemplate_monkey_5ets_KX065350_and_NR_146166_3ets.fasta") #belongs to package BIOSTRINGS
+monkey_modified_rDNA<- readDNAStringSet(file = "nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta") #belongs to package BIOSTRINGS
 monkey_modified_rDNA_seq<- monkey_modified_rDNA[[1]]
 nchar(monkey_modified_rDNA_seq)
 #12980
@@ -37,12 +37,12 @@ nchar(template_monkey_modified_rdna)
 
 template_monkey_modified_rdna_set <- DNAStringSet(template_monkey_modified_rdna)
 
-names(template_monkey_modified_rdna_set) <- "template_KX065350_and_NR_146166"
-writeXStringSet(template_monkey_modified_rdna_set, "template_monkey_5ets_KX065350_and_NR_146166_3ets.fasta")
+names(template_monkey_modified_rdna_set) <- "template_KX061890_and_NR_146166"
+writeXStringSet(template_monkey_modified_rdna_set, "template_monkey_5ets_KX061890_and_NR_146166_3ets.fasta")
 
 
 
-# I added KX065350_5ets_to_3ets_nontemplate.fasta to predict>upload DNA FILE (FASTA FORMAT) (https://im-seeker.org/predict)>continue>end to end with default model>predict
+# I added KX061890_5ets_to_3ets_nontemplate.fasta to predict>upload DNA FILE (FASTA FORMAT) (https://im-seeker.org/predict)>continue>end to end with default model>predict
 # I got a csv file which i saved as monkey_imotif_prediction_end_to_end_default_setting_nontemplate.csv
 
 
@@ -50,8 +50,8 @@ writeXStringSet(template_monkey_modified_rdna_set, "template_monkey_5ets_KX06535
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/imotif/monkey")
 
 datasets<- list(
-  KX065350 = "KX065350",
-  KX065350_and_NR_146166 = "KX065350_and_NR_146166"
+  KX061890 = "KX061890",
+  KX061890_and_NR_146166 = "KX061890_and_NR_146166"
 )
 
 
