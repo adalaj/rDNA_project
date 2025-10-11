@@ -1,6 +1,7 @@
 
 ## In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus(2025) script details:
 
+## Chicken Folder
 This folder contains all the scripts for identification of predicted non-canonical DNA structure sequences in chicken rDNA sequence.
 
 
@@ -17,11 +18,6 @@ The script requires the following R libraries:
 **Note:** Ensure the required packages are installed before running the script 
 
 
-## Chicken Folder
-
-The upstream pipelines used to generate these files (sequence scanning and motif prediction) are described in the Methods section of the paper and are not reproduced here. The files are included here only as inputs for figure generation.
-
-
 ## Scripts and descriptions
 
 #### 1. `chicken_evolutionary.R`
@@ -33,7 +29,7 @@ The upstream pipelines used to generate these files (sequence scanning and motif
 
 - `chicken_imotif_prediction_end_to_end_prediction_default_setting_master.csv`
 
-These files contain genomic coordinates for G4-forming sequences (G4FS), R-loop forming sequences (RLFS), and i-motif forming sequences (iMFS). All are deposited in supplementary tables.
+These files contain genomic coordinates for G4-forming sequences (G4FS), R-loop forming sequences (RLFS), and i-motif forming sequences (iMFS). All are deposited in supplementary tables 8, 9 and 10 respectively.
 
 **Purpose:** Integrates these datasets for comparative and evolutionary visualization.
 
