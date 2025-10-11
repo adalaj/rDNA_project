@@ -1,7 +1,7 @@
 
 ## In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus(2025) script details:
 
-This folder contains all the scripts for identification of predicted non-canonical structure sequences in chicken rDNA sequence.
+This folder contains all the scripts for identification of predicted non-canonical DNA structure sequences in chicken rDNA sequence.
 
 
 
@@ -47,8 +47,7 @@ These files contain genomic coordinates for G4-forming sequences (G4FS), R-loop 
 ---
 
 #### 3. `chicken_rdna_details.R`
-**Input:** Chicken rDNA FASTA sequence (GenBank: *KT445934*) (https://www.ncbi.nlm.nih.gov/nuccore/KT445934)
-
+**Input:** Chicken rDNA FASTA sequence (GenBank: *KT445934*)(https://www.ncbi.nlm.nih.gov/nuccore/KT445934)
 **Output:** Nucleotide composition and GC-content distribution CSV file  
 **Purpose:** Computes base composition metrics across the rDNA locus.
 
@@ -56,7 +55,6 @@ These files contain genomic coordinates for G4-forming sequences (G4FS), R-loop 
 
 #### 4. `chicken_rdna_G4FS.R`
 **Input:** Output BED file from `g4_canonical_finder_3.11python.py` (https://github.com/CsabaPapp13/Stable-bulged-G-quadruplexes-in-the-human-genome_2022-2023)
-
 **Output:** `G4FS_KT445934_chicken_junctn_details.csv`  
 **Purpose:** Assigns G4-forming sequences to rDNA subregions, normalizes counts, and produces distribution plots.
 
