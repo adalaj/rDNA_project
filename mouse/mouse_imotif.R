@@ -1,7 +1,31 @@
-#mouse imotif
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+# This R script processes i-motif forming sequence (iMFS) predictions in the 
+# mouse rDNA locus to assign each predicted iMFS to defined 
+# rDNA subregions (promoter, 5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS, and IGS).
+#
+# Specifically, it:
+#   1. Generates a reverse-complement (template) strand FASTA sequence, since 
+#      iM-seeker analyzes only the input (non-template) strand.
+#   2. Merges iM-seeker output files from both strands.
+#   3. Computes iMFS lengths and normalized start–end coordinates.
+#   4. Annotates each iMFS with its corresponding rDNA subregion.
+#
+# Inputs:
+#   - iM-seeker output CSV files for non-template and template strands
+#     (https://im-seeker.org/)
+#   - mouse rDNA FASTA sequence (GenBank: BK000964)
+#
+# Outputs:
+#   - Annotated CSV file containing all predicted iMFSs with strand, 
+#     coordinates, length, and assigned rDNA region.
+#
+# ------------------------------------------------------------------------------
 
-## ##plotting imotif in mouse rDNA locus that has new promoter size of 3000. 
-# go to https://im-seeker.org/
 
 #install libraries
 library(data.table)

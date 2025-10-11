@@ -1,11 +1,40 @@
-##Aim: Find the total nucleotide distribution percent in BK000964.3 NCBI entry that is for mouse rDNA locus. 
-## this calculation as been previously done in my earliar code. 
-##however, after alot of back and forth we redefined the promoter and IGS boundary. 
-## we simply took 2202 from IGS end side, because these were matching with UCSC hg38 nucleotides and added them to front of 5'ETS. We call them as promoter. 
-# previously I manually added 3500 bp from IGS to 5'ETS. out of which 2202 bp is dedicated to promoter. 
-# however I can see RLFS in IGS boreder next to promoter in visualisation using karyoplote
-# so decided to add 5000nucleotides from IGS to front, which will smooth my calculation and out of which I will assign 3000 to promoter this time.
-
+# ------------------------------------------------------------------------------
+# This code accompanies the paper:
+# "In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus"
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+# This R script processes and visualizes R-loop forming sequence (RLFS) predictions 
+# across the mouse rDNA locus obtained from the QmRLFS-finder algorithm.
+# It assigns each predicted RLFS to defined rDNA subregions and quantifies their 
+# strand-specific and normalized distributions for both analytical and visual representation.
+#
+# Specifically, it:
+#   1. Runs QmRLFS-finder (v1.5) on the mouse rDNA FASTA sequence 
+#      (GenBank: BK000964) to identify RLFSs in BED format.
+#   2. Parses and processes the RLFS output to calculate start–end coordinates, 
+#      strand specificity, and RLFS lengths.
+#   3. Assigns each RLFS to rDNA subcomponents (5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS) 
+#      using a rule-based system that counts RLFSs in the region where they initiate, 
+#      ensuring junction-spanning RLFSs are not lost to boundary truncation.
+#   4. Computes raw and normalized RLFS counts per region, including junctional regions, 
+#      and generates tabular outputs suitable for statistical or graphical analyses.
+#   5. Visualizes RLFS distributions using bar plots (overall, junction-excluded, 
+#      and strandwise) and custom ideograms with karyoploteR for template and 
+#      non-template strands.
+#
+# Inputs:
+#   - mouse rDNA FASTA sequence (GenBank: BK000964)
+#   - BED output file from QmRLFS-finder (v1.5)
+#
+# Outputs:
+#   - Annotated CSVs summarizing RLFS counts per rDNA region (with and without junctions)
+#   - Strandwise normalized RLFS count tables
+#   - Publication-quality TIFF plots showing RLFS distributions
+#   - KaryoploteR ideograms illustrating RLFS positions on both strands
+#
+# ------------------------------------------------------------------------------
 
 
 library(Biostrings)
@@ -19,7 +48,6 @@ library(tidyverse)
 #Database resources of the national center for biotechnology information.
 #Nucleic Acids Res. 2022; 50: D20-D26
 
-#Human KY962518.1 (44,838 nt) and mouse Genbank BK000964.3 (45,306 nt) reference rDNA sequences are available from NCBI Genbank (13) and are used in the literature as consensus reference rDNA sequences for their respective species (8, 14, 15, 16)
 
 #I found mouse link https://www.ncbi.nlm.nih.gov/nuccore/BK000964?report=genbank
 #rdna region is in 12, 15, 17,18 and 19 in mouse. I guess the sequency is in chr 17 in mouse ncbi genome assembly.
@@ -28,7 +56,6 @@ library(tidyverse)
 #BK000964_mouse_rDNA_2013.fastacontains one mouse rDNA repeat from chr17 i believe.
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/mouse/input")
 
 
 mouse_rDNA<- read.fasta(file = "BK000964_mouse_rDNA_2013.fasta", forceDNAtolower = FALSE, as.string = TRUE) #belongs to package seqinr
@@ -119,7 +146,6 @@ rdna_mouse_dataset_details_v2 <- rdna_mouse_dataset_v1 %>%
   select(1,2,3,4,5,9,6,10,7,11,8,12)
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rloop_and_rdna/mouse/output")
 
 fwrite(rdna_mouse_dataset_details_v2, 
        file = "rdna_mouse_2013_dataset_details_v2.csv")
@@ -146,7 +172,7 @@ for (j in 1: nrow(rdna_mouse_dataset_sequences)){
   
 }
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/mouse/output")
+
 rdna_2013<- fread("rdna_mouse_2013_dataset_details_v2.csv", header = TRUE, sep = ",")
 # select only nucleotide percent and identifier 
 nucleotide<- rdna_2013 %>% select(Name,"A%","T%","G%","C%")
@@ -189,7 +215,7 @@ ggsave( "rdna_mouse_2013_sequences_nucleotide_distribution.tiff",
 
 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
+#(python2.7) Downloads % python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
 #QmRLFS-finder.py (version v1.5)
 #run on Fri Apr 04 2025 13:14:27 
 #command line: python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
@@ -198,11 +224,11 @@ ggsave( "rdna_mouse_2013_sequences_nucleotide_distribution.tiff",
 
 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs 
+#(python2.7) Downloads % python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs 
 #QmRLFS-finder.py (version v1.5)
 #run on Fri Apr 04 2025 13:15:12 
 #command line: python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
 
 
-#jyotiadala@Jyotis-MacBook-Pro Downloads % conda activate python3.11
-#(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % python g4_canonical_finder_3.11python.py BK000964_added_5000nt_IGS_upstream_nontemplate.fasta >output_BK000964_added_5000nt_IGS_upstream_nontemplate.txt
+# % conda activate python3.11
+#(python3.11) % python g4_canonical_finder_3.11python.py BK000964_added_5000nt_IGS_upstream_nontemplate.fasta >output_BK000964_added_5000nt_IGS_upstream_nontemplate.txt

@@ -1,19 +1,48 @@
-##i want plot bar graph after the rule for RLFSs that has 5000 bp added to 5ETS.  
-##basically input file will be output_RLFS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt after passing through QmRLFS algorithm.
+# ------------------------------------------------------------------------------
+# This code accompanies the paper:
+# "In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus"
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+# This R script processes and visualizes R-loop forming sequence (RLFS) predictions 
+# across the mouse rDNA locus obtained from the QmRLFS-finder algorithm.
+# It assigns each predicted RLFS to defined rDNA subregions and quantifies their 
+# strand-specific and normalized distributions for both analytical and visual representation.
+#
+# Specifically, it:
+#   1. Runs QmRLFS-finder (v1.5) on the mouse rDNA FASTA sequence 
+#      (GenBank: BK000964) to identify RLFSs in BED format.
+#   2. Parses and processes the RLFS output to calculate start–end coordinates, 
+#      strand specificity, and RLFS lengths.
+#   3. Assigns each RLFS to rDNA subcomponents (promoter, 5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS, IGS) 
+#      using a rule-based system that counts RLFSs in the region where they initiate, 
+#      ensuring junction-spanning RLFSs are not lost to boundary truncation.
+#   4. Computes raw and normalized RLFS counts per region, including junctional regions, 
+#      and generates tabular outputs suitable for statistical or graphical analyses.
+#   5. Visualizes RLFS distributions using bar plots (overall, junction-excluded, 
+#      and strandwise) and custom ideograms with karyoploteR for template and 
+#      non-template strands.
+#
+# Inputs:
+#   - mouse rDNA FASTA sequence (GenBank: BK000964)
+#   - BED output file from QmRLFS-finder (v1.5)
+#
+# Outputs:
+#   - Annotated CSVs summarizing RLFS counts per rDNA region (with and without junctions)
+#   - Strandwise normalized RLFS count tables
+#   - Publication-quality TIFF plots showing RLFS distributions
+#   - KaryoploteR ideograms illustrating RLFS positions on both strands
+#
+# ------------------------------------------------------------------------------
 
-##the rule: Counting the presence of RLFSs where it is first detected. For example, if RLFSs start towards the
-# end of 5'ETS but stretches to 18S then it will counted under 5'ETS. 
-# if we would have defined boundary in the first place then we would have lost this junction during counting. 
 
-
-
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/mouse/output/QmRLFS")
 
 library(data.table)
 library(tidyverse)
 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
+#(python2.7)  Downloads % python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
 #QmRLFS-finder.py (version v1.5)
 #run on Fri Apr 04 2025 13:14:27 
 #command line: python QmRLFS-finder.py -bed -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
@@ -22,7 +51,7 @@ library(tidyverse)
 
 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs 
+#(python2.7)  % python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs 
 #QmRLFS-finder.py (version v1.5)
 #run on Fri Apr 04 2025 13:15:12 
 #command line: python QmRLFS-finder.py -i BK000964_added_5000nt_IGS_upstream_nontemplate.fasta -o BK000964_added_5000nt_IGS_upstream_nontemplate_qmrlfs
