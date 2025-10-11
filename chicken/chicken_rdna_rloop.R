@@ -1,30 +1,58 @@
-##i want plot bar graph after to chicken rDNA sequence  
-##basically input file will be KT445934_chicken_rDNA_2017.fasta for QmRLFS algorithm.
+# ------------------------------------------------------------------------------
+# This code accompanies the paper:
+# "In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus"
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+# This R script processes and visualizes R-loop forming sequence (RLFS) predictions 
+# across the chicken (Gallus gallus) rDNA locus obtained from the QmRLFS-finder algorithm.
+# It assigns each predicted RLFS to defined rDNA subregions and quantifies their 
+# strand-specific and normalized distributions for both analytical and visual representation.
+#
+# Specifically, it:
+#   1. Runs QmRLFS-finder (v1.5) on the chicken rDNA FASTA sequence 
+#      (GenBank: KT445934) to identify RLFSs in BED format.
+#   2. Parses and processes the RLFS output to calculate start–end coordinates, 
+#      strand specificity, and RLFS lengths.
+#   3. Assigns each RLFS to rDNA subcomponents (5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS) 
+#      using a rule-based system that counts RLFSs in the region where they initiate, 
+#      ensuring junction-spanning RLFSs are not lost to boundary truncation.
+#   4. Computes raw and normalized RLFS counts per region, including junctional regions, 
+#      and generates tabular outputs suitable for statistical or graphical analyses.
+#   5. Visualizes RLFS distributions using bar plots (overall, junction-excluded, 
+#      and strandwise) and custom ideograms with karyoploteR for template and 
+#      non-template strands.
+#
+# Inputs:
+#   - Chicken rDNA FASTA sequence (GenBank: KT445934)
+#   - BED output file from QmRLFS-finder (v1.5)
+#
+# Outputs:
+#   - Annotated CSVs summarizing RLFS counts per rDNA region (with and without junctions)
+#   - Strandwise normalized RLFS count tables
+#   - Publication-quality TIFF plots showing RLFS distributions
+#   - KaryoploteR ideograms illustrating RLFS positions on both strands
+#
+# ------------------------------------------------------------------------------
 
-##the rule: Counting the presence of RLFSs where it is first detected. For example, if RLFSs start towards the
-# end of 5'ETS but stretches to 18S then it will counted under 5'ETS. 
-# if we would have defined boundary in the first place then we would have lost this junction during counting. 
 
-
-
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/chicken")
-
+#load libraries
 library(data.table)
 library(tidyverse)
 
 
 #open terminal
-#(base) jyotiadala@Jyotis-MacBook-Pro ~ % conda activate python2.7
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro ~ % cd Downloads 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i KT445934_chicken_rDNA_2017.fasta -o KT445934_chicken_rDNA_2017_qmrlfs
+#(base)  ~ % conda activate python2.7
+#(python2.7)  ~ % cd Downloads 
+#(python2.7) % python QmRLFS-finder.py -bed -i KT445934_chicken_rDNA_2017.fasta -o KT445934_chicken_rDNA_2017_qmrlfs
 #QmRLFS-finder.py (version v1.5)
 #run on Fri Apr 18 2025 14:55:03 
 #command line: python QmRLFS-finder.py -bed -i KT445934_chicken_rDNA_2017.fasta -o KT445934_chicken_rDNA_2017_qmrlfs
 #Time used: 0.27 mins
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % 
 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -i KT445934_chicken_rDNA_2017.fasta -o KT445934_chicken_rDNA_2017_qmrlfs 
+#(python2.7) % python QmRLFS-finder.py -i KT445934_chicken_rDNA_2017.fasta -o KT445934_chicken_rDNA_2017_qmrlfs 
 #QmRLFS-finder.py (version v1.5)
 #run on Fri Apr 18 2025 14:56:29 
 #command line: python QmRLFS-finder.py -i KT445934_chicken_rDNA_2017.fasta -o KT445934_chicken_rDNA_2017_qmrlfs
@@ -343,67 +371,4 @@ kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#3
 kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.3)
 kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
 
-
-#Playing with colors use zoom option, took screenshot and edited in powerpoint
-
-kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#F5F5DC", data.panel = "ideogram", borders= NA) #marks 5'ETS
-kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#90EE90", data.panel = "ideogram", borders= NA) #marks 18S
-kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#E6E6FA", data.panel = "ideogram", borders= NA) #marks ITS1
-kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#ADD8E6", data.panel = "ideogram", borders= NA) #marks 5.8S
-kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#D3D3D3", data.panel = "ideogram", borders= NA) #marks ITS2
-kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks 28S
-kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 3'ETS
-
-
-#Playing with colors use zoom option, took screenshot and edited in powerpoint
-kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
-kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#ADD8E6", data.panel = "ideogram", borders= NA) #marks 18S
-kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFDAB9", data.panel = "ideogram", borders= NA) #marks ITS1
-kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#E6E6FA", data.panel = "ideogram", borders= NA) #marks 5.8S
-kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
-kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#AAF0D1", data.panel = "ideogram", borders= NA) #marks 28S
-kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#F7E7CE", data.panel = "ideogram", borders= NA) #marks 3'ETS
-
-
-
-kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
-kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#AAF0D1", data.panel = "ideogram", borders= NA) #marks 18S
-kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFDAB9", data.panel = "ideogram", borders= NA) #marks ITS1
-kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#924045", data.panel = "ideogram", borders= NA) #marks 5.8S
-kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
-kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E6E6FA", data.panel = "ideogram", borders= NA) #marks 28S
-kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#ADD8E6", data.panel = "ideogram", borders= NA) #marks 3'ETS
-
-kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.3)
-kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#FDCCE5", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
-
-
-
-##i like these but bruce needs to confirm.
-
-##template only
-kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
-kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#B5F2DC", data.panel = "ideogram", borders= NA) #marks 18S
-kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1
-kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#C98686", data.panel = "ideogram", borders= NA) #marks 5.8S
-kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
-kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
-kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#A2CCE9", data.panel = "ideogram", borders= NA) #marks 3'ETS
-
-kpPlotRegions(kp, data=entire_rdna6_template, col="#1414E1", r0= -0.5, r1= -1.3)
-
-
-
-##non template only
-kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 = 1836 , y0 = 0, y1 = 1, col = "#FFB6C1", data.panel = "ideogram", borders= NA) #marks 5'ETS
-kpRect(kp, chr = 'rDNA_locus', x0 = 1837, x1 = 3659, y0 = 0, y1 = 1, col = "#B5F2DC", data.panel = "ideogram", borders= NA) #marks 18S
-kpRect(kp, chr = 'rDNA_locus', x0 = 3660, x1 = 6189, y0 = 0, y1 = 1, col = "#FFE0C2", data.panel = "ideogram", borders= NA) #marks ITS1
-kpRect(kp, chr = 'rDNA_locus', x0 = 6190, x1 = 6346 , y0 = 0, y1 = 1, col = "#C98686", data.panel = "ideogram", borders= NA) #marks 5.8S
-kpRect(kp, chr = 'rDNA_locus', x0 = 6347, x1 = 7079, y0 = 0, y1 = 1, col = "#FFFFE0", data.panel = "ideogram", borders= NA) #marks ITS2
-kpRect(kp, chr = 'rDNA_locus', x0 = 7080 , x1 = 11520, y0 = 0, y1 = 1, col = "#E8E8FB", data.panel = "ideogram", borders= NA) #marks 28S
-kpRect(kp, chr = 'rDNA_locus', x0 = 11521, x1 = 11863, y0 = 0, y1 = 1, col = "#A2CCE9", data.panel = "ideogram", borders= NA) #marks 3'ETS
-
-kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#FDCCE5", r0= -0.5, r1= -1.3) #-1.5 to make blue with more width
-
-"#DCDCDC","#FFB6C1","#D0B6FF","#E5FFB6","#FFE0C2","#B6FFF4","#FFFFE0", "#E8E8FB","#B6E5FF","#E9BFA2"
 

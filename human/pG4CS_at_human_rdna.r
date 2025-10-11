@@ -6,72 +6,72 @@ library(tidyverse)
 library(data.table)
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
+setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/G4FS_at_rdna_output/files")
 
 
 
 ##the best approach that got approved by Bruce!
 ##i want plot bar graph after the rule for G4s that has 3500 bp added to 5ETS and also has promoter at the end. 
-##basically input file will be output_pG4CS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt after passing through pG4CS algorithm.
+##basically input file will be output_G4FS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt after passing through G4FS algorithm.
 
 ##the rule: Counting the presence of G4s where it is first detected. For example, if G4s start towards the
 # end of 5'ETS but stretches to 18S then it will counted under 5'ETS. 
 # if we would have defined boundary in the first place then we would have lost this junction in our counting. 
 
 
-entire_g4s_rdna<- fread("output_pG4CS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt", sep = "\t", header = FALSE) #222
-#222 is total number of pG4CS that are found when both  the promoter (2202bp) and some  part of IGS (1297) are present twice
+entire_g4s_rdna<- fread("output_G4FS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt", sep = "\t", header = FALSE) #222
+#222 is total number of G4FS that are found when both  the promoter (2202bp) and some  part of IGS (1297) are present twice
 # this means after doing junction analysis we should have less than 222 
-# to avoid double count i will filter the output_pG4CS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt right after the the actual IGS length ends that is 46136.
+# to avoid double count i will filter the output_G4FS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt right after the the actual IGS length ends that is 46136.
 
-# as from the bar graph visualization it is clear that we have 12 extra pG4CS from promoter. 
-colnames(entire_g4s_rdna) <- c("GenBank_Accession", "pG4CS_start", "pG4CS_end", "pG4CS_sequence", "pG4CS_name", "strand")
+# as from the bar graph visualization it is clear that we have 12 extra G4FS from promoter. 
+colnames(entire_g4s_rdna) <- c("GenBank_Accession", "G4FS_start", "G4FS_end", "G4FS_sequence", "G4FS_name", "strand")
 
 ## strand specificty doesnt matter here because we are cropping region of our interest
-entire_g4s_rdna<- entire_g4s_rdna[entire_g4s_rdna$pG4CS_start >1299 & entire_g4s_rdna$pG4CS_start <46137]#210 .. total length is 48338
+entire_g4s_rdna<- entire_g4s_rdna[entire_g4s_rdna$G4FS_start >1299 & entire_g4s_rdna$G4FS_start <46137]#210 .. total length is 48338
 entire_g4s_rdna$rDNA_region <- "junction"
 
-entire_g4s_rdna$pGCS_length<- abs(entire_g4s_rdna$pG4CS_end-entire_g4s_rdna$pG4CS_start)
+entire_g4s_rdna$pGCS_length<- abs(entire_g4s_rdna$G4FS_end-entire_g4s_rdna$G4FS_start)
 
 
 #strand specificity will matter here now we want to allocate G4s to rdna region sub components  based on their direction
 # to do that, i will be creating a column that will have actual G4s start based on strand specificity
 
-entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_pG4CS_start = ifelse(entire_g4s_rdna$strand == "+", pG4CS_start, pG4CS_end))
-entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_pG4CS_end = ifelse(entire_g4s_rdna$strand=="+", pG4CS_end, pG4CS_start))
+entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_G4FS_start = ifelse(entire_g4s_rdna$strand == "+", G4FS_start, G4FS_end))
+entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_G4FS_end = ifelse(entire_g4s_rdna$strand=="+", G4FS_end, G4FS_start))
 
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 1299 & entire_g4s_rdna$actual_pG4CS_start < 3500] <- "Promoter"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 1299 & entire_g4s_rdna$actual_G4FS_start < 3500] <- "Promoter"
 sum(entire_g4s_rdna$rDNA_region=="Promoter")
 #12
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 3500] <- "Promoter and 5'ETS junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 3500] <- "Promoter and 5'ETS junction"
 
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 3501] <- "5'ETS"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 3501] <- "5'ETS"
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 7157 ] <- "5'ETS and 18S junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 7157 ] <- "5'ETS and 18S junction"
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 7158 ] <- "18S"
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 9026 ] <- "18S and ITS1 junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 7158 ] <- "18S"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 9026 ] <- "18S and ITS1 junction"
 
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 9027  ] <- "ITS1"
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 10096] <- "ITS1 and 5.8S junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 9027  ] <- "ITS1"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 10096] <- "ITS1 and 5.8S junction"
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 10097 ] <- "5.8S"
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 10253 ] <- "5.8S and ITS2 junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 10097 ] <- "5.8S"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 10253 ] <- "5.8S and ITS2 junction"
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 10254] <- "ITS2"
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 11420 ] <- "ITS2 and 28S junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 10254] <- "ITS2"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 11420 ] <- "ITS2 and 28S junction"
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 11421 ] <- "28S"
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 16471 ] <- "28S and 3'ETS junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 11421 ] <- "28S"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 16471 ] <- "28S and 3'ETS junction"
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 16472 ] <- "3'ETS"
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 16832 ] <- "3'ETS and IGS junction"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 16472 ] <- "3'ETS"
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 16832 ] <- "3'ETS and IGS junction"
 
-entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 16833 & entire_g4s_rdna$actual_pG4CS_start < 46137] <- "IGS" 
+entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 16833 & entire_g4s_rdna$actual_G4FS_start < 46137] <- "IGS" 
 
 #rDNA_region_length is needed for downstream normalization. 
 #we will doing nromalization over rDNA length 
@@ -91,12 +91,12 @@ entire_g4s_rdna <- entire_g4s_rdna %>%
     TRUE ~0 )) #unmatched make it zero
 
 
-fwrite(entire_g4s_rdna, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", sep = ",")
+fwrite(entire_g4s_rdna, "G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", sep = ",")
 
 entire_g4s_rdna_summary<- entire_g4s_rdna %>% group_by(rDNA_region,rDNA_region_length) %>% count()
 #rows order is lost 
 sum(entire_g4s_rdna_summary$n)
-#210, here we see that 12 extra pG4CS from promoter are removed.
+#210, here we see that 12 extra G4FS from promoter are removed.
 
 entire_g4s_rdna_summary[,1]
 
@@ -138,7 +138,7 @@ entire_g4s_rdna_summary <- entire_g4s_rdna_summary[c("Promoter","Promoter and 5'
                                                      "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ),]
 
 names(entire_g4s_rdna_summary)[2] <- "rDNA_region_length"
-names(entire_g4s_rdna_summary)[3] <- "pG4CS_count"
+names(entire_g4s_rdna_summary)[3] <- "G4FS_count"
 entire_g4s_rdna_summary <- entire_g4s_rdna_summary %>%
   mutate(rDNA_region_length = case_when(
     rDNA_region == "Promoter" ~ 2202,
@@ -153,21 +153,21 @@ entire_g4s_rdna_summary <- entire_g4s_rdna_summary %>%
     TRUE ~ 0)) #unmatched make it zero
 
 
-#Which regions are enriched for pG4CS relative to their size.
-#Removes the bias of region length — highlights hotspots where pG4CS are concentrated
+#Which regions are enriched for G4FS relative to their size.
+#Removes the bias of region length — highlights hotspots where G4FS are concentrated
 
-entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(pG4CS_density = pG4CS_count/rDNA_region_length) %>% 
-  mutate(pG4CS_density= round(pG4CS_density, 3))
+entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(G4FS_density = G4FS_count/rDNA_region_length) %>% 
+  mutate(G4FS_density= round(G4FS_density, 3))
 
-fwrite(entire_g4s_rdna_summary, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
+fwrite(entire_g4s_rdna_summary, "G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
 
 
-entire_g4s_rdna_summary<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
-#Out of all pG4CS across the rDNA locus, what fraction comes from each region?
-entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(pG4CS_proportion_perc = round((pG4CS_count/sum(pG4CS_count)*100),2))
-#Which region contributes the largest share of pG4CS overall.
-#Biased toward longer regions (they naturally accumulate more pG4CS simply because they have more bases)
-fwrite(entire_g4s_rdna_summary, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
+entire_g4s_rdna_summary<- fread("G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+#Out of all G4FS across the rDNA locus, what fraction comes from each region?
+entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(G4FS_proportion_perc = round((G4FS_count/sum(G4FS_count)*100),2))
+#Which region contributes the largest share of G4FS overall.
+#Biased toward longer regions (they naturally accumulate more G4FS simply because they have more bases)
+fwrite(entire_g4s_rdna_summary, "G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
 
 g4s_rdna_summary<- entire_g4s_rdna_summary[!grepl("junction", entire_g4s_rdna_summary$rDNA_region),]
 
@@ -183,16 +183,16 @@ g4s_rdna_summary$rDNA_region <- factor(g4s_rdna_summary$rDNA_region,
 
 #To reverse the order so that "Promoter" appears at the top when flipped, modify the levels of the factor like this
 
-max_value<- max(entire_g4s_rdna_summary$pG4CS_density, na.rm = TRUE) #i added 0.001 because round was making 0.015 to  0.01 instead of 0.02. 
+max_value<- max(entire_g4s_rdna_summary$G4FS_density, na.rm = TRUE) #i added 0.001 because round was making 0.015 to  0.01 instead of 0.02. 
 
-pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG4CS_density, fill= rDNA_region)) + 
+G4FS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = G4FS_density, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(#title= "Normalized pG4CS distribution in the Human rDNA locus", 
+  labs(#title= "Normalized G4FS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "G4FS density", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.005), limits =c(0,max_value), expand = expansion(mult = c(0, 0.08)))+
-  #geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 30)+
+  #geom_text(aes(label= G4FS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
@@ -211,21 +211,21 @@ pG4CS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG
        legend.position = "none")+
   coord_flip()
 
-ggsave( "Normalized_pG4CS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = pG4CS_norm_3500igs_nojuntn, width=30,height=18, dpi=600)
+ggsave( "Normalized_G4FS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+        plot = G4FS_norm_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
 
-max_value<- max(g4s_rdna_summary$pG4CS_proportion_perc, na.rm = TRUE)
+max_value<- max(g4s_rdna_summary$G4FS_proportion_perc, na.rm = TRUE)
 
-pG4CS_prop_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG4CS_proportion_perc, fill= rDNA_region)) + 
+G4FS_prop_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = G4FS_proportion_perc, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(#title= "Normalized pG4CS distribution in the Human rDNA locus", 
+  labs(#title= "Normalized G4FS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "G4FS proportion (%)", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 10), limits =c(0,max_value), expand = expansion(mult = c(0, 0.08)))+
-  #geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= 0.5), size= 30)+
+  #geom_text(aes(label= G4FS_count, hjust= -0.2, vjust= 0.5), size= 30)+
   scale_fill_manual(values= rev(c("#B6FFF4", "#FDCCE5","#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4", "#A4A2A8")))+
   #guides(fill = guide_legend(reverse = TRUE))
@@ -244,21 +244,21 @@ pG4CS_prop_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = pG
         legend.position = "none")+
   coord_flip()
 
-ggsave("pG4CS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-       plot = pG4CS_prop_3500igs_nojuntn, width=30,height=18, dpi=600)
+ggsave("G4FS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+       plot = G4FS_prop_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
 
-entire_g4s_rdna<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", sep = ",", header = TRUE)
+entire_g4s_rdna<- fread("G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", sep = ",", header = TRUE)
 
 #to make template and non-template
 entire_g4s_rdna_summary2<- entire_g4s_rdna %>% group_by(rDNA_region, rDNA_region_length, strand) %>% count()
-names(entire_g4s_rdna_summary2)[4] <- "pG4CS_count"
+names(entire_g4s_rdna_summary2)[4] <- "G4FS_count"
 
 new_rows<- data.table(rDNA_region = c( "Promoter", "ITS1", "18S","18S", "5.8S","5.8S"),
                       rDNA_region_length = c(0,0,0,0,0,0),
                       strand= c("+", "-", "+", "-", "+", "-"),
-                      pG4CS_count = c(0, 0, 0,0,0,0))
+                      G4FS_count = c(0, 0, 0,0,0,0))
 
 entire_g4s_rdna_summary2<- rbind(entire_g4s_rdna_summary2, new_rows)
 
@@ -281,12 +281,12 @@ entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_reg
                                                  levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                                             "ITS2","28S", "3'ETS", "IGS" ))
 
-entire_g4s_rdna_summary2<- entire_g4s_rdna_summary2 %>% mutate(pG4CS_density = pG4CS_count/rDNA_region_length) %>% 
-  mutate(pG4CS_density= round(pG4CS_density, 4))
+entire_g4s_rdna_summary2<- entire_g4s_rdna_summary2 %>% mutate(G4FS_density = G4FS_count/rDNA_region_length) %>% 
+  mutate(G4FS_density= round(G4FS_density, 4))
 
-fwrite(entire_g4s_rdna_summary2, "pG4CS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv")
+fwrite(entire_g4s_rdna_summary2, "G4FS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv")
 
-entire_g4s_rdna_summary2<- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv", sep = ",", header = TRUE)
+entire_g4s_rdna_summary2<- fread("G4FS_KY962518_added_3500nt_IGS_upstream_no_junctn_strandwise_graphinput.csv", sep = ",", header = TRUE)
 
 entire_g4s_rdna_summary2$strand <- factor(
   entire_g4s_rdna_summary2$strand,
@@ -297,16 +297,16 @@ entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_reg
                                                  levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                                                 "ITS2","28S", "3'ETS", "IGS" )))
 
-max_value<- max(entire_g4s_rdna_summary2$pG4CS_density, na.rm = TRUE)#i added 0.001 because round was making 0.015 to  0.01 instead of 0.02. 
+max_value<- max(entire_g4s_rdna_summary2$G4FS_density, na.rm = TRUE)#i added 0.001 because round was making 0.015 to  0.01 instead of 0.02. 
 
-pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = pG4CS_density, fill= strand)) + 
+G4FS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = G4FS_density, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(#title= "Normalized pG4CS strandwise distribution in the Human rDNA locus", 
+  labs(#title= "Normalized G4FS strandwise distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
        y= "G4FS density", 
        fill= NULL)+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.003), limits =c(0,max_value),expand = expansion(mult = c(0, 0.05)))+
-  #geom_text(aes(label= pG4CS_count, hjust=-0.2, vjust=0.5), size=20, position = position_dodge(width = 0.9))+
+  #geom_text(aes(label= G4FS_count, hjust=-0.2, vjust=0.5), size=20, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template strand", "-" = "Template strand"),
                     breaks = c("+", "-"))+
@@ -329,8 +329,8 @@ pG4CS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y =
   coord_flip()
 
 
-ggsave( "Normalized_strandwise_pG4CS_flipped_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = pG4CS_strandwise_flip, width=31,height=18, dpi=600)
+ggsave( "Normalized_strandwise_G4FS_flipped_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+        plot = G4FS_strandwise_flip, width=31,height=18, dpi=600)
 
 
 
@@ -340,7 +340,7 @@ ggsave( "Normalized_strandwise_pG4CS_flipped_distribution_in_human_rDNA_subcompo
 
 #################################################
 #Extra
-entire_g4s_rdna_summary <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+entire_g4s_rdna_summary <- fread("G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
 
 entire_g4s_rdna_summary$rDNA_region <- factor(entire_g4s_rdna_summary$rDNA_region, 
                                               levels = c("Promoter","Promoter and 5'ETS junction", "5'ETS", "5'ETS and 18S junction", 
@@ -348,17 +348,17 @@ entire_g4s_rdna_summary$rDNA_region <- factor(entire_g4s_rdna_summary$rDNA_regio
                                                          "5.8S and ITS2 junction",  "ITS2", "ITS2 and 28S junction","28S", 
                                                          "28S and 3'ETS junction", "3'ETS", "3'ETS and IGS junction", "IGS" ))
 
-max_value<- round(max(entire_g4s_rdna_summary$pG4CS_density, na.rm = TRUE)+0.001,2) #i added 0.001 because round was making 0.015 to  0.01 instead of 0.02. 
+max_value<- round(max(entire_g4s_rdna_summary$G4FS_density, na.rm = TRUE)+0.001,2) #i added 0.001 because round was making 0.015 to  0.01 instead of 0.02. 
 
 
-pG4CS_norm_3500igs<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = pG4CS_density, fill= rDNA_region)) + 
+G4FS_norm_3500igs<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = G4FS_density, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized pG4CS distribution in the Human rDNA locus", 
+  labs(title= "Normalized G4FS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "pG4CS density", 
+       y= "G4FS density", 
        fill = "rDNA region")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.005), limits =c(0,max_value))+
-  geom_text(aes(label= pG4CS_count), vjust= -0.5, size= 5)+
+  geom_text(aes(label= G4FS_count), vjust= -0.5, size= 5)+
   scale_fill_manual(values= c( "#FFB6C1","maroon", "#D0B6FF", "steelblue", "#E5FFB6","darkviolet", "#FFE0C2","burlywood2", "#B6FFF4", 
                                "pink4", "#FFFFE0","aquamarine", "#E8E8FB","greenyellow", "#B6E5FF","turquoise2", "#DCDCDC"))+
   #scale_fill_manual(values = combined_colors)+
@@ -373,19 +373,19 @@ pG4CS_norm_3500igs<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = pG4
         axis.ticks.y = element_line(color = "black"))
 #coord_flip()
 
-ggsave( "Normalized_pG4CS_distribution_in_human_rDNA_subcomponents_incld_junctn_after_rule.tiff", 
-        plot = pG4CS_norm_3500igs, width=18,height=10, dpi=150)
+ggsave( "Normalized_G4FS_distribution_in_human_rDNA_subcomponents_incld_junctn_after_rule.tiff", 
+        plot = G4FS_norm_3500igs, width=18,height=10, dpi=150)
 
 
 
-g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = pG4CS_density, fill= rDNA_region)) + 
+g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = G4FS_density, fill= rDNA_region)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized Non-template pG4CS distribution in the Human rDNA locus", 
+  labs(title= "Normalized Non-template G4FS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Non-template pG4CS density", 
+       y= "Non-template G4FS density", 
        fill= "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
-  geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  geom_text(aes(label= G4FS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
   scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
                               "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC"))+
@@ -400,7 +400,7 @@ g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = pG4CS_density, fi
         axis.ticks.y = element_line(color = "black"))
 
 
-ggsave( "Normalized_nontemplate_pG4CS_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+ggsave( "Normalized_nontemplate_G4FS_distribution_in_human_rDNA_subcomponents_AR.tiff", 
         plot = g4s_nontemplate, width=18,height=10, dpi=150)
 
 
@@ -409,17 +409,17 @@ template$rDNA_region <- factor(template$rDNA_region,
                                levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                           "ITS2","28S", "3'ETS", "IGS" ))
 
-max_value<- round(max(template$pG4CS_density),4)
+max_value<- round(max(template$G4FS_density),4)
 
 
-g4s_template <- ggplot(template, aes(x= rDNA_region, y = pG4CS_density, fill= rDNA_region)) + 
+g4s_template <- ggplot(template, aes(x= rDNA_region, y = G4FS_density, fill= rDNA_region)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized Template pG4CS distribution in the Human rDNA locus", 
+  labs(title= "Normalized Template G4FS distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "Template pG4CS density", 
+       y= "Template G4FS density", 
        fill= "rDNA")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
-  geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  geom_text(aes(label= G4FS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
   scale_fill_manual(values= c("#FFB6C1", "#D0B6FF", "#E5FFB6", "#FFE0C2", "#B6FFF4", 
                               "#FFFFE0", "#E8E8FB", "#B6E5FF", "#DCDCDC"))+
@@ -434,17 +434,17 @@ g4s_template <- ggplot(template, aes(x= rDNA_region, y = pG4CS_density, fill= rD
         axis.ticks.y = element_line(color = "black"))
 
 
-ggsave( "Normalized_template_pG4CS_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+ggsave( "Normalized_template_G4FS_distribution_in_human_rDNA_subcomponents_AR.tiff", 
         plot = g4s_template, width=18,height=10, dpi=150)
 
 
-#Thinking of making a pie chart with pG4CS percentage
+#Thinking of making a pie chart with G4FS percentage
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/files")
 
-entire_g4s_rdna_summary <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
-entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(perc=(pG4CS_density/ sum(entire_g4s_rdna_summary2$pG4CS_density))*100)
+entire_g4s_rdna_summary <- fread("G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
+entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(perc=(G4FS_density/ sum(entire_g4s_rdna_summary2$G4FS_density))*100)
 
-fwrite(entire_g4s_rdna_summary, "pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv")
+fwrite(entire_g4s_rdna_summary, "G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv")
 
 g4s_rdna_summary<- entire_g4s_rdna_summary[!grepl("junction", entire_g4s_rdna_summary$rDNA_region),]
 
@@ -467,7 +467,7 @@ g4s_perc<- ggplot(g4s_rdna_summary, aes(x = "", y = perc, fill = rDNA_region)) +
     "#FFFFE0", "#E8E8FB","#B6E5FF","#DCDCDC")) +
   guides(fill = guide_legend(title = "rDNA"))
 
-ggsave("Normalized_pG4CS_pie_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+ggsave("Normalized_G4FS_pie_distribution_in_human_rDNA_subcomponents_AR.tiff", 
        plot=g4s_perc, width=18, height=10, dpi=150)
 
 
@@ -478,21 +478,21 @@ nontemplate<- entire_g4s_rdna_summary2 %>% filter(strand == "+")
 nontemplate$rDNA_region <- factor(nontemplate$rDNA_region, 
                                   levels = c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
                                              "ITS2","28S", "3'ETS", "IGS" ))
-max_value<- round(max(nontemplate$pG4CS_density),4)
+max_value<- round(max(nontemplate$G4FS_density),4)
 
 
 
-max_value<- round(max(entire_g4s_rdna_summary2$pG4CS_density, na.rm = TRUE),4)
+max_value<- round(max(entire_g4s_rdna_summary2$G4FS_density, na.rm = TRUE),4)
 
 
-pG4CS_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = pG4CS_density, fill= strand)) + 
+G4FS_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = G4FS_density, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized pG4CS strandwise distribution in the Human rDNA locus", 
+  labs(title= "Normalized G4FS strandwise distribution in the Human rDNA locus", 
        x= "Human rDNA region", 
-       y= "pG4CS density", 
-       fill= "pG4CS strand")+
+       y= "G4FS density", 
+       fill= "G4FS strand")+
   scale_y_continuous(breaks= seq(0, max_value, by = 0.002), limits =c(0,max_value))+
-  geom_text(aes(label= pG4CS_count, hjust= -0.2, vjust= -1.0), size= 12, position = position_dodge(width = 0.9))+
+  geom_text(aes(label= G4FS_count, hjust= -0.2, vjust= -1.0), size= 12, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template", "-" = "Template"),
                     breaks = c("+", "-"))+
@@ -516,6 +516,6 @@ pG4CS_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = pG4C
 
 #coord_flip()
 
-ggsave( "Normalized_strandwise_pG4CS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = pG4CS_strandwise, width=18,height=10, dpi=150)
+ggsave( "Normalized_strandwise_G4FS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+        plot = G4FS_strandwise, width=18,height=10, dpi=150)
 

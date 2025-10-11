@@ -1,6 +1,17 @@
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+
+# Purpose: This R code is designed to characterize nucleotide distribution of chicken rDNA sequence 
+# Inputs:fasta file from https://www.ncbi.nlm.nih.gov/nuccore/KT445934 
+# the code takes the input chicken rDNA fasta file, divide sequence into specific rDNA regions and count their nucleotide distribution
+# Outputs: Nucleotide distribution csv file for chicken rDNA
+# ------------------------------------------------------------------------------
+
+
 
 #to gather information on chicken rDNA
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/chicken")
 
 library(Biostrings)
 library(data.table)
@@ -72,12 +83,12 @@ rdna_chicken_dataset_details_v1 <- rdna_chicken_dataset_v2 %>%
 fwrite(rdna_chicken_dataset_details_v1, 
        file = "rdna_chicken_dataset_details_v1.csv")
 
-##filter rows that contain a certain string
+#filter rows that contain a certain string
 
 rdna_chicken_dataset_sequences<- rdna_chicken_dataset_details_v1 %>% select(1,2)
 
 
-##create FASTA format
+#create FASTA format
 for (j in 1: nrow(rdna_chicken_dataset_sequences)){
   
   write(paste(">",rdna_chicken_dataset_sequences[j,1], sep=''),                                            
@@ -104,7 +115,7 @@ nucleotide_new<- separate(nucleotide, Name, "Name", sep = "_")
 
 #to convert columns to rows pivot_longer can work 
 #pivot_longer() "lengthens" data, increasing the number of rows and decreasing the number of columns. The inverse transformation is pivot_wider()
-##all columns except Name column will be reshaped
+#all columns except Name column will be reshaped
 
 nucleotide_reshape <- pivot_longer(nucleotide_new, -Name, names_to = "Nucleotide", values_to = "Percent")
 fwrite(nucleotide_reshape,  
