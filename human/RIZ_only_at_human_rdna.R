@@ -1,19 +1,40 @@
-#I want to coorelate RIZ with g4s and imotif
-#for that i modified the QmRLFS-finder.py to calculate only RIZ not RLFS. 
-#i commented out all the REZ and linker information, and retained only RIZ information. 
-# refer the code QmRLFS_RIZ_finder.py , refer the comments. 
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   Quantifies and visualizes R-loop initiation zone (RIZ) across the human
+#   rDNA locus (KY962518 + 3.5 kb upstream IGS) based on their origin.
+#   RIZ are assigned to the region where they first appear (e.g., an RIZ
+#   spanning 5′ETS–18S is counted under 5′ETS). Outputs regional counts,
+#   normalized densities, and strand-specific RIZ distributions.
+#
+# Major Steps:
+#   1. Import QMRLFS output BED file and filter to promoter–IGS range (1299–46136 bp).
+#   2. Assign RIZ to rDNA subregions based on start coordinate and strand.
+#   3. Compute region-specific counts, lengths, normalized densities, and proportions.
+#   4. Generate bar plots:
+#        - RIZ proportion per rDNA region
+#        - Length-normalized RIZ density
+#        - Strandwise RIZ density (template vs non-template)
+#
+# Input:
+#   - Human rDNA FASTA sequence (GenBank: KY962518)
+#   - RIZ output text file from QmRLFS_RIZ_finder.py
+#
+#
+# Output:
+#  - Annotated CSV file "RIZ_KY962518_added_3500nt_IGS_upstream_at_junctn_details_after_rule.csv"and 
+#  plots of RIZ counts, density and proportion per rDNA region (not deposited in git).
+# ------------------------------------------------------------------------------
 
-#i used the test sequence (which is random few sequence length from KY), ran both QmRLFS-finder and QmRLFS_RIZ_finder.py it is working. 
-# i received all RIZ that is there in RLFS bed and i also received new ones. 
 
-#All this shows that RIZ code is correct and working. 
-
-setwd("/Users/jyotiadala/Downloads")
 library(tidyverse)
 library(data.table)
 
-{#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS_RIZ_finder.py -bed -i test.fasta -o test_rlfs
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads %python QmRLFS-finder.py -bed -i test.fasta -o test_riz
+{#(python2.7)  Downloads % python QmRLFS_RIZ_finder.py -bed -i test.fasta -o test_rlfs
+#(python2.7)  %python QmRLFS-finder.py -bed -i test.fasta -o test_riz
 
 
 rlfs<- fread("test_rlfs.out.bed", sep = "\t", header = FALSE) #50
@@ -50,19 +71,18 @@ setdiff(rlfs_minus, riz_minus)
 
 #Now, as RIZ code is up and running i would like to run on KY962518_added_3500nt_IGS_upstream_nontemplate.fasta 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS_RIZ_finder.py -bed -i KY962518_added_3500nt_IGS_upstream_nontemplate.fasta -o KY962518_added_3500nt_IGS_upstream_RIZ
+#(python2.7) Downloads % python QmRLFS_RIZ_finder.py -bed -i KY962518_added_3500nt_IGS_upstream_nontemplate.fasta -o KY962518_added_3500nt_IGS_upstream_RIZ
 #QmRLFS_RIZ_finder.py (version v1.5)
 #run on Thu Aug 14 2025 18:06:22 
 #command line: python QmRLFS_RIZ_finder.py -bed -i KY962518_added_3500nt_IGS_upstream_nontemplate.fasta -o KY962518_added_3500nt_IGS_upstream_RIZ
 #Time used: 0.00 mins
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS_RIZ_finder.py -i KY962518_added_3500nt_IGS_upstream_nontemplate.fasta -o KY962518_added_3500nt_IGS_upstream_RIZ 
+#(python2.7) Downloads % python QmRLFS_RIZ_finder.py -i KY962518_added_3500nt_IGS_upstream_nontemplate.fasta -o KY962518_added_3500nt_IGS_upstream_RIZ 
 #QmRLFS_RIZ_finder.py (version v1.5)
 #run on Thu Aug 14 2025 18:06:51 
 #command line: python QmRLFS_RIZ_finder.py -i KY962518_added_3500nt_IGS_upstream_nontemplate.fasta -o KY962518_added_3500nt_IGS_upstream_RIZ
 #Time used: 0.00 mins
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/RIZ_only_results_KY962518_2018")
 entire_RIZs_rdna<- fread("KY962518_added_3500nt_IGS_upstream_RIZ.out.bed", sep = "\t", header = FALSE) #304
 #208 was RLFS which is now changed to 304 just RIZ when both  the promoter (2202bp) and some  part of IGS (1297) are present twice
 
@@ -140,7 +160,9 @@ entire_RIZs_rdna <- entire_RIZs_rdna %>%
 
 fwrite(entire_RIZs_rdna, "RIZ_KY962518_added_3500nt_IGS_upstream_at_junctn_details_after_rule.csv", sep = ",")
 
-entire_RIZs_rdna_summary<- entire_RIZs_rdna %>% group_by(rDNA_region, rDNA_region_length) %>% count()
+
+#Extra and not needed for manuscript
+{entire_RIZs_rdna_summary<- entire_RIZs_rdna %>% group_by(rDNA_region, rDNA_region_length) %>% count()
 #rows order is lost 
 
 sum(entire_RIZs_rdna_summary$n)
@@ -454,4 +476,4 @@ RIZ_template <- ggplot(template, aes(x= rDNA_region, y = RIZ_density, fill= rDNA
 ggsave( "Normalized_template_RIZ_distribution_in_human_rDNA_subcomponents_AR.tiff", 
         plot = RIZ_template, width=18,height=10, dpi=150)
 
-
+}

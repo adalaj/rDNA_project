@@ -1,7 +1,33 @@
-# Calculate RIZ only vs G4 vs Imotif count and their correlation
-#lets make 100 bin size histogram for g4s, riz, imotif and see if they show similar trend.
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   Quantifies, compares, and visualizes the genome-wide distribution of
+#   three non-canonical DNA structures — Rloop initiation Zone (RIZ), G-quadruplexes (G4FS),
+#   and i-motifs (iMFS) — across the human rDNA locus.
+#   Assesses their positional overlap, correlation, and co-occurrence.
+#
+# Major Steps:
+#   1. Bin the rDNA locus (default 100 bp bins) and count RIZ, G4FS, and iMFS per bin.
+#   2. Plot combined bar + density overlays showing positional distributions.
+#   3. Generate correlation matrix (Pearson/Spearman) and Venn diagrams.
+#   4. Produce scatter plots to assess G4FS–RIZ co-enrichment trends.
+#   5. Create schematic rDNA maps (karyoploteR) for visualization reference.
+#
+# Input:
+#   - G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv
+#   - RIZ_KY962518_added_3500nt_IGS_upstream_at_junctn_details_after_rule.csv
+#   - imotif_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv
+#
+# Output:
+#   CSV and figure files showing binned distributions, correlations, co-occurrence (Venn), and 
+#  scatter relationships of RIZ, G4FS, and iMFS across the human rDNA locus (Fig 5 and Supplementary table 5)
+# ------------------------------------------------------------------------------
 
 
+#Load libraries
 library(tidyverse)
 library(data.table)
 library(karyoploteR)
@@ -9,26 +35,23 @@ library(corrplot)
 library(VennDiagram)
 
 #read the files
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
-entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
-entire_g4s_rdna<- entire_g4s_rdna %>% mutate(new_start = actual_pG4CS_start-1298)
+entire_g4s_rdna <- fread("G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
+entire_g4s_rdna<- entire_g4s_rdna %>% mutate(new_start = actual_G4FS_start-1298)
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output/RIZ_only_results_KY962518_2018")
 riz<- fread("RIZ_KY962518_added_3500nt_IGS_upstream_at_junctn_details_after_rule.csv", header = TRUE, sep = ",") #286
 riz<- riz %>% mutate(new_start = actual_RIZ_start-1298)
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/imotif/human/output/files")
 imotif<- fread("imotif_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #85
 imotif<- imotif %>% mutate(new_start = actual_imotif_start-1298)
 
 #
-# mean of length, count for pG4CS, RIZ, RIZ
-g4_summary<- entire_g4s_rdna %>% group_by(rDNA_region, pG4CS_length) %>% mean()
+# mean of length, count for G4FS, RIZ, RIZ
+g4_summary<- entire_g4s_rdna %>% group_by(rDNA_region, G4FS_length) %>% mean()
 
 
-mean_pG4CS_count<- round(mean(g4_summary$n),2)
-mean_pG4CS_length<- round(mean(entire_g4s_rdna$pG4CS_length),2)
+mean_G4FS_count<- round(mean(g4_summary$n),2)
+mean_G4FS_length<- round(mean(entire_g4s_rdna$G4FS_length),2)
 
 riz_summary<- riz %>% group_by(rDNA_region) %>% count()
 mean_riz_count<- round(mean(riz_summary$n),2)
@@ -50,7 +73,7 @@ for (i in bin_size){
   
   bin_width<- diff(bin_break)[1]
   
-  g4s_hist<- hist(entire_g4s_rdna[["actual_pG4CS_start"]], breaks = bin_break, plot = FALSE)
+  g4s_hist<- hist(entire_g4s_rdna[["actual_G4FS_start"]], breaks = bin_break, plot = FALSE)
   riz_hist <- hist(riz[["actual_RIZ_start"]], breaks = bin_break, plot = FALSE)
   imotif_hist <- hist(imotif[["actual_imotif_start"]], breaks = bin_break, plot = FALSE)
   
@@ -58,18 +81,17 @@ for (i in bin_size){
     bin_lower_value= head(bin_break,-1),
     bin_upper_value=tail(bin_break,-1),
     bin_midpoints = (head(bin_break,-1) + tail(bin_break,-1))/2,
-    pG4CS_counts = g4s_hist$counts,
+    G4FS_counts = g4s_hist$counts,
     RIZ_counts = riz_hist$counts,
     imotif_counts = imotif_hist$counts
   )
   
   
 
-  fwrite(combined_count, paste("graph_input_pG4CS_RIZ_imotif_count_bar_graph_", i,"bin.csv", sep=""), sep=",")
+  fwrite(combined_count, paste("graph_input_G4FS_RIZ_imotif_count_bar_graph_", i,"bin.csv", sep=""), sep=",")
   
-  setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/RIZ_g4s_imotif")
   
-  combined_count<- fread("graph_input_pG4CS_RIZ_imotif_count_bar_graph_100bin.csv", sep=",", header = TRUE)  
+  combined_count<- fread("graph_input_G4FS_RIZ_imotif_count_bar_graph_100bin.csv", sep=",", header = TRUE)  
   bin_size_new<- i +1 #100 bins
   bin_break <- seq(1299, 46137, length.out= bin_size_new)
   bin_width<- diff(bin_break)[1]
@@ -79,11 +101,11 @@ for (i in bin_size){
   #together
   g4s_riz_imotif_count<- ggplot() + 
     geom_bar(data = combined_count, 
-             aes(x = bin_midpoints, y = pG4CS_counts, fill = "pG4CS_counts"), 
+             aes(x = bin_midpoints, y = G4FS_counts, fill = "G4FS_counts"), 
              stat = "identity", color = "#228B22", alpha = 0.7) + 
     geom_density(data = entire_g4s_rdna,
-                 aes(x = pG4CS_start, 
-                     y = ..density.. * length(entire_g4s_rdna$pG4CS_start) * bin_width),
+                 aes(x = G4FS_start, 
+                     y = ..density.. * length(entire_g4s_rdna$G4FS_start) * bin_width),
                  color = "#228B22", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##B4F609"
     geom_bar(data = combined_count, 
              aes(x = bin_midpoints, y = RIZ_counts, fill = "RIZ_counts"), 
@@ -108,9 +130,9 @@ for (i in bin_size){
          y= "Frequency", 
          fill= NULL)+
     scale_y_continuous(breaks= seq(5, 25, by = 10), limits =c(0,25))+
-    scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
-                      breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
-                      labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
+    scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "G4FS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
+                      breaks = c("RIZ_counts", "G4FS_counts", "imotif_counts"),
+                      labels = c("RIZ_counts" = "RIZ", "G4FS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
     theme_minimal()+
     theme(axis.ticks = element_line(color = "black", linewidth = 4),
           axis.ticks.length = unit(50, "pt"),
@@ -129,7 +151,7 @@ for (i in bin_size){
           legend.key.size = unit(3, "cm"),
           legend.position = "top")
   
-  ggsave(paste("pG4CS_RIZ_imotif_count_entire_human_rdna_in_", i, "bin.png", sep = ""), 
+  ggsave(paste("G4FS_RIZ_imotif_count_entire_human_rdna_in_", i, "bin.png", sep = ""), 
          plot = g4s_riz_imotif_count, width = 18, height = 15, dpi = 300)
   
   
@@ -146,11 +168,11 @@ for (i in bin_size){
   
   g4s_riz_imotif_count_zoom<- ggplot() + 
     geom_bar(data = combined_count_zoom, 
-             aes(x = bin_midpoints, y = pG4CS_counts, fill = "pG4CS_counts"), 
+             aes(x = bin_midpoints, y = G4FS_counts, fill = "G4FS_counts"), 
              stat = "identity", color = "#228B22", alpha = 0.7) + 
     geom_density(data = entire_g4s_rdna_zoom,
-                 aes(x = pG4CS_start, 
-                     y = ..density.. * length(entire_g4s_rdna_zoom$pG4CS_start) * bin_width),
+                 aes(x = G4FS_start, 
+                     y = ..density.. * length(entire_g4s_rdna_zoom$G4FS_start) * bin_width),
                  color = "#228B22", size = 2, bw = 2000, kernel = "gaussian", show.legend = FALSE)+ ##B4F609"
     geom_bar(data = combined_count_zoom, 
              aes(x = bin_midpoints, y = RIZ_counts, fill = "RIZ_counts"), 
@@ -176,9 +198,9 @@ for (i in bin_size){
          y= "Frequency", 
          fill= NULL)+
     scale_y_continuous(breaks= seq(5, 25, by = 10), limits =c(0,25))+
-    scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "pG4CS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
-                      breaks = c("RIZ_counts", "pG4CS_counts", "imotif_counts"),
-                      labels = c("RIZ_counts" = "RIZ", "pG4CS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
+    scale_fill_manual(values= c("RIZ_counts" = "#aa2a85", "G4FS_counts" = "#228B22", "imotif_counts"= "#32A0CD"),
+                      breaks = c("RIZ_counts", "G4FS_counts", "imotif_counts"),
+                      labels = c("RIZ_counts" = "RIZ", "G4FS_counts" = "G4FS", "imotif_counts" = "iMFS"))+
     theme_minimal()+
     theme(axis.ticks = element_line(color = "black", linewidth = 4),
           axis.ticks.length = unit(50, "pt"),
@@ -197,7 +219,7 @@ for (i in bin_size){
           legend.key.size = unit(3, "cm"),
           legend.position = "top")
   
-  ggsave(paste("pG4CS_RIZ_imotif_count_entire_human_rdna_in_", i, "bin_zoom.png", sep = ""), 
+  ggsave(paste("G4FS_RIZ_imotif_count_entire_human_rdna_in_", i, "bin_zoom.png", sep = ""), 
          plot = g4s_riz_imotif_count_zoom, width = 18, height = 15, dpi = 300)
   
   
@@ -206,9 +228,9 @@ for (i in bin_size){
   #only smooth line
   g4s_riz_imotif_density<- ggplot() +
     geom_density(data = entire_g4s_rdna,
-                 aes(x = pG4CS_start,
-                     y = ..density.. * length(entire_g4s_rdna$pG4CS_start) * bin_width,
-                     color = "pG4CS"),
+                 aes(x = G4FS_start,
+                     y = ..density.. * length(entire_g4s_rdna$G4FS_start) * bin_width,
+                     color = "G4FS"),
                  size = 2, bw = 2000, kernel = "gaussian") +
     
     geom_density(data = riz,
@@ -225,9 +247,9 @@ for (i in bin_size){
     
     scale_color_manual(
       name = NULL,
-      values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
-      breaks = c("RIZ", "pG4CS", "imotif"),
-      labels = c(RIZ="RIZ", pG4CS="G4FS", imotif="iMFS"),guide = guide_legend(
+      values = c("RIZ" = "#aa2a85", "G4FS" = "#228B22", "imotif" = "#32A0CD"),
+      breaks = c("RIZ", "G4FS", "imotif"),
+      labels = c(RIZ="RIZ", G4FS="G4FS", imotif="iMFS"),guide = guide_legend(
         override.aes = list(fill = c("#aa2a85", "#228B22", "#32A0CD"), 
                             linetype = 0)  # removes line in legend
       )
@@ -261,7 +283,7 @@ for (i in bin_size){
   
   
 
-  ggsave(paste("pG4CS_RIZ_imotif_density_entire_human_rdna_in_", i, "bin.png", sep = ""), 
+  ggsave(paste("G4FS_RIZ_imotif_density_entire_human_rdna_in_", i, "bin.png", sep = ""), 
          plot = g4s_riz_imotif_density, width = 18, height = 15, dpi = 300)
   
   
@@ -327,7 +349,7 @@ dev.off()
 
 
 
-cor_matrix <- cor(combined_count[, c("RIZ_counts", "pG4CS_counts","imotif_counts")],
+cor_matrix <- cor(combined_count[, c("RIZ_counts", "G4FS_counts","imotif_counts")],
                   method = "pearson")  # or method = "spearman" for rank correlation or skewed distrubution
 new_labels <- c("RIZ","G4FS", "iMFS")
 dimnames(cor_matrix) <- list(new_labels, new_labels)  # row + col names
@@ -357,16 +379,16 @@ dev.off()
 
 
 # combined_count= 70 bins
-#                   pG4CS_counts RIZ_counts imotif_counts
-# pG4CS_counts     1.0000000  0.6937813     0.6016396
+#                   G4FS_counts RIZ_counts imotif_counts
+# G4FS_counts     1.0000000  0.6937813     0.6016396
 # RIZ_counts       0.6937813  1.0000000     0.4504837
 # imotif_counts    0.6016396  0.4504837     1.0000000
 
 
 
 # combined_count= 100 bins
-#pG4CS_counts RIZ_counts imotif_counts
-#pG4CS_counts     1.0000000  0.6774687     0.6513185
+#G4FS_counts RIZ_counts imotif_counts
+#G4FS_counts     1.0000000  0.6774687     0.6513185
 #RIZ_counts       0.6774687  1.0000000     0.5159703
 #imotif_counts    0.6513185  0.5159703     1.0000000
 
@@ -392,9 +414,9 @@ dev.off()
 ###Venn diagram:
 #Convert each count column into presence/absence (1 if count > 0, 0 if count = 0).
 combined_count$RIZ_bin    <- as.integer(combined_count$RIZ_counts > 0)
-combined_count$pG4CS_bin     <- as.integer(combined_count$pG4CS_counts > 0)
+combined_count$G4FS_bin     <- as.integer(combined_count$G4FS_counts > 0)
 combined_count$iMFS_bin   <- as.integer(combined_count$imotif_counts > 0)
-fwrite(combined_count, "graph_input_pG4CS_RIZ_imotif_count_bar_graph_100bin.csv")
+fwrite(combined_count, "graph_input_G4FS_RIZ_imotif_count_bar_graph_100bin.csv")
 
 
 png("RIZ_g4s_imfs_venn_plot.png", width = 11, height = 10, units = "in", res = 300)
@@ -402,7 +424,7 @@ png("RIZ_g4s_imfs_venn_plot.png", width = 11, height = 10, units = "in", res = 3
 venn.plot <- venn.diagram(
   x = list(
     RIZ   = which(combined_count$RIZ_bin == 1),
-    pG4CS   = which(combined_count$pG4CS_bin == 1),    
+    G4FS   = which(combined_count$G4FS_bin == 1),    
     iMFS  = which(combined_count$iMFS_bin == 1)
     
   ),
@@ -427,7 +449,7 @@ png("RIZ_g4s_imfs_venn_plot2.png", width = 11, height = 10, units = "in", res = 
 venn.plot <- venn.diagram(
   x = list(
     RIZ   = which(combined_count$RIZ_bin == 1),
-    pG4CS = which(combined_count$pG4CS_bin == 1),
+    G4FS = which(combined_count$G4FS_bin == 1),
     iMFS  = which(combined_count$iMFS_bin == 1)
   ),
   filename = NULL,
@@ -450,7 +472,7 @@ png("RIZ_g4s_imfs_venn_plot3.png", width = 11, height = 10, units = "in", res = 
 venn.plot <- venn.diagram(
   x = list(
     RIZ   = which(combined_count$RIZ_bin == 1),
-    pG4CS   = which(combined_count$pG4CS_bin == 1),    
+    G4FS   = which(combined_count$G4FS_bin == 1),    
     iMFS  = which(combined_count$iMFS_bin == 1)
     
   ),
@@ -474,13 +496,13 @@ dev.off()
 
 
 #scatter plot to show how g4s and RIZ are showing similar trend 
-graph_max_value <- max(max(combined_count$pG4CS_counts), max(combined_count$RIZ_counts))+1
+graph_max_value <- max(max(combined_count$G4FS_counts), max(combined_count$RIZ_counts))+1
 
-g4_riz<- ggplot(combined_count, aes(x = pG4CS_counts, y = RIZ_counts)) +
+g4_riz<- ggplot(combined_count, aes(x = G4FS_counts, y = RIZ_counts)) +
   geom_point(color = "blue") +
   geom_smooth(method = "lm", se = FALSE, color = "red") +  # Add a trend line
-  labs(title = "Scatter Plot of pG4CS vs RIZ Frequency in human rDNA",
-       x = "pG4CS Frequency",
+  labs(title = "Scatter Plot of G4FS vs RIZ Frequency in human rDNA",
+       x = "G4FS Frequency",
        y = "RIZ Frequency") +
   scale_x_continuous(breaks= seq(0, graph_max_value, by = 3))+
   scale_y_continuous(breaks= seq(0, graph_max_value, by = 3))+
@@ -495,16 +517,16 @@ g4_riz<- ggplot(combined_count, aes(x = pG4CS_counts, y = RIZ_counts)) +
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
         axis.ticks.y = element_line(color = "black"))  
 
-ggsave(paste("pG4CS_vs_RIZ_scatter_plot_human_rdna_in_", i, "bin.tiff", sep = ""), 
+ggsave(paste("G4FS_vs_RIZ_scatter_plot_human_rdna_in_", i, "bin.tiff", sep = ""), 
        plot = g4_riz, width = 18, height = 10, dpi = 150)
 
 
-riz_g4<- ggplot(combined_count,, aes(x = RIZ_counts, y = pG4CS_counts)) +
+riz_g4<- ggplot(combined_count, aes(x = RIZ_counts, y = G4FS_counts)) +
   geom_point(color = "blue") +
   geom_smooth(method = "lm", se = FALSE, color = "red") +  # Add a trend line
-  labs(title = "Scatter Plot of RIZ vs pG4CS in human rDNA",
+  labs(title = "Scatter Plot of RIZ vs G4FS in human rDNA",
        x = "RIZ Frequency",
-       y = "pG4CS Frequency") +
+       y = "G4FS Frequency") +
   scale_x_continuous(breaks= seq(0, graph_max_value, by = 3))+
   scale_y_continuous(breaks= seq(0, graph_max_value, by = 3))+
   theme_minimal()+
@@ -518,21 +540,21 @@ riz_g4<- ggplot(combined_count,, aes(x = RIZ_counts, y = pG4CS_counts)) +
         axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5),  # Center Y-axis title
         axis.ticks.y = element_line(color = "black"))  
 
-ggsave(paste("RIZ_vs_pG4CS_scatter_plot_human_rdna_in_", i, "bin.tiff", sep = ""), 
+ggsave(paste("RIZ_vs_G4FS_scatter_plot_human_rdna_in_", i, "bin.tiff", sep = ""), 
        plot = riz_g4, width = 18, height = 10, dpi = 150)
 
-print(paste("RIZ_vs_pg4CS_scatter_plot_correlation_in_", i, "bins", sep = ""))
+print(paste("RIZ_vs_G4FS_scatter_plot_correlation_in_", i, "bins", sep = ""))
 
-print(cor.test(combined_count$RIZ_counts, combined_count$pG4CS_counts, method = "spearman")) #or cor.test(combined_count$pG4CS_counts,combined_count$RIZ_counts, method = "spearman") the rho value is same
+print(cor.test(combined_count$RIZ_counts, combined_count$G4FS_counts, method = "spearman")) #or cor.test(combined_count$G4FS_counts,combined_count$RIZ_counts, method = "spearman") the rho value is same
 }
 
 
 
-#[1] "RIZ_vs_pg4CS_scatter_plot_correlation_in_100bins in seq 1 to 45000
+#[1] "RIZ_vs_G4FS_scatter_plot_correlation_in_100bins in seq 1 to 45000
 
 #Spearman's rank correlation rho
 
-#data:  combined_count$RIZ_counts and combined_count$pG4CS_counts
+#data:  combined_count$RIZ_counts and combined_count$G4FS_counts
 #S = 65242, p-value = 1.871e-11
 #alternative hypothesis: true rho is not equal to 0
 #sample estimates:
@@ -542,7 +564,7 @@ print(cor.test(combined_count$RIZ_counts, combined_count$pG4CS_counts, method = 
 
 #Spearman's rank correlation rho in case of 100 bins in seq 1 to 44857.
 
-#data:  combined_count$pG4CS_counts and combined_count$RIZ_counts
+#data:  combined_count$G4FS_counts and combined_count$RIZ_counts
 #S = 60273, p-value = 9.062e-13
 #alternative hypothesis: true rho is not equal to 0
 #sample estimates:
@@ -583,15 +605,15 @@ rho
 # refer: https://pmc.ncbi.nlm.nih.gov/articles/PMC374386/
 
 
+#Extra code not needed as this moment
+{{
 
-{
-  #moving it down as this is not needed as of now
   #for individual count and length graphs
   
   g4s_length <- entire_g4s_rdna %>%
-    mutate(bin = cut(actual_pG4CS_start, breaks = bin_break, include.lowest = TRUE, right = FALSE)) %>%
+    mutate(bin = cut(actual_G4FS_start, breaks = bin_break, include.lowest = TRUE, right = FALSE)) %>%
     group_by(bin) %>%
-    summarise(avg_length = round(mean(pG4CS_length),2), .groups = "drop")
+    summarise(avg_length = round(mean(G4FS_length),2), .groups = "drop")
   
   g4s_length$bin <- gsub("\\[|\\]|\\(|\\)", "",g4s_length$bin)
   g4s_length <- g4s_length %>%
@@ -599,7 +621,7 @@ rho
   g4s_length$lower_limit<- as.numeric(g4s_length$lower_limit)
   g4s_length$upper_limit<- as.numeric(g4s_length$upper_limit)
   g4s_length<- g4s_length %>% mutate(bin_midpoints = (lower_limit + upper_limit) /2)
-  g4s_length$identifier<- "pG4CS"
+  g4s_length$identifier<- "G4FS"
   
   riz_length <- riz %>%
     mutate(bin = cut(actual_RIZ_start, breaks = bin_break, include.lowest = TRUE, right = FALSE)) %>%
@@ -616,7 +638,7 @@ rho
   
   
   combined_length<- rbind(g4s_length, riz_length)
-  fwrite(combined_length, paste("graph_input_pG4CS_RIZ_length_bar_graph_", i,"bin.csv", sep=""), sep=",")
+  fwrite(combined_length, paste("graph_input_G4FS_RIZ_length_bar_graph_", i,"bin.csv", sep=""), sep=",")
   
   
   #individual G4S length
@@ -627,14 +649,14 @@ rho
     
     scale_x_continuous(breaks = c(seq(0, 45000, by = 5000), 44838), 
                        labels = c(seq(0, 45000, by = 5000), "")) +
-    geom_hline(yintercept = mean_pG4CS_length, color = "cornflowerblue", linetype = "dashed", size = 1)+
+    geom_hline(yintercept = mean_G4FS_length, color = "cornflowerblue", linetype = "dashed", size = 1)+
     
-    labs(title= "pG4CS length distribution in human rDNA", 
+    labs(title= "G4FS length distribution in human rDNA", 
          x= paste0("Human rDNA region (",i, "100bins)"), 
-         y= "pG4CS average length")+
+         y= "G4FS average length")+
     
     scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
-    #scale_fill_manual(values= c("pG4CS_counts" = "cornflowerblue"))+
+    #scale_fill_manual(values= c("G4FS_counts" = "cornflowerblue"))+
     theme_minimal()+
     theme(axis.text.x = element_text(angle = 45, hjust=1),
           axis.ticks.x = element_line(color = "black"),
@@ -647,7 +669,7 @@ rho
           axis.ticks.y = element_line(color = "black"))
   
   
-  ggsave(paste("pG4CS_length_entire_human_rdna_in_", i, "bin.tiff", sep = ""), 
+  ggsave(paste("G4FS_length_entire_human_rdna_in_", i, "bin.tiff", sep = ""), 
          plot = g4s_length_entire, width = 18, height = 10, dpi = 150)
   
   
@@ -684,20 +706,20 @@ rho
   #together
   g4s_riz_length<- ggplot(combined_length, aes(x= bin_midpoints, y = avg_length, fill= identifier)) + 
     geom_bar(stat= "identity", position ="dodge", color = "black") +
-    labs(title= "pG4CS vs RIZ length distribution in human rDNA", 
+    labs(title= "G4FS vs RIZ length distribution in human rDNA", 
          x= paste0("Human rDNA region with",i," bins"), 
          y= "Average length", 
          fill = "Non-canonical structures")+
     scale_y_continuous(breaks= seq(0, 30, by = 10), limits =c(0,30))+
     scale_x_continuous(breaks = c(seq(0, 45000, by = 5000), 44838), 
                        labels = c(seq(0, 45000, by = 5000), ""))+
-    geom_hline(yintercept = mean_pG4CS_length, color = "cornflowerblue", linetype = "dashed", size = 1)+
+    geom_hline(yintercept = mean_G4FS_length, color = "cornflowerblue", linetype = "dashed", size = 1)+
     geom_hline(yintercept = mean_riz_length, color = "pink", linetype = "dashed", size = 1)+
     
     
     #geom_text(aes(label= riz_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
-    scale_fill_manual(values= c(pG4CS = "cornflowerblue", RIZ = "pink"), #changed the non template and template colors
-                      labels = c(pG4CS = "pG4CS", RIZ = "RIZ"))+
+    scale_fill_manual(values= c(G4FS = "cornflowerblue", RIZ = "pink"), #changed the non template and template colors
+                      labels = c(G4FS = "G4FS", RIZ = "RIZ"))+
     #scale_fill_manual(values = combined_colors)+
     theme_minimal()+
     theme(axis.text.x = element_text(angle = 45, hjust=1, size = 20), 
@@ -711,14 +733,14 @@ rho
           axis.ticks.y = element_line(color = "black"))
   
   
-  ggsave(paste("pG4CS_vs_RIZ_length_entire_human_rdna_in_", i, "bin.tiff", sep = ""), 
+  ggsave(paste("G4FS_vs_RIZ_length_entire_human_rdna_in_", i, "bin.tiff", sep = ""), 
          plot = g4s_riz_length, width = 18, height = 10, dpi = 150)
   
 }
 
 {g4s_riz_imotif_scale_density <- ggplot() +
   geom_density(data = entire_g4s_rdna,
-               aes(x = pG4CS_start, y = after_stat(scaled), color = "pG4CS"),#after_stat(scaled) (formerly ..scaled..) gives a curve whose maximum is 1 for each group; perfect for visual shape comparison
+               aes(x = G4FS_start, y = after_stat(scaled), color = "G4FS"),#after_stat(scaled) (formerly ..scaled..) gives a curve whose maximum is 1 for each group; perfect for visual shape comparison
                size = 1, bw = 2000, kernel = "gaussian") +
   geom_density(data = riz,
                aes(x = RIZ_start, y = after_stat(scaled), color = "RIZ"),
@@ -728,15 +750,15 @@ rho
                size = 1, bw = 2000, kernel = "gaussian") +
   scale_color_manual(
     name = "Non-canonical structures",
-    values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
-    breaks = c("RIZ", "pG4CS", "imotif"),
-    labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS")
+    values = c("RIZ" = "#aa2a85", "G4FS" = "#228B22", "imotif" = "#32A0CD"),
+    breaks = c("RIZ", "G4FS", "imotif"),
+    labels = c(RIZ="RIZ", G4FS="G4FS", imotif="iMFS")
   ) +
   scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
                      labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
   
   labs(
-    title = "pG4CS vs RIZ vs imotif (scaled density, 0–1)",
+    title = "G4FS vs RIZ vs imotif (scaled density, 0–1)",
     x = paste0("Human rDNA region (", i, " bins)"),
     y = "Scaled density (0–1)"
   ) +
@@ -755,15 +777,15 @@ rho
     legend.position = "top"
   )
 
-ggsave(paste("pG4CS_RIZ_imotif_scaled_density_entire_human_rdna_in_", i, "bin.png", sep = ""), 
+ggsave(paste("G4FS_RIZ_imotif_scaled_density_entire_human_rdna_in_", i, "bin.png", sep = ""), 
        plot = g4s_riz_imotif_density, width = 15, height = 10, dpi = 300)
 
 
 g4s_riz_imotif_density_zoom<- ggplot() +
   geom_density(data = entire_g4s_rdna_zoom,
-               aes(x = pG4CS_start,
-                   y = ..density.. * length(entire_g4s_rdna_zoom$pG4CS_start) * bin_width,
-                   color = "pG4CS"),
+               aes(x = G4FS_start,
+                   y = ..density.. * length(entire_g4s_rdna_zoom$G4FS_start) * bin_width,
+                   color = "G4FS"),
                size = 1, bw = 2000, kernel = "gaussian") +
   
   geom_density(data = riz_zoom,
@@ -780,14 +802,14 @@ g4s_riz_imotif_density_zoom<- ggplot() +
   
   scale_color_manual(
     name = "Non-canonical structures",
-    values = c("RIZ" = "#aa2a85", "pG4CS" = "#228B22", "imotif" = "#32A0CD"),
-    breaks = c("RIZ", "pG4CS", "imotif"),
-    labels = c(RIZ="RIZ", pG4CS="pG4CS", imotif="iMFS"))+
+    values = c("RIZ" = "#aa2a85", "G4FS" = "#228B22", "imotif" = "#32A0CD"),
+    breaks = c("RIZ", "G4FS", "imotif"),
+    labels = c(RIZ="RIZ", G4FS="G4FS", imotif="iMFS"))+
   
   scale_x_continuous(breaks = c(1299, 3501, 7158,9027,10097, 10254, 11421, 16472, 16833, 46137),
                      labels = c("", "5'ET", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ET", "IGS", ""))+ #changed ETS to ET so that all labels have same space
   
-  labs(title= "pG4CS vs RIZ vs imotif frequency distribution in human rDNA", 
+  labs(title= "G4FS vs RIZ vs imotif frequency distribution in human rDNA", 
        x= paste0("Human rDNA region (",i, "bins)"), 
        y= "Bin Density (Smooth)", 
        fill= "Non-canonical structures") +
@@ -808,11 +830,11 @@ g4s_riz_imotif_density_zoom<- ggplot() +
 
 
 
-ggsave(paste("pG4CS_RIZ_imotif_density_entire_human_rdna_in_", i, "bin_zoom.png", sep = ""), 
+ggsave(paste("G4FS_RIZ_imotif_density_entire_human_rdna_in_", i, "bin_zoom.png", sep = ""), 
        plot = g4s_riz_imotif_density_zoom, width = 15, height = 10, dpi = 300)
 
 }
-
+}
 
 
 

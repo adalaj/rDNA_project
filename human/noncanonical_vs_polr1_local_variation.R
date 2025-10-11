@@ -1,4 +1,46 @@
-#Idea is to see trend of UBF and polr1 in presence of R-loop, G4s, imotif
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   This script quantifies and visualizes the relationship between transcriptional
+#   regulators (POLR1A) and non-canonical DNA structures (R-loops, G4s, i-motifs)
+#   across the modified human rDNA locus (*chrR*, 1–44,838 bp).
+#   It generates binned correlation maps, zoomed promoter-to-3′ETS profiles,
+#   and pairwise correlation plots for Figure 5.
+#
+# Major Steps:
+#   1. Define 100-bin segmentation of *chrR* region (rDNA locus from hg38-rDNA_v1.0.bed).
+#   2. Integrate POLR1A ChIP-seq counts with RLFS, G4FS, and iMFS annotations.
+#   3. Normalize all datasets (0–1 scale) for cross-signal comparison.
+#   4. Assess directional agreement (increase/decrease per bin) between POLR1A and each structure.
+#   5. Compute Pearson and Spearman correlations and plot:
+#        - POLR1A vs RLFS, G4FS, iMFS line plots (normalized trends)
+#        - Corresponding scatterplots with correlation coefficients.
+#   6. Generate genome schematic for rDNA context (full and zoomed black-and-white maps).
+#
+# Input:
+#   - hg38-rDNA_v1.0.bed (from Vikram et al., 2020)
+#   - ChIP_entire_rDNA_100bins_summary_raw_counts.tab (POLR1A ChIP-seq)
+#   - RLFS_human_modified_[template/nontemplate].bed
+#   - G4FS_human_modified_[template/nontemplate].bed
+#   - imotif_human_modified_[template/nontemplate].bed
+#
+# Output:
+#   - *_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv (graph-ready merged data)
+#   - *_RLFS_with_POLR1A.png / *_G4FS_with_POLR1A.png / *_iMFS_with_POLR1A.png (Fig 6 and Supplementary table 6)
+#   - *_pearson.png (scatterplots with r and P values) (Fig 6)
+#   - rdna_black_and_white.png, rdna_zoom_black_and_white.png (rDNA region schematics)
+#
+# Notes:
+#   - RLFS = R-loop forming sequence; G4FS = predicted G4-forming sequence; iMFS = i-motif forming sequence.
+#   - Normalized data (0–1) used to compare relative enrichment profiles.
+#   - Directional inverse trends (POLR1A↑ vs RLFS↓, etc.) are quantified as percentage mismatches per bin.
+#   - Figures correspond to correlation analyses in Figure 5 of the manuscript.
+#
+# ------------------------------------------------------------------------------
+
 
 #step1: identity chrR region of interest that where i will count the read count of UBF and polr1
 
@@ -9,7 +51,6 @@ library(ggtext)
 library(karyoploteR)
 
 #set working directory
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/human/IGV_files/bedfiles")
 
 modified_rdna<- fread("hg38-rDNA_v1.0.bed", sep = "\t", header = FALSE)
 #hg38-rDNA_v1.0.bed file contains the bed format of modified rdna used in 
@@ -55,7 +96,6 @@ fwrite(bin_data, "entire_rdna_100bins.csv")
 
 #here it the outfile
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/human/IGV_files/bedfiles")
 
 chip<- fread("ChIP_entire_rDNA_100bins_summary_raw_counts.tab", sep = "\t", header = TRUE)
 
@@ -63,11 +103,10 @@ chip<- fread("ChIP_entire_rDNA_100bins_summary_raw_counts.tab", sep = "\t", head
 
 ###########################################################
 #prepare entire, nontemplate, template RLFS, G4s, imotif  for making graphs
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/human/IGV_files/Bedgraphs/input_bedfiles")
 
 
 # Simple unnamed list
-list_of_names <- list("imotif", "RLFS", "pG4CS")
+list_of_names <- list("imotif", "RLFS", "G4FS")
 
 # Define binning parameters
 bin_size <- 100
@@ -117,19 +156,19 @@ bin_info <- data.frame(
 
 # Construct final data.frames
 combined_count_nontemplate <- cbind(bin_info, data.frame(
-  pG4CS_counts = all_counts_nontemplate[["pG4CS"]],
+  G4FS_counts = all_counts_nontemplate[["G4FS"]],
   RLFS_counts  = all_counts_nontemplate[["RLFS"]],
   imotif_counts = all_counts_nontemplate[["imotif"]]
 ))
 
 combined_count_template <- cbind(bin_info, data.frame(
-  pG4CS_counts = all_counts_template[["pG4CS"]],
+  G4FS_counts = all_counts_template[["G4FS"]],
   RLFS_counts  = all_counts_template[["RLFS"]],
   imotif_counts = all_counts_template[["imotif"]]
 ))
 
 combined_count_entire <- cbind(bin_info, data.frame(
-  pG4CS_counts = all_counts_entire[["pG4CS"]],
+  G4FS_counts = all_counts_entire[["G4FS"]],
   RLFS_counts  = all_counts_entire[["RLFS"]],
   imotif_counts = all_counts_entire[["imotif"]]
 ))
@@ -140,9 +179,9 @@ combined_count_entire <- cbind(bin_info, data.frame(
 colnames(chip) <- c("chr", "bin_start", "bin_end", "UBF", "POLR1A")
 
 # 2. Merge chip with structural counts (column-wise, assuming same number of rows)
-chip_with_entire <- cbind(chip, combined_count_entire[, c("bin_midpoints","pG4CS_counts", "RLFS_counts", "imotif_counts")])
-chip_with_template <- cbind(chip, combined_count_template[, c("bin_midpoints","pG4CS_counts", "RLFS_counts", "imotif_counts")])
-chip_with_nontemplate <- cbind(chip, combined_count_nontemplate[, c("bin_midpoints","pG4CS_counts", "RLFS_counts", "imotif_counts")])
+chip_with_entire <- cbind(chip, combined_count_entire[, c("bin_midpoints","G4FS_counts", "RLFS_counts", "imotif_counts")])
+chip_with_template <- cbind(chip, combined_count_template[, c("bin_midpoints","G4FS_counts", "RLFS_counts", "imotif_counts")])
+chip_with_nontemplate <- cbind(chip, combined_count_nontemplate[, c("bin_midpoints","G4FS_counts", "RLFS_counts", "imotif_counts")])
 
 
 ####Save these files as graph input
@@ -168,10 +207,10 @@ data_of_interest<- list(
 for (i in names(data_of_interest)){
 colnames(data_of_interest[[i]])[9]<- "iMFS_counts" #previously it was imotif_counts
 
-#need to scale both the axis as between zero to 1 for all UBF, POLR1A, RLFS, pG4CS, iMFS
+#need to scale both the axis as between zero to 1 for all UBF, POLR1A, RLFS, G4FS, iMFS
 data_of_interest[[i]]<- data_of_interest[[i]] %>% mutate(norm_UBF= (UBF- min(UBF))/(max(UBF)-min(UBF)),
                                                          norm_POLR1A= (POLR1A- min(POLR1A))/(max(POLR1A)-min(POLR1A)),
-                                                         norm_pG4CS_counts= (pG4CS_counts- min(pG4CS_counts))/(max(pG4CS_counts)-min(pG4CS_counts)),
+                                                         norm_G4FS_counts= (G4FS_counts- min(G4FS_counts))/(max(G4FS_counts)-min(G4FS_counts)),
                                                          norm_RLFS_counts= (RLFS_counts- min(RLFS_counts))/(max(RLFS_counts)-min(RLFS_counts)),
                                                          norm_iMFS_counts= (iMFS_counts- min(iMFS_counts))/(max(iMFS_counts)-min(iMFS_counts)))
 
@@ -198,7 +237,7 @@ data_of_interest[[i]] <- data_of_interest[[i]] %>%
   mutate(
     diff_norm_UBF = norm_UBF - lag(norm_UBF, default = 0),
     diff_norm_POLR1A = norm_POLR1A - lag(norm_POLR1A),
-    diff_norm_pG4CS_counts = norm_pG4CS_counts - lag(norm_pG4CS_counts),
+    diff_norm_G4FS_counts = norm_G4FS_counts - lag(norm_G4FS_counts),
     diff_norm_RLFS_counts = norm_RLFS_counts - lag(norm_RLFS_counts),
     diff_norm_iMFS_counts = norm_iMFS_counts - lag(norm_iMFS_counts)
   )
@@ -209,7 +248,7 @@ data_of_interest[[i]] <- data_of_interest[[i]] %>%
   mutate(POLR1_RLFS_sign_match = ifelse(sign(diff_norm_POLR1A) != sign(diff_norm_RLFS_counts), 1, 0))
 
 data_of_interest[[i]] <- data_of_interest[[i]] %>%
-  mutate(POLR1_pG4CS_sign_match = ifelse(sign(diff_norm_POLR1A) != sign(diff_norm_pG4CS_counts), 1, 0))
+  mutate(POLR1_G4FS_sign_match = ifelse(sign(diff_norm_POLR1A) != sign(diff_norm_G4FS_counts), 1, 0))
 
 data_of_interest[[i]] <- data_of_interest[[i]] %>%
   mutate(POLR1_iMFS_sign_match = ifelse(sign(diff_norm_POLR1A) != sign(diff_norm_iMFS_counts), 1, 0))
@@ -221,7 +260,6 @@ fwrite(data_of_interest[[i]], paste0(i, "_non_canonical_with_Chip_UBF_POLR1A_gra
 
 
 #####read again
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/human/IGV_files/bedfiles")
 
 zoom_start <- 7000
 zoom_end <- 23000
@@ -368,15 +406,15 @@ for (i in names(data_of_interest)){
 
   
   
-  ############ plot pG4CS
+  ############ plot G4FS
   
-  cols <- c("pG4CS" = "#228B22", "POLR1A" = "#D2691E")
+  cols <- c("G4FS" = "#228B22", "POLR1A" = "#D2691E")
   
   # legend-only data (NA coordinates => nothing is drawn on the panel)
   legend_df <- data.frame(
     bin_midpoints = NA_real_,
     y = NA_real_,
-    grp = factor(c("POLR1A","pG4CS"), levels = c("POLR1A","pG4CS"))
+    grp = factor(c("POLR1A","G4FS"), levels = c("POLR1A","G4FS"))
   )
   
   plot_g4s_polr1a <-ggplot() +
@@ -384,9 +422,9 @@ for (i in names(data_of_interest)){
     geom_line(data = data_of_interest[[i]], aes(x = bin_midpoints, y = norm_POLR1A, color = "POLR1A"), size = 3.0,show.legend = FALSE) +
     
     geom_line(data = data_of_interest[[i]],
-              aes(x = bin_midpoints, y = norm_pG4CS_counts, color = "pG4CS"), size = 3.0, show.legend = FALSE) +
+              aes(x = bin_midpoints, y = norm_G4FS_counts, color = "G4FS"), size = 3.0, show.legend = FALSE) +
     #geom_point(data = chip_with_nontemplate,
-    #aes(x = bin_midpoints, y = norm_pG4CS_counts, shape = "pG4CS", color = "pG4CS"), size = 3) +
+    #aes(x = bin_midpoints, y = norm_G4FS_counts, shape = "G4FS", color = "G4FS"), size = 3) +
     
     # legend-only filled squares
     geom_point(data = legend_df,
@@ -395,15 +433,15 @@ for (i in names(data_of_interest)){
     
     scale_color_manual(name = NULL, 
                        values = cols,
-                       labels = c("pG4CS" = "G4FS", "POLR1A" = "POLR1A"))+
+                       labels = c("G4FS" = "G4FS", "POLR1A" = "POLR1A"))+
     #labels = c(
-    #"pG4CS"   = "<span style='color:#228B22;'>pG4CS</span>",
+    #"G4FS"   = "<span style='color:#228B22;'>G4FS</span>",
     #"POLR1A" = "<span style='color:#D2691E;'>POLR1A</span>" #"UBF" = "#f609b4" #CD32A0, #9e277b
     #),
     
     guides(color = guide_legend(override.aes = list(shape = 15, size = 40, linetype = NA))) +
     
-    #scale_shape_manual(name = "Non-canonical structure", values = c("pG4CS" = 16)) +
+    #scale_shape_manual(name = "Non-canonical structure", values = c("G4FS" = 16)) +
     scale_x_continuous(breaks = region_marks, labels = region_labels) +
     scale_y_continuous(
       name = "POLR1A ChIP-seq signal",
@@ -413,7 +451,7 @@ for (i in names(data_of_interest)){
                           name = "G4FS counts")
     ) +
     labs(
-      #title = paste0(i," pG4CS and POLR1A"),
+      #title = paste0(i," G4FS and POLR1A"),
       x = "Human rDNA region"
     ) +
     theme(axis.ticks = element_line(color = "black", linewidth = 4),
@@ -437,7 +475,7 @@ for (i in names(data_of_interest)){
   
 
 
-  ggsave(paste0(i, "_pG4CS_with_POLR1A.png"), plot_g4s_polr1a, width = 40, height = 31, dpi = 600)
+  ggsave(paste0(i, "_G4FS_with_POLR1A.png"), plot_g4s_polr1a, width = 40, height = 31, dpi = 600)
   
     
   
@@ -446,7 +484,7 @@ for (i in names(data_of_interest)){
   
   ###################### correlation test
   cor_test <- cor.test(data_of_interest[[i]]$norm_POLR1A,
-                       data_of_interest[[i]]$norm_pG4CS_counts,
+                       data_of_interest[[i]]$norm_G4FS_counts,
                        method = "pearson")
   
   # round values
@@ -456,14 +494,14 @@ for (i in names(data_of_interest)){
 
   # plot
   pearson_g4s_polr1a<- ggplot(data_of_interest[[i]],
-         aes(x = norm_POLR1A, y = norm_pG4CS_counts)) +
+         aes(x = norm_POLR1A, y = norm_G4FS_counts)) +
     geom_point(alpha = 0.6, size = 8, color = "black") +
     geom_smooth(method = "lm", color = "black", se = TRUE) +
     annotate("text", 
              x = 0.1, y = 0.9, hjust = 0,
              label = paste0("Pearson r = ", r_val," ", "P = ", p_val),
              size = 40) +   # text size scales differently than theme text
-    labs(#title = paste0(i, "Correlation between POLR1A and pG4CS"),
+    labs(#title = paste0(i, "Correlation between POLR1A and G4FS"),
          x = "POLR1A ChIP-seq signal",
          y = "G4FS counts") +
     scale_x_continuous(limits = c(0,1), breaks = seq(0,1,0.2)) +
@@ -483,7 +521,7 @@ for (i in names(data_of_interest)){
 
   
   
-  ggsave(paste0(i, "_pG4CS_with_POLR1A_pearson.png"), pearson_g4s_polr1a, width = 30, height = 20, dpi = 600)
+  ggsave(paste0(i, "_G4FS_with_POLR1A_pearson.png"), pearson_g4s_polr1a, width = 30, height = 20, dpi = 600)
   
   
   ###############plot imotif
@@ -619,8 +657,8 @@ for (i in names(data_of_interest1)){
   #This is a strong indicator of an inverse relationship.
   
   
-  print("pG4CS")
-  proportion2<- (sum(data_of_interest[[i]]$POLR1_pG4CS_sign_match == 1, na.rm = TRUE)/99)*100
+  print("G4FS")
+  proportion2<- (sum(data_of_interest[[i]]$POLR1_G4FS_sign_match == 1, na.rm = TRUE)/99)*100
   print(paste0(proportion2, "% of the time, the directions are opposite."))
   
   
@@ -634,7 +672,7 @@ for (i in names(data_of_interest1)){
 #[1] "Entire"
 #[1] "RLFS"
 #[1] "82.8282828282828% of the time, the directions are opposite."
-#[1] "pG4CS"
+#[1] "G4FS"
 #[1] "83.8383838383838% of the time, the directions are opposite."
 #[1] "iMFS"
 #[1] "72.7272727272727% of the time, the directions are opposite."
@@ -644,7 +682,7 @@ for (i in names(data_of_interest1)){
 #[1] "Nontemplate"
 #[1] "RLFS"
 #[1] "88.8888888888889% of the time, the directions are opposite."
-#[1] "pG4CS"
+#[1] "G4FS"
 #[1] "93.9393939393939% of the time, the directions are opposite."
 #[1] "iMFS"
 #[1] "84.8484848484848% of the time, the directions are opposite."
@@ -652,7 +690,7 @@ for (i in names(data_of_interest1)){
 #[1] "Template"
 #[1] "RLFS"
 #[1] "82.8282828282828% of the time, the directions are opposite."
-#[1] "pG4CS"
+#[1] "G4FS"
 #[1] "85.8585858585859% of the time, the directions are opposite."
 #[1] "iMFS"
 #[1] "84.8484848484848% of the time, the directions are opposite."
@@ -668,7 +706,7 @@ Nontemplate_zoom = Nontemplate_zoom,
 
 for (i in names(data_of_interest2)){
   data_of_interest2[[i]]$POLR1_RLFS_sign_match[1]<- NA
-  data_of_interest2[[i]]$POLR1_pG4CS_sign_match[1]<- NA
+  data_of_interest2[[i]]$POLR1_G4FS_sign_match[1]<- NA
   data_of_interest2[[i]]$POLR1_iMFS_sign_match[1]<- NA
   print(i)
   print("RLFS")
@@ -679,8 +717,8 @@ for (i in names(data_of_interest2)){
   #This is a strong indicator of an inverse relationship.
   
   
-  print("pG4CS")
-  proportion2<- (sum(data_of_interest2[[i]]$POLR1_pG4CS_sign_match == 1, na.rm = TRUE)/34)*100
+  print("G4FS")
+  proportion2<- (sum(data_of_interest2[[i]]$POLR1_G4FS_sign_match == 1, na.rm = TRUE)/34)*100
   print(paste0(proportion2, "% of the time, the directions are opposite."))
   
   
@@ -696,7 +734,7 @@ for (i in names(data_of_interest2)){
 #[1] "Entire_zoom"
 #[1] "RLFS"
 #[1] "76.4705882352941% of the time, the directions are opposite."
-#[1] "pG4CS"
+#[1] "G4FS"
 #[1] "85.2941176470588% of the time, the directions are opposite."
 #[1] "iMFS"
 #[1] "76.4705882352941% of the time, the directions are opposite."
@@ -704,7 +742,7 @@ for (i in names(data_of_interest2)){
 #[1] "Nontemplate_zoom"
 #[1] "RLFS"
 #[1] "76.4705882352941% of the time, the directions are opposite."
-#[1] "pG4CS"
+#[1] "G4FS"
 #[1] "85.2941176470588% of the time, the directions are opposite."
 #[1] "iMFS"
 #[1] "82.3529411764706% of the time, the directions are opposite."
@@ -712,7 +750,7 @@ for (i in names(data_of_interest2)){
 #[1] "Template_zoom"
 #[1] "RLFS"
 #[1] "76.4705882352941% of the time, the directions are opposite."
-#[1] "pG4CS"
+#[1] "G4FS"
 #[1] "91.1764705882353% of the time, the directions are opposite."
 #[1] "iMFS"
 #[1] "88.2352941176471% of the time, the directions are opposite."
@@ -805,8 +843,8 @@ cor.test(chip_with_entire$POLR1A, chip_with_entire$RLFS_counts, method = "spearm
 
                      
                       
-
-######shape information
+#extra
+{######shape information
 
 
 
@@ -824,7 +862,6 @@ cor.test(chip_with_entire$POLR1A, chip_with_entire$RLFS_counts, method = "spearm
   
 
 ##wanted to plot only G4s, imotif, and RLFS and do correlation
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/human/IGV_files/bedfiles")
 
 list_of_files<- list(
   entire= "Entire_non_canonical_with_Chip_UBF_POLR1A_graph_input.csv",
@@ -839,9 +876,9 @@ for (i in names(list_of_files)) {
   ggplot() +
     geom_density(data = data,
                  aes(x = bin_midpoints,
-                     y = ..density.. * sum(data$pG4CS_counts) * bin_width/ sum(data$pG4CS_counts > 0),
-                     weight = pG4CS_counts,
-                     color = "pG4CS"),
+                     y = ..density.. * sum(data$G4FS_counts) * bin_width/ sum(data$G4FS_counts > 0),
+                     weight = G4FS_counts,
+                     color = "G4FS"),
                  size = 1, bw = 2000, kernel = "gaussian") +
     
     geom_density(data = data,
@@ -859,7 +896,7 @@ for (i in names(list_of_files)) {
                  size = 1, bw = 2000, kernel = "gaussian") +
     
     scale_color_manual(name = "Non-canonical structures",
-                       values = c("pG4CS" = "#E3A81C", 
+                       values = c("G4FS" = "#E3A81C", 
                                   "RLFS" = "#1CE3A8", 
                                   "imotif" = "#A81CE3")) +
     
@@ -883,6 +920,7 @@ for (i in names(list_of_files)) {
   
   
   #print(p)
+}
 }
 
 

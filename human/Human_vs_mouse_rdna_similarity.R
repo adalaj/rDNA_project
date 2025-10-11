@@ -1,3 +1,44 @@
+# ------------------------------------------------------------------------------
+#This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   This script calculates sequence identity between human and mouse rDNA
+#   using global (Needleman–Wunsch) pairwise alignment. The analysis focuses
+#   on the transcribed region (5′ETS–3′ETS) and its subcomponents to generate
+#   an identity matrix summarizing cross-species conservation.
+#
+# Major Steps:
+#   1. Load human (*KY962518*) and mouse (*BK000964*) rDNA FASTA sequences.
+#   2. Extract the 5′ETS–3′ETS (coding) regions from both genomes.
+#   3. Perform pairwise global alignment for each corresponding rDNA subregion.
+#   4. Compute alignment statistics:
+#        - Percent identity (pwalign::pid and NCBI-style)
+#        - Match, mismatch counts, alignment score, and alignment length
+#   5. Save all pairwise results and an identity matrix (human vs. mouse) to CSV files.
+#
+# Input:Fasta files for human and mouse entire and subregions. 
+#
+# Output:
+#   - human_vs_mouse_rDNA_sequences_global_blast.csv
+#       Pairwise alignment statistics between all human and mouse rDNA regions (Supplementary table 7 and Fig7 asterisk number)
+#
+#
+# Notes:
+#   - Alignments are computed using Biostrings::pairwiseAlignment (global mode)
+#     with match = 2, mismatch = –3, gap opening = 5, gap extension = 2.
+#   - Identity (%) is reported both via Biostrings (pid) and NCBI-style formula.
+#   - Output matrices can be visualized as heatmaps for conservation profiling.
+#
+# Dependencies:
+#   tidyverse
+#   data.table
+#   Biostrings
+#   pwalign
+#
+# ------------------------------------------------------------------------------
+
 #!/usr/bin/env Rscript
 
 
@@ -9,7 +50,6 @@ library(Biostrings)
 
 #read required files for human
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/input")
 human_entire_rdna<- readDNAStringSet("KY962518_added_3500nt_IGS_upstream_nontemplate.fasta", format = "fasta", use.names = FALSE)
 human_entire_rdna_seq<- as.character(human_entire_rdna[[1]])
 nchar(human_entire_rdna_seq)
@@ -20,14 +60,12 @@ human_coding_rdna<- subseq(human_entire_rdna_seq, start = 3501, end= 16832)
 nchar(human_coding_rdna)
 #13332
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output")
 human<- fread("rdna_hg38_chr21_2018_dataset_details_v3.csv", sep = ",", header = TRUE)
 #this file has all rDNA region wise sequence and their nucleotide distribution
 #9 rows
 
 
 #read required files for mouse
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/mouse/input")
 mouse_entire_rdna<- readDNAStringSet("BK000964_added_5000nt_IGS_upstream_nontemplate.fasta", format = "fasta", use.names = FALSE)
 mouse_entire_rdna_seq<- as.character(mouse_entire_rdna[[1]])
 nchar(mouse_entire_rdna_seq)
@@ -38,7 +76,6 @@ mouse_coding_rdna<- subseq(mouse_entire_rdna_seq, start = 5001, end= 18403)
 nchar(mouse_coding_rdna)
 #13403
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/mouse/output")
 mouse<- fread("rdna_mouse_2013_dataset_details_v2.csv", sep = ",", header = TRUE)
 #this file has all rDNA region wise sequence and their nucleotide distribution
 #9 rows

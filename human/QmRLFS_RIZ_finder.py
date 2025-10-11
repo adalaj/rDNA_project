@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # Script Name: QmRLFS_RIZ_finder.py (version v1.5)
 # Description: QmRLFS_RIZ_inder.py is program to predict 
-#              R-loop forming regions in any DNA sequences 
+#              R-loop initiation zone in any DNA sequences 
 #              (in FASTA file)
 # Created By:  QmRLFS-finder.py was created by Piroon Jenjaroenpun and Thidathip Wongsurawat but modified by Jyoti Adala 
+# for paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
 # e-mail:      piroonj@bii.a-star.edu.sg (QmRLFS-finder.py) and adalaj@upstate.edu (QmRLFS_RIZ_finder.py)
 # Update:      22-Jan-2016, modified for RIZ on 13Aug2025
 ################################

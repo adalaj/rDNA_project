@@ -1,3 +1,44 @@
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   This script processes and visualizes i-motif (iMFS) predictions from
+#   *iM-Seeker* (https://im-seeker.org) to generate Figure 4B–G.
+#   It combines results for template and non-template strands of the human
+#   rDNA locus (KY962518 + 3.5 kb upstream IGS) and performs:
+#       (a) Genomic mapping of i-motif positions with karyoploteR (Fig. 4B,F,G)
+#       (b) Region-specific counting and density normalization (Figs. 4C–E)
+#       (c) Strand-resolved i-motif distribution analysis.
+#
+# Major Steps:
+#   1. Prepare template and non-template FASTA sequences for *iM-Seeker* input.
+#   2. Import i-motif prediction CSV outputs from *iM-Seeker* (default model).
+#   3. Merge strand-specific predictions into a single master table.
+#   4. Assign i-motifs to annotated rDNA subregions (Promoter–IGS) based on
+#      start coordinates and strand orientation.
+#   5. Compute region length, iMFS counts, normalized density, and proportion.
+#   6. Plot:
+#        - Fig. 4B: Genome-wide i-motif distribution (both strands)
+#        - Fig. 4C–D: Regional proportion and normalized density
+#        - Fig. 4E: Strandwise i-motif density comparison
+#        - Fig. 4F–G: Strand-specific coverage up to 3′ETS
+#
+# Input:
+#   - iM-seeker output CSV files for non-template and template strands
+#     (https://im-seeker.org/)
+#   - human rDNA FASTA sequence (GenBank: KY962518)
+#
+# Output:
+#   - Annotated CSV file and plots of iMFS counts, density and proportion per rDNA region. 
+#   - High-resolution ideogram plots (.png, .tiff) showing iMFS locations across the human rDNA locus
+#   - Separate visualizations for template and non-template strands
+# ------------------------------------------------------------------------------
+
+
+
+
 #Below code used for generation of Fig.4B to G
 ##plotting imotif in human rDNA locus
 # go to https://im-seeker.org/

@@ -1,16 +1,43 @@
-#Below code used for generation of Fig.3C to E
-#To make plot for G4S distribution in human rDNA locus 
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+# This R script processes G-quadruplex forming sequence (G4FS) predictions in the 
+# Human rDNA locus to assign each predicted G4FS to defined 
+# rDNA subregions (Promoter, 5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS, and IGS).
+#
+
+# Specifically, it:
+#   1.Reads G4FS predictions generated using the G4 canonical finder 
+#      (run in Python: g4_canonical_finder_3.11python.py).
+#   2. Separates template and non-template strand G4FS predictions.
+#   4. Assigns each G4FS to rDNA subregions (Promoter, 5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS)
+#      based on strand-specific start coordinates.
+#   5. Counts and normalizes G4FS occurrences across subregions, including junctions,
+#      following the rule that a G4FS is assigned to the region where it initiates.
+#   6. Generates summary CSVs and high-resolution bar plots showing:
+#        - Overall normalized G4FS distribution
+#        - Strandwise (template vs non-template) distributions
+#
+# Inputs:
+#   - Human rDNA FASTA sequence (GenBank: KY962518)
+#   - G4FS output text file from g4_canonical_finder_3.11python.py
+#
+# Outputs:
+#   - Annotated CSV file and plots of G4FS counts, density and proportion per rDNA region.
+#
+# ------------------------------------------------------------------------------
+
+
+
 
 
 library(tidyverse)
 library(data.table)
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/G4FS_at_rdna_output/files")
-
-
-
-##the best approach that got approved by Bruce!
 ##i want plot bar graph after the rule for G4s that has 3500 bp added to 5ETS and also has promoter at the end. 
 ##basically input file will be output_G4FS_KY962518_added_3500nt_IGS_upstream_humanrDNA.txt after passing through G4FS algorithm.
 
@@ -169,6 +196,10 @@ entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(G4FS_proportion_per
 #Biased toward longer regions (they naturally accumulate more G4FS simply because they have more bases)
 fwrite(entire_g4s_rdna_summary, "G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",")
 
+
+
+#Fig 3C to 3E
+entire_g4s_rdna_summary<- fread("G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_rule_graphinput.csv", sep = ",", header = TRUE)
 g4s_rdna_summary<- entire_g4s_rdna_summary[!grepl("junction", entire_g4s_rdna_summary$rDNA_region),]
 
 

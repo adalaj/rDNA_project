@@ -1,25 +1,41 @@
-#i wanted to show evolutionary conservation
-#everything will be 5'ETS to 3'ETS
-# thinking to write a code that will code and simultaneously save the graphs
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+
+# Purpose: This R code is designed to visualize R-loops, G4 and imotif forming sequences in human rDNA 
+# the code takes the input data, filteres for human rdna transcriptional unit (5'ETS to 3'ETS)  
+# and makes plots all predicted non-canonical DNA sequences in human rDNA.
+# Inputs: G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv, 
+# RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_rule.csv, 
+# imotif_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv (deposited in supplementary table)
+# Outputs: PNG files of strand-specific coverage plots 
+# ------------------------------------------------------------------------------
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/human/pG4CS_at_rdna_output/files")
-entire_g4s_rdna <- fread("pG4CS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
-entire_g4s_rdna<- entire_g4s_rdna %>% select(GenBank_Accession, actual_pG4CS_start, actual_pG4CS_end, rDNA_region, strand)
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output")
+# load library
+library(tidyverse)
+library(data.table)
+library(karyoploteR)
+
+
+# load G-quadruplex forming sequences
+entire_g4s_rdna <- fread("G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #210
+entire_g4s_rdna<- entire_g4s_rdna %>% select(GenBank_Accession, actual_G4FS_start, actual_G4FS_end, rDNA_region, strand)
+
+# load R-loop forming sequences
 rlfs<- fread("RLFS_KY962518_added_3500nt_IGS_upstream_master_qmrlfs_table_after_rule.csv", header = TRUE, sep = ",") #195
 rlfs<- rlfs %>% select("#Name", actual_RLFS_start, actual_RLFS_end, rDNA_region, strand)
 
-
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/imotif/human/output/files")
+# load i-motif forming sequences
 imotif<- fread("imotif_KY962518_added_3500nt_IGS_upstream_at_junctn_details.csv", header = TRUE, sep = ",") #85
 imotif<- imotif %>% select(chr, actual_imotif_start, actual_imotif_end, rDNA_region, strand)
 
 
 #prepare datasets:
 
-datasets<- list(pG4CS=entire_g4s_rdna,
+datasets<- list(G4FS=entire_g4s_rdna,
                 RLFS=rlfs, 
                 imotif=imotif)
 

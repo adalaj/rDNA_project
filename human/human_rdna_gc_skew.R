@@ -1,210 +1,70 @@
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   This script computes and visualizes GC content (%) and GC skew [(G−C)/(G+C)]
+#   across the human rDNA transcription unit (promoter to 3′ETS) using custom
+#   functions (`gc_content()` and `gc_skew()`). Sliding-window analysis highlights
+#   regional variation in base composition and strand bias along the rDNA locus.
+#
+# Major Steps:
+#   1. Source the GC content and GC skew functions.
+#   2. Load required libraries (stringr, tidyverse, data.table, Biostrings).
+#   3. Read the extended human rDNA FASTA sequence (KY962518 + upstream IGS).
+#   4. Extract the 5′ETS–3′ETS region (positions 1299–16832).
+#   5. Compute GC content and GC skew using a user-defined sliding window (e.g., 100 bp).
+#   6. Export sliding-window data tables as CSV files.
+#   7. Generate publication-ready plots:
+#        - Fig. 1E: GC content (%) profile
+#        - Fig. 1F: GC skew profile
+#
+# Input:
+#   - KY962518_added_3500nt_IGS_upstream_nontemplate.fasta
+#       Extended human rDNA reference sequence (non-template strand).
+#
+# Output:
+#   - KY962518_5ETS_TO_3ETS_gc_content_sliding_<window>bp.csv
+#       GC content values for each window across the rDNA.
+#   - KY962518_5ETS_TO_3ETS_gc_skew_sliding_<window>bp.csv
+#       GC skew values for each window across the rDNA.
+#   - KY962518_5ETS_TO_3ETS_gc_content_sliding_<window>bp.png  (Fig. 1E)
+#   - KY962518_5ETS_TO_3ETS_gc_skew_sliding_<window>bp.png     (Fig. 1F)
+#
+# Notes:
+#   - Sliding windows are overlapping; step size = 1 bp.
+#   - Reference positions correspond to KY962518 numbering (start = 1299).
+#   - Dashed horizontal lines indicate genome-average GC (~40.9%) or neutral skew (0).
+#   - Figures are exported at 600 dpi for publication quality.
+#
+# Dependencies:
+#   gc_content_function.R
+#   gc_skew_function.R
+#
+# ------------------------------------------------------------------------------
 
 
-#Task is to visually show GC skew for human RDNA locus. 
 
-#first make GC for each region and then calculate GC skew using sliding window in entire rDNA length .
+# I made a loop that will calculate GC skew and GC content in 40, 70, 100 overlapping and non-overlapping window size for rdna locus (as a whole not compartmentalized) 
+#starting from 5'ETS and ending at 3'ETS).
+
+#load GC skew and GC content function
+#calculate GC skew
+source("./gc_skew_function.R")
+
+#calculate GC content
+source("./GC_content_function.R")
 
 
-# for first analysis, I already defined a function to calculate GC skew  
-
-#load GC skew function
-source("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/rDNA_project/human/gc_skew_function.R")
-
+#load libraries
 library(stringr) #needed for GC skew function
 library(tidyverse)
 library(data.table)
 library(Biostrings)
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output")
-rdna_human<- fread ("rdna_hg38_chr21_2018_dataset_details_v2.csv", sep = ",", header = TRUE)
-
-attempt1<- data.frame((matrix(nrow = 0, ncol=6))) #6 coloumns because Gc skew has 6 columns
-
-for ( i in 1:nrow(rdna_human)){
-  gc_skew_data<- gc_skew(rdna_human$Sequences[i])
-  attempt1<- rbind(attempt1, gc_skew_data)
-}
-
-selected_gc_skew_data <- attempt1 %>% select(GC_skew_value) 
-rdna_human<- cbind(rdna_human, selected_gc_skew_data)
 
 
-#calculated GC skew for template strand as well
-attempt2<- data.frame((matrix(nrow = 0, ncol=6)))
-for ( i in 1:nrow(rdna_human)){
-  rev_seq<- as.character(reverseComplement(DNAString(rdna_human$Sequences[i])))
-  temp_gc_skew<- gc_skew(rev_seq)
-  attempt2<- rbind(attempt2, temp_gc_skew)
-  
-}
-
-template_GC_skew<- attempt2 %>% select(window_seq, G_count, C_count, GC_skew_value)
-colnames(template_GC_skew)<- c("template_seq", "temp_G_count", "temp_C_count", "temp_GC_skew_value")
-rdna_human<- cbind(rdna_human, template_GC_skew)
-
-
-# wanted to add cumulative sum of total nucleotides for future 
-rdna_human<- rdna_human %>% mutate(norm_GC_skew = GC_skew_value/sum(GC_skew_value))
-rdna_human<- rdna_human %>% mutate(temp_norm_GC_skew = temp_GC_skew_value/sum(GC_skew_value))
-
-rdna_human$x_axis <- cumsum(rdna_human$Total_nucleotides)
-
-#calculated GC and AT perc
-rdna_human<- rdna_human %>% mutate(GC_perc = round(((G+C)/(Total_nucleotides))*100,2))
-rdna_human<- rdna_human %>% mutate(AT_perc = round(((A+T)/(Total_nucleotides))*100,2))
-
-
-
-
-#also wanted to calculate CpG or CG dinucleotide
-
-rdna_human <- rdna_human %>%
-    mutate(
-      CpG_count = str_count(Sequences, "CG"),
-      CpG_perc = (CpG_count/Total_nucleotides)*100,
-      CpG_OE = (CpG_count * Total_nucleotides) / (G * C))
-
-
-
-fwrite(rdna_human, "rdna_hg38_chr21_2018_dataset_details_v3.csv")
-
-
-
-full_length_gc_skew<- ggplot(rdna_human, aes(x = x_axis, y = norm_GC_skew)) +
-  geom_line(color = "#E21515") +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-  labs(title = "GC Skew Across rDNA Sequence KY962518",
-       x = "rDNA",
-       y = "Normalized GC Skew") +
-  scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534, 47040 ),
-                     labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS", "IGS"))+
-                  
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        panel.grid = element_blank(),
-        panel.background = element_rect(fill = "white", color = "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-        axis.text.y = element_text(color = "black"))
-
-ggsave("KY962518_full_length_normalised_gc_skew.tiff", 
-       plot = full_length_gc_skew, width=18, height = 10, dpi = 150)
-
-
-full_length_gc_skew_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = norm_GC_skew)) +
-  geom_line(color = "#E21515") +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-  labs(title = "GC Skew Across rDNA Sequence KY962518 (Exculding IGS)",
-       x = "rDNA",
-       y = "Normalised GC Skew") +
-  scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
-                     labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        panel.grid = element_blank(),
-        panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-        axis.text.y = element_text(color = "black"))
-
-ggsave("KY962518_full_length_excld_IGS_normalised_gc_skew.tiff", 
-       plot = full_length_gc_skew_excld_igs, width=18, height = 10, dpi = 150)
-
-#plotting GC content
-full_length_gc_content_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = GC_perc)) +
-  geom_line(color = "#E21515")+
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-  geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen")+
-  labs(title = "GC Content Across rDNA Sequence KY962518 (Exculding IGS)",
-       x = "rDNA",
-       y = "GC Content") +
-  scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
-                     labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        panel.grid = element_blank(),
-        panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-        axis.text.y = element_text(color = "black"))
-
-ggsave("KY962518_full_length_excld_IGS_GC_content.tiff", 
-       plot = full_length_gc_content_excld_igs, width=18, height = 10, dpi = 150)
-
-
-
-#plotting CpG dinucleotide content
-full_length_CpG_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = CpG_OE)) +
-  geom_line(color = "#E21515")+
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-  geom_hline(yintercept = 0.6, linetype = "dashed", color="darkorange")+
-  labs(title = "CpG dinucleotides O/E ratio Across rDNA Sequence KY962518 (Exculding IGS)",
-       x = "rDNA",
-       y = "CpG dinucleotides O/E ratio") +
-  scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
-                     labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        panel.grid = element_blank(),
-        panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-        axis.text.y = element_text(color = "black"))
-
-ggsave("KY962518_full_length_excld_IGS_CpG_dinucleotides_OE_ratio.tiff", 
-       plot = full_length_CpG_excld_igs, width=18, height = 10, dpi = 150)
-
-
-full_length_CpG_perc_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = CpG_perc)) +
-  geom_line(color = "#E21515")+
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-  labs(title = "CpG dinucleotides rDNA Sequence KY962518 (Exculding IGS)",
-       x = "rDNA",
-       y = "CpG dinucleotides percent") +
-  scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
-                     labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
-        text = element_text(size = 30),
-        axis.line = element_line(color = "black"),
-        panel.grid = element_blank(),
-        panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
-        axis.ticks.y = element_line(color = "black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
-        axis.text.y = element_text(color = "black"))
-
-ggsave("KY962518_full_length_excld_IGS_CpG_dinucleotides_perc.tiff", 
-       plot = full_length_CpG_perc_excld_igs, width=18, height = 10, dpi = 150)
-
-
-
-# there is no need to make template ones because it will be mirror image of non -template
-
-# Above result showed that there is a GC skew rDNA region. the maximum is seen in promoter region, followed by 28s region than 5'ETS. 
-# lowest is seen in 18S.
-
-# I made a loop that will calculate GC skew and GC content in 40, 70, 100 overlapping and non-overlapping window size for rdna locus (as a whole not compartmentalized) 
-#starting from 5'ETS and ending at 3'ETS).
-
-
-library(Biostrings) #needed to read fasta file
-#load GC skew and GC content function
-#calculate GC skew
-source("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/rDNA_project/human/gc_skew_function.R")
-
-#calculate GC content
-source("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/rDNA_project/human/GC_content_function.R")
-
-#calculate CpG content
-source("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/rDNA_project/human/CpG_dinucleotides_function.R")
 
 
 
@@ -249,7 +109,7 @@ for ( i in bin_size){
   fwrite(sliding_content, paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv"))
   
   
-  #Fig1D
+  #Fig1E
   sliding_content_graph<- ggplot(sliding_content, aes(x = start, y = gc_content_perc)) +
     geom_line(color = "#E21515", size = 1.5) +
     #geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =2.0) +
@@ -279,7 +139,7 @@ for ( i in bin_size){
          plot =  sliding_content_graph, width=18, height = 10, dpi = 600)
   
   
-  #Fig1E
+  #Fig1F
   sliding_skew_graph<- ggplot(sliding_skew, aes(x = start, y = GC_skew_value)) +
     geom_line(color = "#E21515", size = 1.5) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth =3.0) +
@@ -304,10 +164,7 @@ for ( i in bin_size){
   ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_skew_sliding_", i, "bp.png"), 
          plot = sliding_skew_graph, width=18, height = 10, dpi = 600)
   
-  
-  #sliding<- paste0("KY962518_5ETS_TO_3ETS_gc_content_sliding_data_", i,"bp.csv")
-  #sliding_content<- fread(sliding, sep = ",", header = TRUE)
-  
+
  
   
 } 
@@ -315,7 +172,139 @@ for ( i in bin_size){
 
 
 
-  #CpG dinucleotides 
+ 
+
+
+
+
+
+#######All are extra stuff that is no longer needed
+{
+  #calculate CpG content
+  #source("./CpG_dinucleotides_function.R")
+  rdna_human<- fread("rdna_hg38_chr21_2018_dataset_details_v3.csv", sep = ",", header = TRUE)
+  
+  full_length_gc_skew<- ggplot(rdna_human, aes(x = x_axis, y = norm_GC_skew)) +
+    geom_line(color = "#E21515") +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+    labs(title = "GC Skew Across rDNA Sequence KY962518",
+         x = "rDNA",
+         y = "Normalized GC Skew") +
+    scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534, 47040 ),
+                       labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS", "IGS"))+
+    
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"),
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
+  
+  ggsave("KY962518_full_length_normalised_gc_skew.tiff", 
+         plot = full_length_gc_skew, width=18, height = 10, dpi = 150)
+  
+  
+  full_length_gc_skew_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = norm_GC_skew)) +
+    geom_line(color = "#E21515") +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+    labs(title = "GC Skew Across rDNA Sequence KY962518 (Exculding IGS)",
+         x = "rDNA",
+         y = "Normalised GC Skew") +
+    scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
+                       labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"),
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
+  
+  ggsave("KY962518_full_length_excld_IGS_normalised_gc_skew.tiff", 
+         plot = full_length_gc_skew_excld_igs, width=18, height = 10, dpi = 150)
+  
+  #plotting GC content
+  full_length_gc_content_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = GC_perc)) +
+    geom_line(color = "#E21515")+
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+    geom_hline(yintercept = 40.89, linetype = "dashed", color="darkgreen")+
+    labs(title = "GC Content Across rDNA Sequence KY962518 (Exculding IGS)",
+         x = "rDNA",
+         y = "GC Content") +
+    scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
+                       labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"),
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
+  
+  ggsave("KY962518_full_length_excld_IGS_GC_content.tiff", 
+         plot = full_length_gc_content_excld_igs, width=18, height = 10, dpi = 150)
+  
+  
+  
+  #plotting CpG dinucleotide content
+  full_length_CpG_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = CpG_OE)) +
+    geom_line(color = "#E21515")+
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+    geom_hline(yintercept = 0.6, linetype = "dashed", color="darkorange")+
+    labs(title = "CpG dinucleotides O/E ratio Across rDNA Sequence KY962518 (Exculding IGS)",
+         x = "rDNA",
+         y = "CpG dinucleotides O/E ratio") +
+    scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
+                       labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"),
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
+  
+  ggsave("KY962518_full_length_excld_IGS_CpG_dinucleotides_OE_ratio.tiff", 
+         plot = full_length_CpG_excld_igs, width=18, height = 10, dpi = 150)
+  
+  
+  full_length_CpG_perc_excld_igs<- ggplot(rdna_human[1:8,], aes(x = x_axis, y = CpG_perc)) +
+    geom_line(color = "#E21515")+
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+    labs(title = "CpG dinucleotides rDNA Sequence KY962518 (Exculding IGS)",
+         x = "rDNA",
+         y = "CpG dinucleotides percent") +
+    scale_x_continuous(breaks = c(2202, 5859, 7728,8798, 8955, 10122, 15173, 15534 ),
+                       labels = c("promoter", "5'ETS", "18S", "ITS1", "5.8S", "ITS2", "28S", "3'ETS"))+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          text = element_text(size = 30),
+          axis.line = element_line(color = "black"),
+          panel.grid = element_blank(),
+          panel.background = element_rect(fill = "white", color = "black"),#if you want to add a rectangle box or you can use theme_minimal()
+          axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, size = 25), # Center Y-axis title
+          axis.ticks.y = element_line(color = "black"),
+          axis.text.x = element_text(angle = 45, hjust = 1, size=20, color = "black"),
+          axis.text.y = element_text(color = "black"))
+  
+  ggsave("KY962518_full_length_excld_IGS_CpG_dinucleotides_perc.tiff", 
+         plot = full_length_CpG_perc_excld_igs, width=18, height = 10, dpi = 150)
+  
+  
+# there is no need to make template ones because it will be mirror image of non -template
+
+# Above result showed that there is a GC skew rDNA region. the maximum is seen in promoter region, followed by 28s region than 5'ETS. 
+# lowest is seen in 18S.
+
+ #CpG dinucleotides 
 # as per Gardiner-Garden and Frommer: paper title : CpG Islands in vertebrate genomes (1987) teh CpG has to have a length of 200, GC >50%, and CpG O/E >0.6
 # but in 2002 a new paper published takai and Jones (Comprehensive analysis of CpG islands in human chromosomes 21 and 22)
 # they said that earlier formula was made when sequencing was not performed, contain repetitive and alu elements. 
@@ -356,11 +345,6 @@ for ( i in bin_size){
   
   
 }  
-
-
-
-
-
 
 # if you want to run non-sliding skew
 non_sliding_skew<- gc_skew_data$fixed_window_results
@@ -428,46 +412,9 @@ fwrite(non_sliding_skew, paste0("KY962518_5ETS_TO_3ETS_gc_skew_non_sliding_data_
   ggsave(paste0("KY962518_5ETS_TO_3ETS_gc_content_non_sliding_", i, "bp.tiff"), 
          plot = non_sliding_content_graph, width=18, height = 10, dpi = 150)
   
+}
 
 
-  #if you want to visualize 
-  library(karyoploteR)
-  
-  #need to plot only from 5'ETS to 3'ETS
-  png("rdna.png", width = 10, height= 10, units= "in", res = 600)
-  
-  custom_genome <- toGRanges(data.frame(chr="rDNA_locus", start=1, end=19000))
-  kp <- plotKaryotype(genome=custom_genome, plot.type = 2)
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 1, x1 =1298 , y0 = 0, y1 = 1, col = "white", data.panel = "ideogram", borders= NA) #marks last 1298bp from IGS representing previous rdna 
-  kpRect(kp, chr = 'rDNA_locus', x0 = 1299, x1 =3500 , y0 = 0, y1 = 1, col = "#B6FFF4", data.panel = "ideogram", borders= NA) #marks 2202 bp of  promoter
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 3501, x1 = 7157 , y0 = 0, y1 = 1, col = "#FDCCE5", data.panel = "ideogram", borders= NA) #marks 5'ETS (3501+(3657-1))
-  #3501+(3657-1) = 7157
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 7158, x1 = 9026, y0 = 0, y1 = 1, col = "#D0B6FF", data.panel = "ideogram", borders= NA) #marks 18S
-  #7158+ (1869-1) = 9026
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 9027, x1 = 10096, y0 = 0, y1 = 1, col = "#EF9B20", data.panel = "ideogram", borders= NA) #marks ITS1S
-  #9027+ (1070-1) = 10096 
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 10097, x1 = 10253, y0 = 0, y1 = 1, col = "#A0322B", data.panel = "ideogram", borders= NA) #marks 5.8S
-  #10097+ (157-1) = 10253
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 10254, x1 = 11420, y0 = 0, y1 = 1, col = "#FFCC17", data.panel = "ideogram", borders= NA) #marks ITS2
-  #10254+(1167-1) = 11420
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 11421, x1 = 16471, y0 = 0, y1 = 1, col = "#E5FFB6", data.panel = "ideogram", borders= NA) #marks 28S
-  #11421+(5051-1) = 16471
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 16472, x1 = 16832, y0 = 0, y1 = 1, col = "#3B8CC4", data.panel = "ideogram", borders= NA) #marks 3'ETS
-  #16472+(361-1) = 16832
-  
-  kpRect(kp, chr = 'rDNA_locus', x0 = 16833, x1 = 19000, y0 = 0, y1 = 1, col = "white", data.panel = "ideogram", borders= NA) #marks IGS
-  
-  #16472+(361-1) = 16832
-  
-  dev.off()
   
   
 

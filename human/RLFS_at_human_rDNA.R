@@ -1,11 +1,33 @@
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   Quantifies and visualizes R-loop forming sequences (RLFSs) across the human
+#   rDNA locus (KY962518 + 3.5 kb upstream IGS) based on their origin.
+#   RLFSs are assigned to the region where they first appear (e.g., an RLFS
+#   spanning 5′ETS–18S is counted under 5′ETS). Outputs regional counts,
+#   normalized densities, and strand-specific RLFS distributions.
+#
+# Major Steps:
+#   1. Import QMRLFS output BED file and filter to promoter–IGS range (1299–46136 bp).
+#   2. Assign RLFSs to rDNA subregions based on start coordinate and strand.
+#   3. Compute region-specific counts, lengths, normalized densities, and proportions.
+#   4. Generate bar plots:
+#        - Fig. 2C: RLFS proportion per rDNA region
+#        - Fig. 2D: Length-normalized RLFS density
+#        - Fig. 2E: Strandwise RLFS density (template vs non-template)
+#
+# Input:
+#   - Human rDNA FASTA sequence (GenBank: KY962518)
+#   - RLFS output text file from QmRLFS-finder.py
+# (KY962518_added_3500nt_IGS_upstream_qmrlfs.out.bed (QMRLFS output, supplementary table 2))
+#
+# Output:
+#  - Annotated CSV file and plots of RLFS counts, density and proportion per rDNA region.
+# ------------------------------------------------------------------------------
 
-##i want plot bar graph RLFS in huan rDNA region based on where RLFS originates
-#the rule: Counting the presence of RLFSs where it is first detected. For example, if RLFSs start towards the
-# end of 5'ETS but stretches to 18S then it will counted under 5'ETS. 
-
-
-#basically input file will be output file of human rDNA when passed through QmRLFS algorithm.
-#i have saved the output file as KY962518_added_3500nt_IGS_upstream_qmrlfs.out.bed in my system
 
 #import library
 library(data.table)

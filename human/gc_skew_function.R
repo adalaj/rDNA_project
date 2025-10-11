@@ -1,14 +1,37 @@
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   Compute GC skew across a DNA sequence, defined as:
+#       GC_skew = (G - C) / (G + C)
+#   GC skew indicates strand compositional bias and can reflect replication
+#   origin or transcriptional asymmetry.
+#
+#   If no window size is provided, GC skew is computed for the entire sequence.
+#   If a window size is provided, GC skew is computed for:
+#     (a) fixed, non-overlapping windows (1–10, 11–20, …)
+#     (b) sliding, overlapping windows (1–10, 2–11, …)
+#
+# Input:
+#   - seq: A character string representing a DNA sequence.
+#   - window_size: (optional) Integer; window length for skew calculation.
+#
+# Output:
+#   - If window_size = NULL → returns a data.frame with overall GC skew value.
+#   - If window_size provided → returns a list with two data.frames:
+#       * fixed_window_results
+#       * sliding_window_results
+#
+# Notes:
+#   - Case-insensitive ('g' and 'c' treated as 'G' and 'C').
+#   - Non-ACGT characters are allowed; they count toward window length but not
+#     toward GC skew numerator/denominator.
+#   - Function operates in memory (no input/output files).
+# ------------------------------------------------------------------------------
 
-#GC skew function 
-#This function calculates GC skew, which measures the relative abundance of guanine (G) and cytosine (C) in a given DNA sequence. It provides results based on either the entire sequence or using a window-based approach.
-# Handles two cases:
-#1) if window size is not provided, it calculated GC skew for the entire sequence
-#2) If window size is provided, it calculated GC skew using fixed (Non overlapping) and sliding windows (overlapping window).
-
-#non overlapping meaning bin size could be 1 to 10 then 11 to 20 
-# overlapping meaning bin size could be 1 to 10, 2 to 11 and so on. 
-
-
+#load library
 library(stringr)
 
 gc_skew <- function(seq, window_size= NULL){

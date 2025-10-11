@@ -1,14 +1,33 @@
-#Calculating GC content function
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   Compute GC content—the fraction/percent of 'G' and 'C' bases—in a DNA
+#   sequence. If no window size is provided, GC is computed for the full
+#   sequence. If a window size is provided, GC is computed for:
+#     (a) fixed, non-overlapping windows (1–10, 11–20, …)
+#     (b) sliding, overlapping windows (1–10, 2–11, …)
+#
+# Input:
+#   - seq: A character string representing a DNA sequence.
+#   - window_size: (optional) Integer; window length for GC calculation.
+#
+# Output:
+#   - If window_size = NULL → returns a data.frame with overall GC content.
+#   - If window_size provided → returns a list with two data.frames:
+#       * fixed_window_results
+#       * sliding_window_results
+#
+# Notes:
+#   - Function operates in memory (no input/output files).
+#   - Case-insensitive; 'g' and 'c' treated as 'G' and 'C'.
+#   - Non-ACGT characters are ignored in GC counting.
+# ------------------------------------------------------------------------------
 
-#this function simply calculates GC content that is the percentage of G and C in a given DNA sequence.
 
-#1) if window size is not provided, it calculated GC content for the entire sequence
-#2) If window size is provided, it calculated GC content using fixed (Non overlapping) and sliding windows (overlapping window).
-
-#non overlapping meaning bin size could be 1 to 10 then 11 to 20 
-# overlapping meaning bin size could be 1 to 10, 2 to 11 and so on. 
-
-
+#load library
 library(stringr)
 
 gc_content <- function(seq, window_size= NULL){

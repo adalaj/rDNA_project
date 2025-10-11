@@ -152,7 +152,58 @@ for (j in 1: nrow(rdna_hg38_dataset_sequences)[1:9]){
 
 
 
-#refer human_rdna_gc_skew.R code to see calculation of GC percent, GC skew and AT percent
+rdna_human<- fread ("rdna_hg38_chr21_2018_dataset_details_v2.csv", sep = ",", header = TRUE)
+attempt1<- data.frame((matrix(nrow = 0, ncol=6))) #6 coloumns because Gc skew has 6 columns
+
+#calculate GC skew
+source("./gc_skew_function.R")
+
+for ( i in 1:nrow(rdna_human)){
+  gc_skew_data<- gc_skew(rdna_human$Sequences[i])
+  attempt1<- rbind(attempt1, gc_skew_data)
+}
+
+selected_gc_skew_data <- attempt1 %>% select(GC_skew_value) 
+rdna_human<- cbind(rdna_human, selected_gc_skew_data)
+
+
+#calculated GC skew for template strand as well
+attempt2<- data.frame((matrix(nrow = 0, ncol=6)))
+for ( i in 1:nrow(rdna_human)){
+  rev_seq<- as.character(reverseComplement(DNAString(rdna_human$Sequences[i])))
+  temp_gc_skew<- gc_skew(rev_seq)
+  attempt2<- rbind(attempt2, temp_gc_skew)
+  
+}
+
+template_GC_skew<- attempt2 %>% select(window_seq, G_count, C_count, GC_skew_value)
+colnames(template_GC_skew)<- c("template_seq", "temp_G_count", "temp_C_count", "temp_GC_skew_value")
+rdna_human<- cbind(rdna_human, template_GC_skew)
+
+
+# wanted to add cumulative sum of total nucleotides for future 
+rdna_human<- rdna_human %>% mutate(norm_GC_skew = GC_skew_value/sum(GC_skew_value))
+rdna_human<- rdna_human %>% mutate(temp_norm_GC_skew = temp_GC_skew_value/sum(GC_skew_value))
+
+rdna_human$x_axis <- cumsum(rdna_human$Total_nucleotides)
+
+#calculated GC and AT perc
+rdna_human<- rdna_human %>% mutate(GC_perc = round(((G+C)/(Total_nucleotides))*100,2))
+rdna_human<- rdna_human %>% mutate(AT_perc = round(((A+T)/(Total_nucleotides))*100,2))
+
+
+#also wanted to calculate CpG or CG dinucleotide
+
+rdna_human <- rdna_human %>%
+  mutate(
+    CpG_count = str_count(Sequences, "CG"),
+    CpG_perc = (CpG_count/Total_nucleotides)*100,
+    CpG_OE = (CpG_count * Total_nucleotides) / (G * C))
+
+
+
+fwrite(rdna_human, "rdna_hg38_chr21_2018_dataset_details_v3.csv")
+
 
 rdna_human<- fread("rdna_hg38_chr21_2018_dataset_details_v3.csv", sep = ",", header = TRUE)
 
@@ -357,20 +408,5 @@ for (nm in names(datasets)) {
   
   
   }
-
-geom_text(aes(label = Percent), position = position_stack(vjust = 0.5), size = 18)+# fontface = "bold") +
-  theme(plot.title = element_text(hjust = 0.5), #face = "bold", size=20),
-        plot.subtitle = element_text(hjust = 0.5),
-        text = element_text(size = 80), #face = "bold"),
-        axis.line = element_line(color = "black", linewidth = 4),
-        panel.grid = element_blank(),
-        axis.title.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r=20)),
-        axis.ticks = element_line(color = "black", linewidth = 4),
-        axis.ticks.length = unit(30, "pt"),
-        axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
-        axis.text.y  = element_text(color = "black"),
-        panel.background = element_blank(),   # removes grey background
-        plot.background  = element_blank(),
-        legend.position = "top") 
 
 

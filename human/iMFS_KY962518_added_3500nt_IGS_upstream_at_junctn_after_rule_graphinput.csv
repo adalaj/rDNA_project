@@ -1,0 +1,18 @@
+rDNA_region,rDNA_region_length,iMFS_count,iMFS_density,iMFS_proportion_perc
+Promoter,2202,5,0.0023,5.88
+Promoter and 5'ETS junction,0,0,,0
+5'ETS,3657,7,0.0019,8.24
+5'ETS and 18S junction,0,0,,0
+18S,1869,1,5e-04,1.18
+18S and ITS1 junction,0,0,,0
+ITS1,1070,3,0.0028,3.53
+ITS1 and 5.8S junction,0,0,,0
+5.8S,157,0,0,0
+5.8S and ITS2 junction,0,0,,0
+ITS2,1167,8,0.0069,9.41
+ITS2 and 28S junction,0,0,,0
+28S,5051,15,0.003,17.65
+28S and 3'ETS junction,0,0,,0
+3'ETS,361,2,0.0055,2.35
+3'ETS and IGS junction,0,0,,0
+IGS,29305,44,0.0015,51.76
