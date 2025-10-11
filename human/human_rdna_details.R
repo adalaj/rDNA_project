@@ -1,15 +1,54 @@
-##Aim: Find the total nucleotide distribution percent in KY962518_2018 NCBI entry that is for human rDNA locus. 
-## this calculation as been previously done in my earliar code. 
-##however, after alot of back and forth we redefined the promoter and IGS boundary. 
-## we simply took 2202 from IGS end side, because these were matching with UCSC hg38 nucleotides and added them to front of 5'ETS. We call them as promoter. 
-## so manually i added 3500 bp form IGS to upstream of 5'ETS 
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+#   This script extracts individual regions from the human rDNA reference
+#   sequence (KY962518, with added upstream 3.5 kb IGS extension) and computes
+#   nucleotide composition (A, T, G, C counts and percentages) for each region.
+#   The script also generates publication-quality bar plots comparing AT vs GC
+#   content and individual base distribution across annotated rDNA segments.
+#
+# Major Steps:
+#   1. Load extended human rDNA sequence (KY962518_added_3500nt_IGS_upstream).
+#   2. Define functional subregions (promoter, ETS, ITS, 18S, 5.8S, 28S, IGS).
+#   3. Compute total nucleotide counts (A, T, G, C) and percentages.
+#   4. Save composition tables as CSV and FASTA files for downstream analyses.
+#   5. Generate bar plots:
+#        - AT vs GC content across rDNA subregions (Fig. 3)
+#        - Individual nucleotide distribution (A, T, G, C; Fig. 4)
+#        - Entire rDNA composition summary (Fig. 2)
+#
+# Input:
+#   - KY962518_added_3500nt_IGS_upstream_nontemplate.fasta
+#       Extended human rDNA reference sequence including upstream IGS.
+#
+# Output:
+#   - rdna_hg38_chr21_2018_dataset_details_v2.csv
+#       Nucleotide counts and percentages for all defined regions.
+#   - rDNA_KY962518_2018_sequence_fasta_format.txt
+#       FASTA-formatted sequences for promoter, ETS, ITS, rRNAs, and IGS.
+#   - rdna_2018_no_igs_AT_vs_GC_sequences_nucleotide_distribution.tiff
+#       Bar plot of AT vs GC content.
+#   - rdna_2018_no_igs_ATGC_only_sequences_nucleotide_distribution.tiff
+#       Bar plot of individual nucleotide percentages.
+#   - entire_rdna_sequences_nucleotide_distribution.tiff
+#       Summary of overall rDNA nucleotide composition.
+#
+# Notes:
+#   - Sequence boundaries follow KY962518 annotations with added upstream IGS.
+#   - Base composition is calculated using `stringr::str_count`.
+#   - Percentages are normalized to total nucleotides per region.
+#   - Visualization performed using ggplot2 (part of tidyverse).
+#   - Output figures are in TIFF format for publication use.
+#
+#------------------------------------------------------------------------------
 
-#in future if you want to avoid manual adding you can use stringr which i did for mouse rDNA refer code mouse_rdna_details.R
 
 
 
-
-
+#load libraries
 library(Biostrings)
 library(seqinr)
 library(stringr)
@@ -85,7 +124,6 @@ rdna_hg38_dataset_details_v2 <- rdna_hg38_dataset_v2 %>%
   select(1,2,3,4,5,9,6,10,7,11,8,12)
 
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/human/one_rDNA_seq/output")
 
 fwrite(rdna_hg38_dataset_details_v2, 
        file = "rdna_hg38_chr21_2018_dataset_details_v2.csv")
@@ -162,7 +200,7 @@ for (nm in names(datasets)) {
     dplyr::mutate(Nucleotide = factor(Nucleotide, levels = c("AT_perc", "GC_perc")))
   
   
-  #fig 3
+ 
  p_atgc<- ggplot(atgc, aes(x = Name, y = Percent, fill = Nucleotide)) + 
     geom_bar(stat = 'identity', color = "black") +
     labs(#title = "AT vs GC percent comparison",
@@ -202,7 +240,7 @@ for (nm in names(datasets)) {
     dplyr::mutate(Nucleotide = factor(Nucleotide, levels = c("A%", "T%", "G%", "C%")))
   
   
-  #fig 4
+
   p_atgc_only<- ggplot(atgc_only, aes(x = Name, y = Percent, fill = Nucleotide)) + 
     geom_bar(stat = 'identity', color = "black") +
     #theme(axis.text.x = element_text(angle = 45, size = 30, hjust = 1)) +
@@ -240,7 +278,7 @@ for (nm in names(datasets)) {
          plot = p_atgc_only, width = 20, height = 16, dpi = 600)
   
   
-  ###Fig 2 
+  
   
   # dataset 1: individual bases
   df1 <- data.frame(
