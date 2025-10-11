@@ -1,27 +1,36 @@
-#i wanted to show evolutionary conservation
-#everything will be 5'ETS to 3'ETS
-# thinking to write a code that will code and simultaneously save the graphs
-#visualisation is identical for KX061890 and KX061890_and_NR_146166
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
 
-#for KX061890
+# Purpose: This R code is designed to visualize R-loops, G4 and imotif forming sequences in monkey rDNA (5'ETS to 3'ETS)
+# the code takes the input data and makes plots all predicted non-canonical DNA sequences in monkey rDNA (5'ETS to 3'ETS)
+# Inputs: G4FS_KX061890_monkey_junctn_details.csv, RLFS_KX061890_monkey_junctn_details.csv, monkey_imotif_5ets_KX061890_3ets_prediction_end_to_end_prediction_default_setting_master.csv (deposited in supplementary table)
+# Outputs: PNG files of strand-specific coverage plots 
+# ------------------------------------------------------------------------------
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/monkey")
-entire_g4s_rdna <- fread("pG4CS_KX061890_and_NR_146166_monkey_junctn_details.csv", header = TRUE, sep = ",")#114
-entire_g4s_rdna<- entire_g4s_rdna %>% select(chr, actual_pG4CS_start, actual_pG4CS_end, rDNA_region, strand)
 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/monkey")
+# load library
+library(tidyverse)
+library(data.table)
+library(karyoploteR)
+
+# load G-quadruplex forming sequences
+entire_g4s_rdna <- fread("G4FS_KX061890_monkey_junctn_details.csv", header = TRUE, sep = ",")#114
+entire_g4s_rdna<- entire_g4s_rdna %>% select(chr, actual_G4FS_start, actual_G4FS_end, rDNA_region, strand)
+
+# load R-loop forming sequences
 rlfs<- fread("RLFS_KX061890_monkey_junctn_details.csv", header = TRUE, sep = ",")#131
 rlfs<- rlfs %>% select(GenBank_Accession, actual_rlfs_start, actual_rlfs_end, rDNA_region, strand)
 
-
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/imotif/monkey")
+# load i-motif forming sequences
 imotif<- fread("monkey_imotif_5ets_KX061890_3ets_prediction_end_to_end_prediction_default_setting_master.csv", header = TRUE, sep = ",")#53
 imotif<- imotif %>% select(chr, actual_imotif_start, actual_imotif_end, rDNA_region, strand)
 
 
 #prepare datasets:
 
-datasets<- list(pG4CS=entire_g4s_rdna,
+datasets<- list(G4FS=entire_g4s_rdna,
                 RLFS=rlfs,
                 imotif=imotif)
 
@@ -196,8 +205,8 @@ for (i in names(nontemplate_filt_datasets)[3]){
 # make new for KX061890_and_NR_146166, custom genome to 12980
 
   setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/monkey")
-  entire_g4s_rdna <- fread("pG4CS_KX061890_and_NR_146166_monkey_junctn_details.csv", header = TRUE, sep = ",")
-  entire_g4s_rdna<- entire_g4s_rdna %>% select(chr, actual_pG4CS_start, actual_pG4CS_end, rDNA_region, strand)
+  entire_g4s_rdna <- fread("G4FS_KX061890_and_NR_146166_monkey_junctn_details.csv", header = TRUE, sep = ",")
+  entire_g4s_rdna<- entire_g4s_rdna %>% select(chr, actual_G4FS_start, actual_G4FS_end, rDNA_region, strand)
   
   setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/monkey")
   rlfs<- fread("RLFS_KX061890_and_NR_146166_monkey_junctn_details.csv", header = TRUE, sep = ",")
@@ -211,7 +220,7 @@ for (i in names(nontemplate_filt_datasets)[3]){
   
   #prepare datasets:
   
-  datasets<- list(pG4CS=entire_g4s_rdna,
+  datasets<- list(G4FS=entire_g4s_rdna,
                   RLFS=rlfs,
                   imotif=imotif)
   

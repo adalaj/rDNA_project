@@ -1,20 +1,56 @@
-#assign regions to monkey pG4CS 
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+# This R script processes G-quadruplex forming sequence (G4FS) predictions in the 
+# monkey rDNA locus to assign each predicted G4FS to defined 
+# rDNA subregions (5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS, and IGS).
+#
+
+# Specifically, it:
+#   1.Reads G4FS predictions generated using the G4 canonical finder 
+#      (run in Python: g4_canonical_finder_3.11python.py).
+#   2. Separates template and non-template strand G4FS predictions.
+#   3. Plots G4FS distributions on a custom rDNA ideogram using karyoploteR.
+#   4. Assigns each G4FS to rDNA subregions (5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS)
+#      based on strand-specific start coordinates.
+#   5. Counts and normalizes G4FS occurrences across subregions, including junctions,
+#      following the rule that a G4FS is assigned to the region where it initiates.
+#   6. Generates summary CSVs and high-resolution bar plots showing:
+#        - Overall normalized G4FS distribution
+#        - Strandwise (template vs non-template) distributions
+#        - Junction-inclusive and junction-excluded comparisons
+#
+# Inputs:
+#   - monkey rDNA FASTA sequence (GenBank: KX061890)
+#   - G4FS output text file from g4_canonical_finder_3.11python.py
+#
+# Outputs:
+#   - Annotated CSVs of G4FS counts per rDNA region (with and without junctions)
+#   - Strandwise G4FS summary CSV
+#   - Publication-quality TIFF figures of normalized G4FS distributions
+#
+# ------------------------------------------------------------------------------
+
 
 #open terminal
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % conda activate python3.11
-#(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta >output_pG4CS_nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.txt  
-#(python3.11) jyotiadala@Jyotis-MacBook-Pro Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX061890_3ets.fasta >output_pG4CS_nontemplate_monkey_5ets_KX061890_3ets.txt      
+#(python2.7) Downloads % conda activate python3.11
+#(python3.11) Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta >output_G4FS_nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.txt  
+#(python3.11) Downloads % python g4_canonical_finder_3.11python.py nontemplate_monkey_5ets_KX061890_3ets.fasta >output_G4FS_nontemplate_monkey_5ets_KX061890_3ets.txt      
 
 
 
 setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/g4s_and_rdna/monkey")
 library(data.table)
 library(tidyverse)
+library(karyoploteR)
 
-KX061890<- fread("output_pG4CS_nontemplate_monkey_5ets_KX061890_3ets.txt", sep = "\t", header = FALSE) #114
-KX061890_and_NR_146166<- fread("output_pG4CS_nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.txt", sep = "\t", header = FALSE) #114
+KX061890<- fread("output_G4FS_nontemplate_monkey_5ets_KX061890_3ets.txt", sep = "\t", header = FALSE) #114
+KX061890_and_NR_146166<- fread("output_G4FS_nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.txt", sep = "\t", header = FALSE) #114
 
-#no difference in pG4CS count or annotation
+#no difference in G4FS count or annotation
 
 datasets<- list(
   KX061890 = KX061890,
@@ -25,7 +61,7 @@ for (i in names(datasets)){
   filename<- i
   
   entire_g4s_rdna<- datasets[[i]]
-  colnames(entire_g4s_rdna) <- c("chr", "pG4CS_start", "pG4CS_end", "sequence", "name", "strand")
+  colnames(entire_g4s_rdna) <- c("chr", "G4FS_start", "G4FS_end", "sequence", "name", "strand")
   
   
   entire_g4s_rdna$rDNA_region <- "junction"
@@ -34,35 +70,35 @@ for (i in names(datasets)){
   #strand specificity will matter here now we want to allocate RLFS to rdna region sub components  based on their direction
   # to do that, i will be creating a column that will have actual RLFS start based on strand specificity
   
-  entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_pG4CS_start = ifelse(entire_g4s_rdna$strand == "+", pG4CS_start, pG4CS_end))
-  entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_pG4CS_end = ifelse(entire_g4s_rdna$strand == "+", pG4CS_end, pG4CS_start))
-  entire_g4s_rdna$pG4CS_length<- abs(entire_g4s_rdna$pG4CS_start-entire_g4s_rdna$pG4CS_end)
+  entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_G4FS_start = ifelse(entire_g4s_rdna$strand == "+", G4FS_start, G4FS_end))
+  entire_g4s_rdna<- entire_g4s_rdna %>% mutate(actual_G4FS_end = ifelse(entire_g4s_rdna$strand == "+", G4FS_end, G4FS_start))
+  entire_g4s_rdna$G4FS_length<- abs(entire_g4s_rdna$G4FS_start-entire_g4s_rdna$G4FS_end)
   
   
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 1] <- "5'ETS"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 1] <- "5'ETS"
   
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 3640 ] <- "5'ETS and 18S junction"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 3640 ] <- "5'ETS and 18S junction"
   
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 3641] <- "18S"
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 5508 ] <- "18S and ITS1 junction"
-  
-  
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 5509   ] <- "ITS1"
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 6535] <- "ITS1 and 5.8S junction"
-  
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 6536 ] <- "5.8S"
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 6692 ] <- "5.8S and ITS2 junction"
-  
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 6693] <- "ITS2"
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 7863] <- "ITS2 and 28S junction"
-  
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 7864 ] <- "28S"
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start > 12648 ] <- "28S and 3'ETS junction"
-  
-  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_pG4CS_start >= 12649] <- "3'ETS"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 3641] <- "18S"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 5508 ] <- "18S and ITS1 junction"
   
   
-  fwrite(entire_g4s_rdna, paste0("pG4CS_",i, "_monkey_junctn_details.csv"), sep = ",")
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 5509   ] <- "ITS1"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 6535] <- "ITS1 and 5.8S junction"
+  
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 6536 ] <- "5.8S"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 6692 ] <- "5.8S and ITS2 junction"
+  
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 6693] <- "ITS2"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 7863] <- "ITS2 and 28S junction"
+  
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 7864 ] <- "28S"
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start > 12648 ] <- "28S and 3'ETS junction"
+  
+  entire_g4s_rdna$rDNA_region[entire_g4s_rdna$actual_G4FS_start >= 12649] <- "3'ETS"
+  
+  
+  fwrite(entire_g4s_rdna, paste0("G4FS_",i, "_monkey_junctn_details.csv"), sep = ",")
 }
 
 #####################################below code has not executed################
@@ -98,13 +134,13 @@ entire_g4s_rdna_summary$rDNA_region
 
 
 row.names(entire_g4s_rdna_summary)<- entire_g4s_rdna_summary$rDNA_region
-names(entire_g4s_rdna_summary)[2] <- "pG4CS_count"
+names(entire_g4s_rdna_summary)[2] <- "G4FS_count"
 
 
-entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(norm_pG4CS_count = pG4CS_count/sum(entire_g4s_rdna_summary$pG4CS_count)) %>% 
-  mutate(norm_pG4CS_count= round(norm_pG4CS_count, 2))
+entire_g4s_rdna_summary<- entire_g4s_rdna_summary %>% mutate(norm_G4FS_count = G4FS_count/sum(entire_g4s_rdna_summary$G4FS_count)) %>% 
+  mutate(norm_G4FS_count= round(norm_G4FS_count, 2))
 
-fwrite(entire_g4s_rdna_summary, "pG4CS_KX061890_monkey_at_junctn_graphinput.csv", sep = ",")
+fwrite(entire_g4s_rdna_summary, "G4FS_KX061890_monkey_at_junctn_graphinput.csv", sep = ",")
 
 entire_g4s_rdna_summary$rDNA_region <- factor(entire_g4s_rdna_summary$rDNA_region, 
                                               levels = c("5'ETS", "5'ETS and 18S junction", 
@@ -113,13 +149,13 @@ entire_g4s_rdna_summary$rDNA_region <- factor(entire_g4s_rdna_summary$rDNA_regio
                                                          "28S and 3'ETS junction", "3'ETS" ))
 
 
-g4s_norm<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = norm_pG4CS_count, fill= rDNA_region)) + 
+g4s_norm<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = norm_G4FS_count, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized pG4CS distribution in the monkey rDNA locus", 
+  labs(title= "Normalized G4FS distribution in the monkey rDNA locus", 
        x= "monkey rDNA region", 
-       y= "Normalized pG4CS count")+
+       y= "Normalized G4FS count")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.70))+
-  geom_text(aes(label= pG4CS_count, vjust= -0.5, size= 50))+
+  geom_text(aes(label= G4FS_count, vjust= -0.5, size= 50))+
   scale_fill_manual(values= c("#FDCCE5", "steelblue", "#D0B6FF","darkviolet", "#EF9B20","burlywood2", "#A0322B", 
                               "pink", "#FFCC17","aquamarine", "#E5FFB6","greenyellow", "#3B8CC4"))+
   #scale_fill_manual(values = combined_colors)+
@@ -135,7 +171,7 @@ g4s_norm<- ggplot(entire_g4s_rdna_summary, aes(x= rDNA_region, y = norm_pG4CS_co
   theme(axis.ticks.y = element_line(color = "black"))
 #coord_flip()
 
-ggsave( "Normalized_pG4CS_distribution_in_monkey_rDNA_subcomponents_incld_junctn_AR.tiff", 
+ggsave( "Normalized_G4FS_distribution_in_monkey_rDNA_subcomponents_incld_junctn_AR.tiff", 
         plot = g4s_norm, width=18,height=10, dpi=150)
 
 
@@ -155,14 +191,14 @@ g4s_rdna_summary$rDNA_region <- factor(g4s_rdna_summary$rDNA_region,
 #To reverse the order so that "Promoter" appears at the top when flipped, modify the levels of the factor like this
 
 
-g4s_norm_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = norm_pG4CS_count, fill= rDNA_region)) + 
+g4s_norm_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = norm_G4FS_count, fill= rDNA_region)) + 
   geom_bar(stat= 'identity', color= "black") +
-  labs(title= "Normalized pG4CS distribution in the monkey rDNA locus", 
+  labs(title= "Normalized G4FS distribution in the monkey rDNA locus", 
        x= "monkey rDNA region", 
-       y= "Normalized pG4CS count", 
+       y= "Normalized G4FS count", 
        fill = "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.60, by = 0.1), limits =c(0,0.70))+
-  geom_text(aes(label= pG4CS_count, hjust= -1.0, vjust= 0.5, size= 50))+
+  geom_text(aes(label= G4FS_count, hjust= -1.0, vjust= 0.5, size= 50))+
   scale_fill_manual(values= rev(c("#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
                                   "#FFCC17", "#E5FFB6", "#3B8CC4")))+
   #guides(fill = guide_legend(reverse = TRUE))
@@ -178,38 +214,38 @@ g4s_norm_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = norm_pG4CS_c
         axis.ticks.y = element_line(color = "black"))+
   coord_flip()
 
-ggsave("Normalized_pG4CS_distribution_in_monkey_rDNA_subcomponents_after_rule.tiff", 
+ggsave("Normalized_G4FS_distribution_in_monkey_rDNA_subcomponents_after_rule.tiff", 
        plot = g4s_norm_nojuntn, width=18,height=10, dpi=150)
 
 
 
 #to make template and non-template
 entire_g4s_rdna_summary2<- entire_g4s_rdna %>% group_by(rDNA_region, strand) %>% count()
-names(entire_g4s_rdna_summary2)[3] <- "pG4CS_count"
+names(entire_g4s_rdna_summary2)[3] <- "G4FS_count"
 
 new_rows<- data.table(rDNA_region = c("5'ETS","3'ETS","3'ETS","18S","18S","5.8S","5.8S"),
                       strand= c("+","+", "-","+","-", "+", "-"),
-                      pG4CS_count = c(0,0, 0,0,0,0,0))
+                      G4FS_count = c(0,0, 0,0,0,0,0))
 
 entire_g4s_rdna_summary2<- rbind(entire_g4s_rdna_summary2, new_rows)
 entire_g4s_rdna_summary2$rDNA_region <- factor(entire_g4s_rdna_summary2$rDNA_region, 
                                                levels = c("5'ETS", "18S", "ITS1", "5.8S", 
                                                           "ITS2","28S", "3'ETS"))
 
-entire_g4s_rdna_summary2<- entire_g4s_rdna_summary2 %>% mutate(norm_pG4CS_count = pG4CS_count/sum(entire_g4s_rdna_summary2$pG4CS_count)) %>% 
-  mutate(norm_pG4CS_count= round(norm_pG4CS_count, 2))
+entire_g4s_rdna_summary2<- entire_g4s_rdna_summary2 %>% mutate(norm_G4FS_count = G4FS_count/sum(entire_g4s_rdna_summary2$G4FS_count)) %>% 
+  mutate(norm_G4FS_count= round(norm_G4FS_count, 2))
 
-fwrite(entire_g4s_rdna_summary2, "pG4CS_KX061890_monkey_no_junctn_strandwise_AR_graphinput.csv")
+fwrite(entire_g4s_rdna_summary2, "G4FS_KX061890_monkey_no_junctn_strandwise_AR_graphinput.csv")
 
 
-g4s_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm_pG4CS_count, fill= strand)) + 
+g4s_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm_G4FS_count, fill= strand)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized pG4CS strandwise distribution in the monkey rDNA locus", 
+  labs(title= "Normalized G4FS strandwise distribution in the monkey rDNA locus", 
        x= "monkey rDNA region", 
-       y= "Normalized pG4CS count", 
-       fill= "pG4CS strand")+
+       y= "Normalized G4FS count", 
+       fill= "G4FS strand")+
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
-  geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  geom_text(aes(label= G4FS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   scale_fill_manual(values= c("+" = "#E21515", "-" = "#1414E1"), 
                     labels = c("+" = "Non-template", "-" = "Template"))+
   #scale_fill_manual(values = combined_colors)+
@@ -226,7 +262,7 @@ g4s_strandwise<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = norm_p
 
 
 
-ggsave( "Normalized_strandwise_pG4CS_distribution_in_monkey_rDNA_subcomponents_AR.tiff", 
+ggsave( "Normalized_strandwise_G4FS_distribution_in_monkey_rDNA_subcomponents_AR.tiff", 
         plot = g4s_strandwise, width=18,height=10, dpi=150)
 
 
@@ -245,14 +281,14 @@ template$rDNA_region <- factor(template$rDNA_region,
 
 
 
-g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_pG4CS_count, fill= rDNA_region)) + 
+g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_G4FS_count, fill= rDNA_region)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized Non-template pG4CS distribution in the monkey rDNA locus", 
+  labs(title= "Normalized Non-template G4FS distribution in the monkey rDNA locus", 
        x= "monkey rDNA region", 
-       y= "Normalized Non-template pG4CS count", 
+       y= "Normalized Non-template G4FS count", 
        fill= "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
-  geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  geom_text(aes(label= G4FS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
   scale_fill_manual(values= c("#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
                               "#FFCC17", "#E5FFB6", "#3B8CC4"))+
@@ -267,17 +303,17 @@ g4s_nontemplate <- ggplot(nontemplate, aes(x= rDNA_region, y = norm_pG4CS_count,
         axis.ticks.y = element_line(color = "black"))
 
 
-ggsave( "Normalized_nontemplate_pG4CS_distribution_in_monkey_rDNA_subcomponents_AR.tiff", 
+ggsave( "Normalized_nontemplate_G4FS_distribution_in_monkey_rDNA_subcomponents_AR.tiff", 
         plot = g4s_nontemplate, width=18,height=10, dpi=150)
 
-g4s_template <- ggplot(template, aes(x= rDNA_region, y = norm_pG4CS_count, fill= rDNA_region)) + 
+g4s_template <- ggplot(template, aes(x= rDNA_region, y = norm_G4FS_count, fill= rDNA_region)) + 
   geom_bar(stat= "identity", position ="dodge", color = "black") +
-  labs(title= "Normalized Template pG4CS distribution in the monkey rDNA locus", 
+  labs(title= "Normalized Template G4FS distribution in the monkey rDNA locus", 
        x= "monkey rDNA region", 
-       y= "Normalized Template pG4CS count", 
+       y= "Normalized Template G4FS count", 
        fill= "rDNA")+
   scale_y_continuous(breaks= seq(0, 0.40, by = 0.1), limits =c(0,0.40))+
-  geom_text(aes(label= pG4CS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
+  geom_text(aes(label= G4FS_count), vjust= -1.0, size= 6, position = position_dodge(width = 0.9))+
   
   scale_fill_manual(values= c( "#FDCCE5", "#D0B6FF", "#EF9B20", "#A0322B", 
                                "#FFCC17", "#E5FFB6", "#3B8CC4"))+
@@ -292,7 +328,7 @@ g4s_template <- ggplot(template, aes(x= rDNA_region, y = norm_pG4CS_count, fill=
         axis.ticks.y = element_line(color = "black"))
 
 
-ggsave( "Normalized_template_pG4CS_distribution_in_monkey_rDNA_subcomponents_AR.tiff", 
+ggsave( "Normalized_template_G4FS_distribution_in_monkey_rDNA_subcomponents_AR.tiff", 
         plot = g4s_template, width=18,height=10, dpi=150)
 
 
@@ -301,8 +337,8 @@ BiocManager::install("karyoploteR")
 library(karyoploteR)
 
 
-#read the pG4CS that overlapped with rdna locus
-entire_rdna<- fread("output_pG4CS_KX061890_monkey_rDNA_2017.txt", sep = "\t", header = FALSE) #65
+#read the G4FS that overlapped with rdna locus
+entire_rdna<- fread("output_G4FS_KX061890_monkey_rDNA_2017.txt", sep = "\t", header = FALSE) #65
 entire_rdna$V1= "rDNA_locus"
 colnames(entire_rdna)<- c("chr", "start", "end", "sequence", "name", "strand")
 
@@ -332,7 +368,6 @@ kpPlotRegions(kp, data=entire_rdna6_nontemplate, col="#E21515", r0= -0.5, r1= -1
 
 
 
-#use zoom option, took screenshot and edited in powerpoint
 
 
 

@@ -1,8 +1,16 @@
+# ------------------------------------------------------------------------------
+# This code is part of paper: In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus.
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+
+# Purpose: This R code is designed to characterize nucleotide distribution of monkey rDNA sequence 
+# Inputs:fasta file from https://www.ncbi.nlm.nih.gov/nuccore/KX061890 
+# the code takes the input monkey rDNA fasta file, divide sequence into specific rDNA regions and count their nucleotide distribution
+# Outputs: Nucleotide distribution csv file for monkey rDNA
+# ------------------------------------------------------------------------------
+
 
 #to gather information on monkey rDNA
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/monkey")
-
-
 library(Biostrings)
 library(data.table)
 library(tidyverse)

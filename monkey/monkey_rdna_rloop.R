@@ -1,14 +1,48 @@
-#assign regions to monkey RLFS 
-
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/rloop_and_rdna/monkey")
+# ------------------------------------------------------------------------------
+# This code accompanies the paper:
+# "In silico Mapping of Non-Canonical DNA Structures Across the Human Ribosomal DNA Locus"
+# Author: Jyoti Devendra Adala under supervision of Dr. Bruce Knutson
+# For updates and contributions, visit : https://github.com/adalaj
+#
+# Purpose:
+# This R script processes and visualizes R-loop forming sequence (RLFS) predictions 
+# across the monkey rDNA locus obtained from the QmRLFS-finder algorithm.
+# It assigns each predicted RLFS to defined rDNA subregions and quantifies their 
+# strand-specific and normalized distributions for both analytical and visual representation.
+#
+# Specifically, it:
+#   1. Runs QmRLFS-finder (v1.5) on the monkey rDNA FASTA sequence 
+#      (GenBank: KX061890) to identify RLFSs in BED format.
+#   2. Parses and processes the RLFS output to calculate start–end coordinates, 
+#      strand specificity, and RLFS lengths.
+#   3. Assigns each RLFS to rDNA subcomponents (5′ETS, 18S, ITS1, 5.8S, ITS2, 28S, 3′ETS) 
+#      using a rule-based system that counts RLFSs in the region where they initiate, 
+#      ensuring junction-spanning RLFSs are not lost to boundary truncation.
+#   4. Computes raw and normalized RLFS counts per region, including junctional regions, 
+#      and generates tabular outputs suitable for statistical or graphical analyses.
+#   5. Visualizes RLFS distributions using bar plots (overall, junction-excluded, 
+#      and strandwise) and custom ideograms with karyoploteR for template and 
+#      non-template strands.
+#
+# Inputs:
+#   - monkey rDNA FASTA sequence (GenBank: KX061890)
+#   - BED output file from QmRLFS-finder (v1.5)
+#
+# Outputs:
+#   - Annotated CSVs summarizing RLFS counts per rDNA region (with and without junctions)
+#   - Strandwise normalized RLFS count tables
+#   - Publication-quality TIFF plots showing RLFS distributions
+#   - KaryoploteR ideograms illustrating RLFS positions on both strands
+#
+# ------------------------------------------------------------------------------
 
 library(data.table)
 library(tidyverse)
 
 
 #open terminal
-#(base) jyotiadala@Jyotis-MacBook-Pro ~ % conda activate python2.7
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta -o nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets_qmrlfs
+#(base) % conda activate python2.7
+#(python2.7)  Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta -o nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets_qmrlfs
 #QmRLFS-finder.py (version v1.5)
 #run on Wed Jun 11 2025 16:07:03 
 #command line: python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets.fasta -o nontemplate_monkey_5ets_KX061890_and_NR_146166_3ets_qmrlfs
@@ -17,7 +51,7 @@ library(tidyverse)
 
 
 
-#(python2.7) jyotiadala@Jyotis-MacBook-Pro Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_3ets.fasta -o nontemplate_monkey_5ets_KX061890_3ets_qmrlfs 
+#(python2.7)  Downloads % python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_3ets.fasta -o nontemplate_monkey_5ets_KX061890_3ets_qmrlfs 
 #QmRLFS-finder.py (version v1.5)
 #run on Wed Jun 11 2025 16:14:35 
 #command line: python QmRLFS-finder.py -bed -i nontemplate_monkey_5ets_KX061890_3ets.fasta -o nontemplate_monkey_5ets_KX061890_3ets_qmrlfs
@@ -119,7 +153,7 @@ names(entire_RLFSs_rdna_summary)[2] <- "RLFS_count"
 entire_RLFSs_rdna_summary<- entire_RLFSs_rdna_summary %>% mutate(norm_RLFS_count = RLFS_count/sum(entire_RLFSs_rdna_summary$RLFS_count)) %>% 
   mutate(norm_RLFS_count= round(norm_RLFS_count, 2))
 
-fwrite(entire_RLFSs_rdna_summary, "RLFS_KT445934_monkey_at_junctn_graphinput.csv", sep = ",")
+fwrite(entire_RLFSs_rdna_summary, "RLFS_KX061890_monkey_at_junctn_graphinput.csv", sep = ",")
 
 entire_RLFSs_rdna_summary$rDNA_region <- factor(entire_RLFSs_rdna_summary$rDNA_region, 
                                                 levels = c("5'ETS", "5'ETS and 18S junction", 
