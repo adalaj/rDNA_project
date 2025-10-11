@@ -40,22 +40,27 @@ Figure 3C and 3D use `G4FS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_ru
 **Input:** Output BED file from `g4_canonical_finder_3.11python.py` (https://github.com/CsabaPapp13/Stable-bulged-G-quadruplexes-in-the-human-genome_2022-2023)
 
 **Output:** Generated fig 3F and 3G for human.
+
 **Purpose:** Visualisation of G4-forming sequences at human rDNA.
 
 ---
 
 
 #### 3. `GC_content_function.R`
-**Input:** Any DNA sequence
+**Input:** Any DNA sequence.
+
 **Output:** Generate GC content for the sequence. 
+
 **Purpose:** To calculate GC content for any DNA sequence. 
 
 ---
 
 
 #### 4. `gc_skew_function.R`
-**Input:** Any DNA sequence
+**Input:** Any DNA sequence.
+
 **Output:** Generates GC skew values for the input DNA sequence.
+
 **Purpose:** Calculates GC skew to assess strand compositional asymmetry.
 
 ---
@@ -149,7 +154,8 @@ Fig 6 and supplementary table 6.
 #### 13. `RIZ_G4s_imotif_correlation.R`
 **Input:** Processed coordinate files for RIZ, G4FS, and iMFS across human rDNA  
 **Output:** CSV and plots showing binned distributions, correlation matrix, Venn overlap, and scatter relationships.
-Refer fig5 and supplementary Table 5
+Refer fig5 and supplementary Table 5.
+
 **Purpose:** Compares positional enrichment and co-occurrence of RIZ, G4FS, and iMFS within the rDNA locus.
 
 ---
