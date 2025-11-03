@@ -207,34 +207,7 @@ fwrite(imotif_entire, "output_entire_imotif_human_modified_default_end_to_end_pr
 
 
 
-##I wanted to do same for mouse, 
-## extended file needs to be removed. Task is pending.
-#i wanted to add RLFS and pG4CS bed files to this session 
-setwd("/Users/jyotiadala/Library/CloudStorage/OneDrive-SUNYUpstateMedicalUniversity/project/bruce_lab/project/rDNA/IGV/mouse")
 
-rlfs<- fread("Mouse_BK000964.3_Modified_Snapgene_qmRLFS.out.bed", sep = "\t", header = FALSE) #68
-pg4cs<- fread("Output_pG4CS_Mouse_BK000964.3_Modified_Snapgene.txt", sep = "\t", header = FALSE) #87
-
-
-
-# i have to add strand colur 
-rlfs <- rlfs %>% mutate(V9 = ifelse(V6 == "+", "65,105,225", "205,50,120"))
-rlfs$V1<- "chrR"
-fwrite(rlfs, "Mouse_BK000964.3_Modified_qmrlfs_extended.bed", sep = "\t")
-#removed header manually
-
-
-pg4cs<- pg4cs %>% mutate(V4= 0) # chnage sequece information to zero.
-pg4cs<- pg4cs %>% select(V1, V2, V3, V5, V4, V6) # change the order as per bed file
-pg4cs<- pg4cs %>% mutate(V7 = V2)
-pg4cs<- pg4cs %>% mutate(V8 =V3)
-pg4cs <- pg4cs %>% mutate(V9 = ifelse(V6 == "+", "65,105,225", "205,50,120"))
-pg4cs<- pg4cs %>% mutate(V10 = 2)
-pg4cs<- pg4cs %>% mutate(V11 = V2)
-pg4cs<-pg4cs %>% mutate(V12 = V3)
-pg4cs$V1<- "chrR"
-fwrite(pg4cs, "output_pG4CS_Mouse_BK000964.3_Modified_extended.bed", sep = "\t")
-#removed header manually
 
 
 
