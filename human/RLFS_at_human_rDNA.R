@@ -187,6 +187,12 @@ fwrite(entire_RLFSs_rdna_summary, "RLFS_KY962518_added_3500nt_IGS_upstream_at_ju
 
 
 #Fig 2C
+RLFSs_rdna_summary<- entire_RLFSs_rdna_summary[!grepl("junction", entire_RLFSs_rdna_summary$rDNA_region),]
+RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region, 
+                                         levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
+                                                        "ITS2","28S", "3'ETS", "IGS" )))
+
+
 max_value<- max(RLFSs_rdna_summary$RLFS_proportion_perc, na.rm = TRUE)
 
 
@@ -216,20 +222,16 @@ RLFS_prop_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
         legend.position = "none")+
   coord_flip()
 
-ggsave("RLFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+ggsave("RLFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.png", 
        plot = RLFS_prop_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
 #Fig 2D
-RLFSs_rdna_summary<- entire_RLFSs_rdna_summary[!grepl("junction", entire_RLFSs_rdna_summary$rDNA_region),]
 
 
 #When you use coord_flip(), the order of the factor levels in rDNA_region determines how the categories are displayed along the flipped y-axis.
 #By default, the first factor level appears at the bottom when flipped, and the last factor level appears at the top.
 
-RLFSs_rdna_summary$rDNA_region <- factor(RLFSs_rdna_summary$rDNA_region, 
-                                         levels = rev(c("Promoter", "5'ETS", "18S", "ITS1", "5.8S", 
-                                                        "ITS2","28S", "3'ETS", "IGS" )))
 
 
 #To reverse the order so that "Promoter" appears at the top when flipped, modify the levels of the factor like this
@@ -265,7 +267,7 @@ RLFS_norm_3500igs_nojuntn<- ggplot(RLFSs_rdna_summary, aes(x= rDNA_region, y = R
 
 
 
-ggsave("Normalized_RLFS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+ggsave("Normalized_RLFS_distribution_in_human_rDNA_subcomponents_after_rule.png", 
        plot = RLFS_norm_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
@@ -355,7 +357,7 @@ rlfs_strandwise_flip<- ggplot(entire_RLFSs_rdna_summary2, aes(x= rDNA_region, y 
         legend.key.size = unit(3, "cm"))+
   coord_flip()
 
-ggsave( "Normalized_strandwise_RLFS_flipped_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+ggsave( "Normalized_strandwise_RLFS_flipped_distribution_in_human_rDNA_subcomponents_AR.png", 
         plot = rlfs_strandwise_flip, width=30,height=18, dpi=600)
 
 

@@ -242,8 +242,8 @@ G4FS_norm_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = G4F
        legend.position = "none")+
   coord_flip()
 
-ggsave( "Normalized_G4FS_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
-        plot = G4FS_norm_3500igs_nojuntn, width=30,height=18, dpi=600)
+ggsave( "Normalized_G4FS_distribution_in_human_rDNA_subcomponents_after_rule.png", 
+        plot = G4FS_norm_3500igs_nojuntn, width=30,height=18, dpi=300)
 
 
 
@@ -275,7 +275,7 @@ G4FS_prop_3500igs_nojuntn<- ggplot(g4s_rdna_summary, aes(x= rDNA_region, y = G4F
         legend.position = "none")+
   coord_flip()
 
-ggsave("G4FS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+ggsave("G4FS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.png", 
        plot = G4FS_prop_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
@@ -360,7 +360,7 @@ G4FS_strandwise_flip<- ggplot(entire_g4s_rdna_summary2, aes(x= rDNA_region, y = 
   coord_flip()
 
 
-ggsave( "Normalized_strandwise_G4FS_flipped_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+ggsave( "Normalized_strandwise_G4FS_flipped_distribution_in_human_rDNA_subcomponents_after_rule.png", 
         plot = G4FS_strandwise_flip, width=31,height=18, dpi=600)
 
 

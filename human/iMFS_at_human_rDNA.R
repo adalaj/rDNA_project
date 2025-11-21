@@ -438,7 +438,7 @@ imotif_norm_3500igs_nojuntn<- ggplot(imotif_rdna_summary, aes(x= rDNA_region, y 
         legend.position = "none")+
   coord_flip()
 
-ggsave("Normalized_imotif_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+ggsave("Normalized_imotif_distribution_in_human_rDNA_subcomponents_after_rule.png", 
        plot = imotif_norm_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
@@ -471,7 +471,7 @@ iMFS_prop_3500igs_nojuntn<- ggplot(imotif_rdna_summary, aes(x= rDNA_region, y = 
         legend.position = "none")+
   coord_flip()
 
-ggsave("iMFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.tiff", 
+ggsave("iMFS_proportion_distribution_in_human_rDNA_subcomponents_after_rule.png", 
        plot = iMFS_prop_3500igs_nojuntn, width=30,height=18, dpi=600)
 
 
@@ -560,7 +560,7 @@ imotif_strandwise<- ggplot(entire_imotif_rdna_summary2, aes(x= rDNA_region, y = 
         legend.key.size = unit(3, "cm"))+
   coord_flip()
 
-ggsave( "Normalized_strandwise_imotif_distribution_in_human_rDNA_subcomponents_AR.tiff", 
+ggsave( "Normalized_strandwise_imotif_distribution_in_human_rDNA_subcomponents_AR.png", 
         plot = imotif_strandwise, width=30,height=18, dpi=600)
 
 
