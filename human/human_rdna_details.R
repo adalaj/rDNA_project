@@ -281,7 +281,7 @@ for (nm in names(datasets)) {
           plot.background  = element_blank(), 
           legend.position = "top") 
  
-  ggsave("rdna_2018_no_igs_AT_vs_GC_sequences_nucleotide_distribution.tiff",
+  ggsave("rdna_2018_no_igs_AT_vs_GC_sequences_nucleotide_distribution.png",
          plot = p_atgc, width = 20, height = 15.5, dpi = 600)
   
   
@@ -325,7 +325,7 @@ for (nm in names(datasets)) {
           plot.background  = element_blank(),
           legend.position = "top") 
   
-  ggsave( "rdna_2018_no_igs_ATGC_only_sequences_nucleotide_distribution.tiff",
+  ggsave( "rdna_2018_no_igs_ATGC_only_sequences_nucleotide_distribution.png",
          plot = p_atgc_only, width = 20, height = 16, dpi = 600)
   
   
@@ -403,7 +403,7 @@ for (nm in names(datasets)) {
       legend.position  = "right"
     )
   
-  ggsave( "entire_rdna_sequences_nucleotide_distribution.tiff",
+  ggsave( "entire_rdna_sequences_nucleotide_distribution.png",
           plot = entire_rdna, width = 12, height = 16, dpi = 600)
   
   
