@@ -197,6 +197,20 @@ Figure 2C and 2D use `RLFS_KY962518_added_3500nt_IGS_upstream_at_junctn_after_ru
 
 ---
 
+#### 17. `pncss_acrocentric_chr_t2t.R`
+**Input:**  Acrocentric chromosome rDNA array sequence in fasta format.
+**Output:** Provide information of PNCSS for acrocentric chromosome rDNA array in bed and bedgraph format. Supplementary figure 2,3,4.
+**Purpose:** To find PNCSS in human rDNA array for all five acrocentric chromosome.
+
+---
+
+#### 17. `DeepER_and_DeepRloopPre.R`
+**Input:** Deep learning based methods DeepER and DeepRloopPre output file for detection of predicted rloops using  in Human rDNA FASTA sequence (GenBank: *KY962518*).
+**Output:**  Supplementary figure 1
+**Purpose:** Generates figure-ready visualizations of output files from deep learning based tools.
+
+---
+
 
 ## Contact
 
