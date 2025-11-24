@@ -36,4 +36,4 @@ The script requires the following R libraries:
 
 ## Contact
 
-For any questions or issues, contact Jyoti Devendra Adala.
+For any questions or issues, contact Jyoti Devendra Adala (adalaj@upstate.edu).
